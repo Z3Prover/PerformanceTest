@@ -1,0 +1,187 @@
+﻿<Window x:Class="PerformanceTest.Management.CompareExperiments"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PerformanceTest.Management"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="440" Width="791" WindowStartupLocation="CenterOwner" Icon="/PerformanceTest.Management;component/Images/taskbrowse.ico">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="inverse" />
+        <local:ResultStatusToStringConverter x:Key="statusToString" />
+    </Window.Resources>
+    <Grid>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="gridOuter">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="250" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="dataGrid" IsReadOnly="True" RowHeight="23" 
+                      AlternatingRowBackground="AliceBlue" GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended"
+                      MouseDoubleClick="dataGrid_MouseDoubleClick"
+                      EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                      ItemsSource="{Binding CompareItems}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Path=Filename, Mode=OneWay}" Header="Filename"/>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.NormalizedRuntime, Mode=OneWay, StringFormat={}{0:F3}}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Runtime1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.NormalizedRuntime, Mode=OneWay, StringFormat={}{0:F3}}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Runtime2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.Status, Mode=OneWay, Converter={StaticResource statusToString}}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Status1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.Status, Mode=OneWay, Converter={StaticResource statusToString}}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Status2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.ExitCode, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Exitcode1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.ExitCode, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Exitcode2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Binding="{Binding Path=Diff, Mode=OneWay, StringFormat={}{0:F3}}" Header="Diff"/>
+
+                    <DataGridTextColumn Binding="{Binding Path=Results1.Sat, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Sat1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.Unsat, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Unsat1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.Unknown, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Unknown1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.Sat, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Sat2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.Unsat, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Unsat2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.Unknown, Mode=OneWay}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.Unknown2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+                <DataGrid.CommandBindings>
+                    <CommandBinding Command="{x:Static local:CompareExperiments.CopyFilenameCommand}" Executed="CopyFilename" CanExecute="canCopyFilename" />
+                </DataGrid.CommandBindings>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="mnuCopyFilename" Header="Copy _filename" Command="{x:Static local:CompareExperiments.CopyFilenameCommand}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+
+            <Grid Name="radioGrid" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                  IsEnabled="{Binding IsFiltering, Converter={StaticResource inverse}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="550" Width="*" />
+                    <ColumnDefinition MinWidth="300" Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <RadioButton Name="radioAll" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" IsChecked="True" VerticalAlignment="Center">All</RadioButton>
+                    <RadioButton Name="radioBOTHSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Both SAT</RadioButton>
+                    <RadioButton Name="radioBOTHUNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Both UNSAT</RadioButton>
+                    <RadioButton Name="radioBOTHUNKNOWN" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Both UNKNOWN</RadioButton>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <Label Content="Either is: " VerticalAlignment="Center" />
+                    <RadioButton Name="radioONESAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">SAT</RadioButton>
+                    <RadioButton Name="radioONEUNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">UNSAT</RadioButton>
+                    <RadioButton Name="radioONEUNKNOWN" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">UNKNOWN</RadioButton>
+                    <RadioButton Name="radioONEBUGS" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">BUG</RadioButton>
+                    <RadioButton Name="radioONEERROR" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">ERROR</RadioButton>
+                    <RadioButton Name="radioONEMemouts" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">MEMORY</RadioButton>
+                    <RadioButton Name="radioONETimeouts" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">TIMEOUT</RadioButton>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <Label Content="Discrepancies: " VerticalAlignment="Center" />
+                    <RadioButton Name="radioSATSTAR" GroupName="Option" Padding="5,0,10,0" Click="RadioButton_Click" VerticalAlignment="Center">SAT/*</RadioButton>
+                    <RadioButton Name="radioUNSATSTAR" GroupName="Option" Padding="5,0,10,0" Click="RadioButton_Click" VerticalAlignment="Center">UNSAT/*</RadioButton>
+                    <RadioButton Name="radioOKSTAR" GroupName="Option" Padding="5,0,10,0" Click="RadioButton_Click" VerticalAlignment="Center">OK/*</RadioButton>
+                    <RadioButton Name="radioSATUNSAT" GroupName="Option" Padding="5,0,10,0" Click="RadioButton_Click" VerticalAlignment="Center">SAT/UNSAT</RadioButton>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Orientation="Horizontal">
+                    <Label Content="Filename contains: " VerticalAlignment="Center" />
+                    <RadioButton Name="radioFNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">"sat"</RadioButton>
+                    <RadioButton Name="radioFNUNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">"unsat"</RadioButton>
+                    <RadioButton Name="radioFNTEXT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Text:</RadioButton>
+                    <TextBox Name="txtFilename" Width="100" Height="20" VerticalAlignment="Center" HorizontalContentAlignment="Left" KeyUp="txtFilename_KeyUp" Text="unknown" />
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical"  Grid.RowSpan="4">
+                    <Label Content="Ignore:"/>
+                    <CheckBox Name="chkIgnoreFNPrefix" Content="Prefix (shared directory)" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePrefix, Mode=TwoWay}"/>
+                    <CheckBox Name="chkIgnoreFNCategory" Content="Category" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnoreCategory, Mode=TwoWay}"/>
+                    <CheckBox Name="chkIgnoreFNPostfix" Content="Postfix (extensions):" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePostfix, Mode=TwoWay}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="10,0,0,0">
+                        <Label Name="lblLeft" Content=""/>
+                        <TextBox Name="txtExtensionLeft" MinWidth="75" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="{Binding Extension1}" IsEnabled="{Binding EnableFirstExtension}" KeyUp="txtExtensionLeft_KeyUp"/>
+                        <Label Name="lblRight" Content=""/>
+                        <TextBox Name="txtExtensionRight" MinWidth="75" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="{Binding Extension2}" IsEnabled="{Binding EnableSecondExtension}" KeyUp="txtExtensionRight_KeyUp"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

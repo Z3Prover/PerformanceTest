@@ -1,0 +1,17 @@
+{
+  "Definition": {
+    "Executable": "referencez3.zip",
+    "DomainName": "Z3",
+    "Parameters": "model_validate=true -smt2 -file:{0}",
+    "BenchmarkContainerUri": "default",
+    "BenchmarkDirectory": "reference",
+    "Category": null,
+    "BenchmarkFileExtension": "smt2",
+    "MemoryLimitMB": 2048.0,
+    "BenchmarkTimeout": "00:20:00",
+    "ExperimentTimeout": "00:00:00",
+    "GroupName": null
+  },
+  "Repetitions": 20,
+  "ReferenceValue": 16.34375
+}

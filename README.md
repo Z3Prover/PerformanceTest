@@ -1,4 +1,3 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/s1cushw54324ngjm?svg=true)](https://ci.appveyor.com/project/dvoits/z3test)
 
 This repository holds test infrastructure and benchmarks used to test Z3. 
 
@@ -17,11 +16,17 @@ This repository holds test infrastructure and benchmarks used to test Z3.
     - [Outputs](#outputs)
     - [Binaries](#binaries)
     - [Summaries](#summaries)
-        - [How to update experiment summary](#how-to-update-experiment-summary)  
     - [Secrets](#secrets)
   - [Server-side components](#server-side-components)
     - [Running performance tests](#running-performance-tests)
+    - [Requeueing benchmarks](#requeueing-benchmarks)
+    - [Nightly Z3 performance tests](#nightly-z3-performance-tests)
+        - [How to schedule nightly runs using Azure Batch Schedule](#how-to-schedule-nightly-runs-using-azure-batch-schedule)
   - [Client applications](#client-applications)
+    - [PerformanceTest.Management](#performancetestmanagement)
+    - [Z3 Nightly Web Application](#z3-nightly-web-application)
+    - [Timeline and records builder](#timeline-and-records-builder)
+    - [Import experiment from an obsolete data formats](#import-experiment-from-an-obsolete-data-formats)
 - [Run and deploy](#run-and-deploy)
 
 # Glossary
@@ -47,9 +52,8 @@ how to analyse and aggregate multiple runs.
   experiments.
   * `NightlyWebApp` is ASP.NET web application that shows history of performance tests runs.
   * `NightlyRunner` is a command line application that submits performance tests when new Z3 nightly build is available on the github.
-  See details [here](#setup-nightly-performance-tests).
-  * `Summary` is a command line application that computes summary and records for specified experiment and then updates corresponding data in the Azure Storage.
-  It is executed automatically for nightly Z3 experiments. See details [here](#how-to-update-experiment-summary).
+  See details [here](#nightly-z3-performance-tests).
+  * `Summary` is a command line application that computes summary and records for specified experiment and then updates corresponding data in the Azure Storage. See details [here](#timeline-and-records-builder).
   * `AzurePerformanceTest` is a .NET class library holding the `AzureExperimentManager` class which exposes API to manage experiments based on Microsoft Azure.
   * `PerformanceTest` is a .NET class library containing abstract types for experiments management.
   * `Measurement` is a .NET class library allowing to measure process run time and memory usage.
@@ -76,14 +80,16 @@ If you don't have Visual Studio 2015, you can install the free [Visual Studio 20
 
 ## How to build
 
+Use Visual Studio or msbuild to build solutions `PerformanceTests.sln` and `ImportData.sln`.
 
-
+Also there are helpful PowerShell scripts that build and deploy certain projects; 
+see [Deployment scripts](#deployment-scripts).
 
 # Architecture
 
 The performance test infrastructure has Microsoft Azure-based client-server architecture which consists of following components:
 
-1. Storage is based on Azure Storage Account and Key Vault and keeps following data:
+1. [Storage](#storage) is based on Azure Storage Account and Key Vault and keeps following data:
     * Configuration and system files.
     * Table of completed and running experiments.
     * Results for each of the experiments.
@@ -92,12 +98,14 @@ The performance test infrastructure has Microsoft Azure-based client-server arch
     * Benchmark files.
     * Secrets.
 
-2. Server-side components use storage to prepare and run experiments, save results and build summary. 
+2. [Server-side components](#server-side-components) 
+use storage to prepare and run experiments, save results and build summary. 
 These components run on Azure Batch and include:
-    * [AzureWorker](#) runs an experiment and saves results.
-    * [NightlyRunner](#) checks if there is new Z3 nightly build available and schedules an experiment for it.
+    * *AzureWorker* runs an experiment and saves results.
+    * *NightlyRunner* checks if there is new Z3 nightly build available and schedules an experiment for it.
 
-3. Client applications allow a user to manage experiments and analyze results. Two main applications are:
+3. [Client applications](#client-applications)
+allow a user to manage experiments and analyze results. Two main applications are:
     * Windows application *PerformanceTest.Management* shows a list of experiments and results for each of the experiments,
     compares two experiments and exposes set of features to manage experiments.
     * Web application *NightlyWebApp* is intended to show history of experiments for Z3 nightly builds and perform statistical analysis of results.
@@ -284,18 +292,7 @@ Such a blob is created on-demand when `AzureSummaryManager.GetStatusSummary()` m
 
 The Nightly web application uses the summaries to analyze experiments results.
 
-#### How to update experiment summary
-
-The .NET application `/src/Summary` allows to compute summary and records for an experiment and then either append or replace
-corresponding row in a given summary blob. If the given experiment is missing, the program fails.
-
-Settings for the program should be edited in the `Summary.exe.config` file.
-
-For example, following command updates or adds summary for the experiment 100 in a blob `Z3Nightly.zip` of the container `summary`:
-
-```
-> Summary.exe 100 Z3Nightly
-```
+[Timeline and records builder](#timeline-and-records-builder) allows to update summaries using the experiment results.
 
 
 ### Secrets
@@ -330,7 +327,7 @@ DefaultEndpointsProtocol=https; AccountName=<<storageAccountName>>; AccountKey=<
 
 Performance tests run using Azure Batch. One experiment corresponds to one Azure Batch job.
 
-Job ID is `{storageName}_exp{id}`, where `{storage}` is the storage account name and `{id}` is the experiment id.
+Job ID is `{storage}_exp{id}`, where `{storage}` is the storage account name and `{id}` is the experiment id.
 Such naming rule allows same batch account to be shared between multiple storage accounts eliminating duplicate job 
 identifiers.
 
@@ -338,7 +335,7 @@ The experiment definition must be already added to the [experiments table](#tabl
 
 When created, the job has only job preparation and job manager tasks defined.
 First, **job preparation tasks** start on each of the selected batch pool machines and copy required files to 
-that machine. These include the `configuration` blob container files (AzureWorker.exe with supporting files,
+that machine. These include the [configuration](#configuration) files (AzureWorker.exe with supporting files,
 reference experiment definition).
 
 The **job manager** task runs `AzureWorker.exe --manage-tasks` which starts enumerating the input benchmarks and produces series of performance tests tasks, one task per experiment benchmark. 
@@ -353,6 +350,9 @@ So it doesn't create new performance tests tasks for benchmarks that are either
 in the experiment results table (if it is already existing) or associated with the already
 created performance tests tasks.
 
+For [nightly Z3 performance tests](#nightly-z3-performance-tests), the job manager makes additional steps when all benchmarks are tested:
+1. Extends the [timeline and records](#summaries) to account the experiment results.
+2. If needed, sends the report to e-mails listed in the AzureWorker.exe.config.
 
 
 The **performance test task** runs `AzureWorker.exe --measure` which does the following:
@@ -371,22 +371,29 @@ in the experiment definition, the test can run multiple times and the results ar
 
 4. Measurements are then queued to the Azure Storage queue.
 
-If the test task fails up to 5 times, it restarts and runs the test again. 
+If the test task fails, it restarts and runs the test again up to 5 times. 
 If it still fails after that, the job manager will find that and set an infrastructure error as a result for the 
  benchmark associated with the failed test task.
 
+![Running performance tests using Azure Batch](https://raw.githubusercontent.com/Z3Prover/PerformanceTest/gh-pages/Z3perftest-architecture.png)
+
 To submit new experiment from code, use `AzurePerformanceTest.AzureExperimentManager.StartExperiment()` method.
 
+### Requeueing benchmarks
 
-## Client applications
+When an experiment is complete, it is possible to run tests again for selected benchmarks of that experiment.
+Existing results for those benchmarks remain in the experiment results table 
+so there will appear duplicates when the tests complete.
 
+In the `temp` container, a new blob is created containing list of requeued benchmarks. 
 
+If the Batch job for the experiment exists, it is removed and new job is created with same name.
+The job manager task for the new job is `AzureWorker.exe --manage-retry`.
+The algorithm is same as when running new experiment but the difference here is that it runs tests for the given benchmarks though they are in the results table.
 
-# Run and deploy
+To resubmit some benchmarks of an existing experiment from code, use `AzurePerformanceTest.AzureExperimentManager.RestartBenchmarks()` method.
 
-## Update Azure Batch worker
-
-## Setup Nightly performance tests
+### Nightly Z3 performance tests
 
 The .NET application `/src/NightlyRunner` allows to submit performance tests for the latest nightly build of Z3. 
 It does the following:
@@ -397,14 +404,14 @@ If there are multiple files found, takes commit sha from the file names and look
 3. If the most recent build differs from the last experiment executable, does the following:
   
     1. Uploads new x86 z3 binary package to the blob container `bin` and sets its metadata attribute to the original file name of the package.
-    2. Submits new performance experiment.
+    2. Submits [new performance experiment](#running-performance-tests).
 
-When the experiment completes, it updates the summary table name in accordance with value of the
-parameter `SummaryName` in `NightlyRunner` configuration file (default name is `z3nightly`).
+When all benchmarks of the experiment complete, the [summary](#summaries) determined by the
+parameter `SummaryName` in `NightlyRunner` configuration file (default name is `Z3Nightly`) is updated.
 
 Note that if afterwards you manually change the experiment results (for example, resolve duplicates using UI application), 
 you will need to manually update the summary using `Summary.exe` utility 
-(see [How to update experiment summary](#how-to-update-experiment-summary)).
+(see [Timeline and records builder](#timeline-and-records-builder)).
 
 
 ### How to schedule nightly runs using Azure Batch Schedule
@@ -437,7 +444,6 @@ required to enable access to the Azure Key Vault.
 1. Schedule execution of the application. Open PowerShell and use the following commands to create new schedule:
 
 ```powershell
-
 Login-AzureRmAccount
 
 $NightlyApp = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSApplicationPackageReference"
@@ -462,4 +468,96 @@ $Schedule.RecurrenceInterval = [TimeSpan]::FromDays(1)
 $BatchContext = Get-AzureRmBatchAccountKeys 
 New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpecification $JobSpecification -BatchContext $BatchContext
 ```
+
+
+
+## Client applications
+
+### PerformanceTest.Management
+
+Windows application PerformanceTest.Management shows a list of experiments and results for each of the experiments, compares two experiments and exposes set of features to manage experiments.
+
+It also allows to resolve duplicated benchmarks in experiment results, resubmit experiments, requeue some benchmarks of a completed
+experiment.
+
+### Z3 Nightly Web Application
+
+Web application NightlyWebApp is intended to show history of experiments for Z3 nightly builds and perform statistical analysis of results.
+
+The web application uses the Azure Key Vault to access storage account. The machine running the web application must have 
+the appropriate certificate installed.
+
+The web application can be configured using Web.config file. In Visual Studio, you can open Settings window for the project to change the 
+configuration. 
+
+The `SummaryName` property determines which timeline and records are downloaded from the `summary` blob container.
+Default is `Z3Nightly`. Then the application filters only those experiments of the `experiments` table that
+are listed in the timeline.
+
+
+### Timeline and records builder
+
+The .NET application `/src/Summary` allows to compute timeline entry and records for an experiment and then either append or replace
+corresponding row in a given [summary blob](#summaries). If the given experiment is missing, the program fails.
+
+Settings for the program should be edited in the `Summary.exe.config` file.
+
+For example, following command updates or adds summary for the experiment 100 in a blob `Z3Nightly.zip` of the container `summary`:
+
+```
+> Summary.exe 100 Z3Nightly
+```
+
+### Import experiment from an obsolete data formats
+
+The `ImportTimelime.exe` command line application allows to import experiment list and results from 
+local files collected when the performance tests were running on HPC.
+
+1. Uploads experiment results to the `results` blob container.
+2. Updates the experiments table so it contains the imported experiments definitions using same IDs.
+Note that it silently replaces the existing experiments with same ID in the target storage account.
+3. Updates timeline and records of `Z3Nightly.zip` in the `summary` blob container. 
+
+# Run and deploy
+
+## Deployment scripts
+
+For the sake of convenience, a number of powershell scripts is situated in `/deployment` folder, that allow to streamline deployment processes. Most notable of those are:
+
+1. `Deploy-Everything.ps1` - builds and deploys all the entities required to run performance tests of z3 in Azure. These include:
+    * Resource group that contains everything else (if a resource group with the given name exists already, it will be used instead of creating a new one).
+    * Storage account (if a storage account with the given name exists already, it will be used instead of creating a new one).
+    * Batch account (if a batch account with the given name exists already, it will be used instead of creating a new one).
+    * Key vault where keys to storage and batch are securely kept (if a key vault with the given name exists already, it will be used instead of creating a new one).
+    * Nightly web application  (if a web application with the given name exists already, it will be updated instead of creating a new one).
+    * Reference experiment settings and data (if provided).
+    * Azure worker - application that measures performance in azure batch.
+    * Nightly runner - application that starts nightly performance tests. Is scheduled to run in batch every 24 hours.
+    * Azure Active Directory (AAD) application - an entity required to authenticate azure worker, nightly web app, and nightly runner in azure (if an AAD application with the given name exists already, you will be prompted to use it or create a new one).
+    * A self-signed certificate as credentials for AAD application.
+
+    You should also use this script to update the certificate credentials for AAD application.
+
+2. `Deploy-ReferenceExperiment.ps1` - deploys reference experiment.
+3. `Update-AzureWorker.ps1` - builds and updates Azure worker in an existing deployment. AzureWorker.exe.config file is not updated so, that configuration is preserved.
+4. `Update-NightlyRunner.ps1` - builds and updates Nightly runner in an existing deployment. NightlyRunner.exe.config file is not updated so, that configuration is preserved.
+5. `Update-NightlyWebApp.ps1` - builds and updates Nightly web app in an existing deployment. Web.config file is not updated so, that configuration is preserved.
+
+Other scripts located there are:
+* `Build-AzureWorker.ps1` - builds AzureWorker.
+* `Build-NightlyRunner.ps1` - builds Nightly runner.
+* `Build-NightlyWebApp.ps1` - builds Nightly web app.
+* `Deploy-AADApp.ps1` - creates a new Azure Active Directory application with certificate credentials. If AAD application with given name exists already, prompts user to either add a certificate credentials to existing application or create a new one.
+* `Deploy-AzureWorker.ps1` - builds, configures, and deploys AzureWorker.
+* `Deploy-Batch.ps1` - retrieves azure batch account with given name. If it doesn't exist, creates a new one. Associates a storage account with it. Adds a provided certificate to the batch account and all of its pools. If batch account has no pools, a new one is created.
+* `Deploy-KeyVault.ps1` - retrieves azure key vault with given name. If it doesn't exist, creates a new one. Puts there a connection string to z3 performance testing environment and gives an AAD app permission to access it.
+* `Deploy-NightlyRunner.ps1` - builds, configures, and deploys Nightly runner. Schedules nightly test runs.
+* `Deploy-ResourceGroup.ps1` - retrieves azure resource group with given name. If it doesn't exist, creates a new one.
+* `Deploy-Storage.ps1` - retrieves azure storage with given name. If it doesn't exist, creates a new one.
+* `Deploy-WebApp.ps1` - builds, configures, and deploys Nightly web app.
+* `New-AADApp.ps1` - creates a new Azure Active Directory application with certificate credentials.
+* `New-Cert.ps1` - creates a new self-signed certificate, which can be used in z3 performance testing environment.
+
+To use these scripts, open powershell console in the `/deployment` folder and log into Azure using `Login-AzureRmAccount` cmdlet. All scripts have complete built-in reference information, parameter specifications included, accessible via `Get-Help` cmdlet.
+
 

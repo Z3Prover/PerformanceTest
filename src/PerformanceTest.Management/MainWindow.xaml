@@ -1,0 +1,172 @@
+﻿<Window x:Class="PerformanceTest.Management.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PerformanceTest.Management"
+        mc:Ignorable="d"
+        Title="Performance Tests Management" 
+        Height="511" Width="900" MinHeight="600" MinWidth="650"
+        ResizeMode="CanResizeWithGrip"
+        Icon="/PerformanceTest.Management;component/Images/servers.ico"
+        Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <local:ExecutionStatusToStringConverter x:Key="executionStatus" />
+    </Window.Resources>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="gridOuter" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="80" />
+            <RowDefinition Height="*" MinHeight="100"/>
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="17*" />
+            <ColumnDefinition Width="691*"/>
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.ColumnSpan="2"  IsMainMenu="True" Name="mnuMain">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New..." Name="menuNewJob" IsEnabled="False" Click="btnNewJob_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Images/NewFile_6276_24.bmp" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_New catch-all... " Name="menuNewCatchAll" IsEnabled="False"/>
+                <MenuItem Header="Purge orphaned binaries" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="MenuItemExit_Click"/>
+            </MenuItem>
+            <MenuItem Header="Options" Name="mnuOptions">
+                <MenuItem Header="Show progress" Name="mnuOptProgress" IsCheckable="True" Checked="OptShowProgress_Checked" Unchecked="OptShowProgress_Unchecked"/>
+                <MenuItem Header="Auto-resolve timeout dupes" Name="mnuOptResolveTimeoutDupes" IsCheckable="True" />
+                <MenuItem Header="Auto-resolve same-time dupes" Name="mnuOptResolveSameTimeDupes" IsCheckable="True" />
+                <MenuItem Header="Auto-resolve slowest dupes" Name="mnuOptResolveSlowestDupes" IsCheckable="True" />
+                <MenuItem Header="Auto-resolve in. errors dupes" Name="mnuOptResolveInErrorsDupes" IsCheckable="True"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="60" Margin="10,10,10,10" Name="grid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120" MinWidth="120" />
+                <ColumnDefinition MinWidth="100" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Connection string:" HorizontalAlignment="Left" Name="label5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"/>
+            <TextBox HorizontalAlignment="Stretch" Name="connectionString" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" TabIndex="0"/>
+            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+                <Button Content="Connect" HorizontalAlignment="Right" Name="btnConnect"  Click="btnConnect_Click" Margin="5,0,0,0"
+                    VerticalAlignment="Center" Width="75" TabIndex="5" />
+                <Button Content="Edit..." HorizontalAlignment="Right" Name="btnEdit"  Click="btnEdit_Click" Margin="5,0,0,0"
+                    VerticalAlignment="Center" Width="75" Grid.Row="0" Grid.Column="4" TabIndex="6" />
+            </StackPanel>
+
+            <Label Content="Operations:" HorizontalAlignment="Left" Name="label4" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"/>
+            <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Button Content="Update List" Margin="0,0,50,0" Height="23" HorizontalAlignment="Left" Name="btnUpdate" VerticalAlignment="Center" IsEnabled="false" Padding="5,0,5,0" TabIndex="7" Click="btnUpdate_Click" />
+                <Button Content="New Experiment" Margin="0,0,50,0" Height="23" HorizontalAlignment="Left" Name="btnNewJob" VerticalAlignment="Center" Padding="5,0,5,0" IsEnabled="false"  TabIndex="8" Click="btnNewJob_Click" />
+                <Label Content="Filter:" Margin="0,0,10,0" Height="23" HorizontalAlignment="Stretch"/>
+                <TextBox MinWidth="240" x:Name="txtFilter" HorizontalAlignment="Stretch" VerticalAlignment="Center" TabIndex="9" 
+                         Text="{Binding FilterKeyword, Mode=TwoWay}" KeyUp="txtFilter_KeyUp"
+                         Height="18" Margin="0,10,0,5.333" />
+                <CheckBox Content="My experiments" Margin="15,7,10,0" Height="18" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="myExpFilter" IsChecked="{Binding IsMyExperiments}"></CheckBox>
+            </StackPanel>
+
+        </Grid>
+
+        <TabControl Grid.Row="2" Grid.Column="0" TabStripPlacement="Bottom" Grid.ColumnSpan="2">
+            <TabItem Header="Experiments" >
+                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Name="dataGrid" IsReadOnly="False" 
+                          GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended" AlternatingRowBackground="AliceBlue" 
+                          ItemsSource="{Binding Items}" MouseDoubleClick="dataGrid_MouseDoubleClick" 
+                          EnableRowVirtualization="True" EnableColumnVirtualization="True" >
+                    <DataGrid.Resources>
+                        <DataTemplate x:Key="ProgressTemplate" >
+                            <ProgressBar Minimum="0" Maximum="{Binding BenchmarksTotal, Mode=OneWay}" Value="{Binding BenchmarksDone, Mode=OneWay}" Width="75" Height="15" IsEnabled="True" />
+                        </DataTemplate>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Path=ID, Mode=OneWay}" Header="ID" />
+                        <DataGridTextColumn Binding="{Binding Path=Submitted, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Header="Submitted"/>
+                        <DataGridTextColumn Binding="{Binding Path=Category, Mode=OneWay}" Header="Category" />
+                        <DataGridTextColumn Binding="{Binding Path=Creator, Mode=OneWay}" Header="Creator" />
+                        <DataGridTextColumn Binding="{Binding Path=Note, Mode=OneWay}" Header="Note" />
+                        <DataGridTextColumn Binding="{Binding Path=AdaptiveRun, Mode=OneWay}" Header="Adaptive Run" />
+                        <DataGridCheckBoxColumn Binding="{Binding Path=Flag, UpdateSourceTrigger=PropertyChanged}" Header="Flag" IsThreeState="False" />
+                        <DataGridTextColumn Binding="{Binding Path=WorkerInformation, Mode=OneWay}" Header="Machine" />
+                        <DataGridTemplateColumn Header="Progress" CellTemplate="{StaticResource ProgressTemplate}" Visibility="Hidden"/>
+                        <DataGridTextColumn Binding="{Binding Path=BenchmarksDone, Mode=OneWay}" Header="Done" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
+                        <DataGridTextColumn Binding="{Binding Path=BenchmarksQueued, Mode=OneWay}" Header="Queued" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
+                        <DataGridTextColumn Binding="{Binding Path=BenchmarksTotal, Mode=OneWay}" Header="Total" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
+                        <DataGridTextColumn Binding="{Binding Path=JobStatus, Mode=OneWay, Converter={StaticResource executionStatus}, ConverterParameter={}}" Header="Job Status" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
+                    </DataGrid.Columns>
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Delete" Executed="deleteExperiment" CanExecute="canDeleteExperiment" />
+                        <CommandBinding Command="{x:Static local:MainWindow.CompareCommand}" Executed="Compare" CanExecute="canCompare" />
+                        <CommandBinding Command="{x:Static local:MainWindow.ScatterplotCommand}" Executed="showScatterplot" CanExecute="canShowScatterplot" />
+                        <CommandBinding Command="SaveAs" Executed="saveCSV" CanExecute="canSaveCSV" />
+                        <CommandBinding Command="{x:Static local:MainWindow.CopyCommand}" Executed="Copy" CanExecute="canCopy" />
+                        <CommandBinding Command="{x:Static local:MainWindow.MoveCommand}" Executed="Move" CanExecute="canMove" />
+                        <CommandBinding Command="{x:Static local:MainWindow.CreateGroupCommand}" Executed="CreateGroup" CanExecute="canCreateGroup" />
+                        <CommandBinding Command="{x:Static local:MainWindow.SaveBinaryCommand}" Executed="saveBinary" CanExecute="canSaveBinary" />
+                        <CommandBinding Command="{x:Static local:MainWindow.ReinforcementsCommand}" Executed="showReinforcements" CanExecute="canShowReinforcements" />
+                        <CommandBinding Command="{x:Static local:MainWindow.RequeueIErrorsCommand}" Executed="requeueIErrors" CanExecute="canRequeueIErrors" />
+                        <CommandBinding Command="{x:Static local:MainWindow.RestartCommand}" Executed="Restart" CanExecute="canRestartCommand" />
+                        <CommandBinding Command="{x:Static local:MainWindow.RecoveryCommand}" Executed="recovery" CanExecute="canRecovery" />
+                        <CommandBinding Command="{x:Static local:MainWindow.DuplicatesCommand}" Executed="showDuplicates" CanExecute="canShowDuplicates" />
+                        <CommandBinding Command="{x:Static local:MainWindow.FlagCommand}" Executed="toggleFlag" CanExecute="canToggleFlag" />
+                        <CommandBinding Command="{x:Static local:MainWindow.TallyCommand}" Executed="showTally" CanExecute="canShowTally" />
+                        <CommandBinding Command="{x:Static local:MainWindow.SaveMetaCSVCommand}" Executed="saveMetaCSV" CanExecute="canSaveMetaCSV" />
+                        <CommandBinding Command="{x:Static local:MainWindow.SaveMatrixCommand}" Executed="saveMatrix" CanExecute="canSaveMatrix" />
+                        <CommandBinding Command="{x:Static local:MainWindow.SaveOutputCommand}" Executed="saveOutput" CanExecute="canSaveOutput" />
+                        <CommandBinding Command="Properties" Executed="showProperties" CanExecute="canShowProperties" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.InputBindings>
+                        <KeyBinding Command="{x:Static local:MainWindow.FlagCommand}" Modifiers="Ctrl" Key="T" />
+                    </DataGrid.InputBindings>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Name="mnuDelete" Command="Delete" />
+                            <MenuItem Name="mnuCompare" Header="_Compare" Command="{x:Static local:MainWindow.CompareCommand}" />
+                            <MenuItem Name="mnuScatterplot" Header="_Scatterplot" Command="{x:Static local:MainWindow.ScatterplotCommand}" />
+                            <MenuItem IsEnabled="False" Name="mnuCopy" Header="Copy _to..." Command="{x:Static local:MainWindow.CopyCommand}" />
+                            <MenuItem IsEnabled="False" Name="mnuMove" Header="_Move to..." Command="{x:Static local:MainWindow.MoveCommand}" />
+                            <MenuItem IsEnabled="False" Name="mnuReinforcements" Header="Call _reinforcements..." Command="{x:Static local:MainWindow.ReinforcementsCommand}" />
+                            <MenuItem Name="mnuRequeueIE" Header="Requeue in. errors..." Command="{x:Static local:MainWindow.RequeueIErrorsCommand}" />
+                            <MenuItem Name="mnuRestart" Header="Resubmit" Command="{x:Static local:MainWindow.RestartCommand}" />
+                            <MenuItem IsEnabled="False" Name="mnuRecovery" Header="Start recovery..." Command="{x:Static local:MainWindow.RecoveryCommand}" />
+                            <MenuItem Name="mnuDuplicates" Header="Resolve _duplicates..." Command="{x:Static local:MainWindow.DuplicatesCommand}" />
+                            <MenuItem Name="mnuFlag" Header="Toggle _flag" Command="{x:Static local:MainWindow.FlagCommand}" InputGestureText="Ctrl-T" />
+                            <MenuItem Name="mnuTally" Header="Ta_lly" Command="{x:Static local:MainWindow.TallyCommand}" />
+                            <MenuItem Name="mnuSave" Header="Save...">
+                                <MenuItem Name="mnuSaveBinary" Header="_Binary to..." Command="{x:Static local:MainWindow.SaveBinaryCommand}" />
+                                <MenuItem Name="mnuSaveAs" Header="CS_V..." Command="SaveAs"/>
+                                <MenuItem Name="mnuSaveMetaCSV" Header="_Meta CSV..." Command="{x:Static local:MainWindow.SaveMetaCSVCommand}"/>
+                                <MenuItem Name="mnuSaveMatrix" Header="Matri_x..." Command="{x:Static local:MainWindow.SaveMatrixCommand}"/>
+                                <MenuItem Name="mnuSaveOutput" Header="_Output..." Command="{x:Static local:MainWindow.SaveOutputCommand}"/>
+                            </MenuItem>
+                            <MenuItem Name="mnuProperties" Command="Properties" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </DataGrid.CellStyle>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+
+        <StatusBar Height="25" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="0" Name="statusBar" VerticalAlignment="Bottom" Grid.ColumnSpan="2">
+            <StatusBarItem Content="{Binding Status}" HorizontalAlignment="Stretch" />
+        </StatusBar>
+    </Grid>
+</Window>

@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AzureWorker.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://z3perftest.vault.azure.net</Value>
+    </Setting>
+    <Setting Name="AADApplicationId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">04fc29f8-a2c2-4242-bc17-18c35730a50d</Value>
+    </Setting>
+    <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">510E3EB7B2172ACEEF3D297A2305D278F546F443</Value>
+    </Setting>
+    <Setting Name="ConnectionStringSecretId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">z3PerfConnectionString</Value>
+    </Setting>
+    <Setting Name="LinkPage" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://z3nightlywebapp.azurewebsites.net/</Value>
+    </Setting>
+    <Setting Name="ReportRecipients" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

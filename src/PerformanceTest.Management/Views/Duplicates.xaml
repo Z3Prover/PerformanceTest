@@ -1,0 +1,25 @@
+﻿<Window x:Class="PerformanceTest.Management.Duplicates"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PerformanceTest.Management"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="240" Width="1200"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Double click entry to keep; the others are discarded." Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+
+        <DataGrid Grid.Column="1" Grid.Row="1" AutoGenerateColumns="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" 
+                  IsReadOnly="True" RowHeight="23" SelectionUnit="FullRow" SelectionMode="Extended" GridLinesVisibility="None" AlternatingRowBackground="AliceBlue"
+                  Name="dataGrid" ItemsSource="{Binding Duplicates}" MouseDoubleClick="dataGrid_MouseDoubleClick" />
+    </Grid>
+</Window>

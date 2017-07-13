@@ -1,0 +1,75 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NightlyRunner.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Creator" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Nightly</Value>
+    </Setting>
+    <Setting Name="BenchmarkDirectory" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BenchmarkCategory" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">smtlib-latest</Value>
+    </Setting>
+    <Setting Name="BenchmarkFileExtension" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">smt2|smt</Value>
+    </Setting>
+    <Setting Name="Parameters" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">model_validate=true -smt2 -file:{0}</Value>
+    </Setting>
+    <Setting Name="Domain" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Z3</Value>
+    </Setting>
+    <Setting Name="BenchmarkTimeoutSeconds" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">1200</Value>
+    </Setting>
+    <Setting Name="ExperimentTimeoutSeconds" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MemoryLimitMegabytes" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">2048</Value>
+    </Setting>
+    <Setting Name="GitHubOwner" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Z3Prover</Value>
+    </Setting>
+    <Setting Name="GitHubBinariesRepository" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">bin</Value>
+    </Setting>
+    <Setting Name="GitHubZ3Repository" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">z3</Value>
+    </Setting>
+    <Setting Name="GitHubBinariesNightlyFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">nightly</Value>
+    </Setting>
+    <Setting Name="RegexExecutableFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">^z3-(\d+\.\d+\.\d+).([\d\w]+)-x86-win.zip$</Value>
+    </Setting>
+    <Setting Name="RegexExecutableFileName_CommitGroup" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AzureBatchPoolId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">testPool</Value>
+    </Setting>
+    <Setting Name="ExperimentNote" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Nightly run</Value>
+    </Setting>
+    <Setting Name="ConnectionStringSecretId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">z3PerfConnectionString</Value>
+    </Setting>
+    <Setting Name="AADApplicationId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">04fc29f8-a2c2-4242-bc17-18c35730a50d</Value>
+    </Setting>
+    <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">510E3EB7B2172ACEEF3D297A2305D278F546F443</Value>
+    </Setting>
+    <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://z3perftest.vault.azure.net</Value>
+    </Setting>
+    <Setting Name="SummaryName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Z3Nightly</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

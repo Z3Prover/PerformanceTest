@@ -1,0 +1,127 @@
+﻿<Window x:Class="PerformanceTest.Management.ShowResults"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PerformanceTest.Management"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="518" Width="877" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="inverseBool" />
+        <local:ResultStatusToStringConverter x:Key="statusToString" />
+    </Window.Resources>
+    <Grid>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="gridOuter">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="250" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="grid" Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="200" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="Shared Directory: " Grid.Row="0" Grid.Column="0"/>
+                    <TextBox Name="txtSharedDir" IsReadOnly="True" Grid.Row="0" Grid.Column="1" Text="{Binding Directory, Mode=OneWay}"/>
+                </Grid>
+
+                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Margin="0,0,0,0" Name="dataGrid" Grid.Row="1" Grid.Column="0" IsReadOnly="True" RowHeight="23" SelectionUnit="FullRow" 
+                          SelectionMode="Extended" GridLinesVisibility="None" AlternatingRowBackground="AliceBlue" 
+                          EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                          ItemsSource="{Binding Results}" MouseDoubleClick="dataGrid_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Path=Filename, Mode=OneWay}" Header="Filename" Width="SizeToCells"/>
+                        <DataGridTextColumn Binding="{Binding Path=ExitCode, Mode=OneWay}" Header="Exitcode" />
+                        <DataGridTextColumn Binding="{Binding Path=Status, Mode=OneWay, Converter={StaticResource statusToString}}" Header="Status"/>
+                        <DataGridTextColumn Binding="{Binding Path=Sat, Mode=OneWay}" Header="SAT" />
+                        <DataGridTextColumn Binding="{Binding Path=Unsat, Mode=OneWay}" Header="UNSAT"/>
+                        <DataGridTextColumn Binding="{Binding Path=Unknown, Mode=OneWay}" Header="UNKNOWN" />
+                        <DataGridTextColumn Binding="{Binding Path=NormalizedRuntime, Mode=OneWay, StringFormat={}{0:F3}}" Header="Normalized Runtime"/>
+                        <DataGridTextColumn Binding="{Binding Path=MemorySizeMB, Mode=OneWay, StringFormat={}{0:F2}}" Header="Memory size (MB)" />
+                        <DataGridTextColumn Binding="{Binding Path=TotalProcessorTime, Mode=OneWay, StringFormat={}{0:F3}}" Header="Total processor time"/>
+                        <DataGridTextColumn Binding="{Binding Path=WallClockTime, Mode=OneWay, StringFormat={}{0:F3}}" Header="Wall clock time"/>
+                    </DataGrid.Columns>
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="{x:Static local:ShowResults.ReclassifyOKCommand}" Executed="ReclassifyOK" CanExecute="canReclassify" />
+                        <CommandBinding Command="{x:Static local:ShowResults.ReclassifyBugCommand}" Executed="ReclassifyBug" CanExecute="canReclassify" />
+                        <CommandBinding Command="{x:Static local:ShowResults.ReclassifyErrorCommand}" Executed="ReclassifyError" CanExecute="canReclassify" />
+                        <CommandBinding Command="{x:Static local:ShowResults.ReclassifyTimeoutCommand}" Executed="ReclassifyTimeout" CanExecute="canReclassify" />
+                        <CommandBinding Command="{x:Static local:ShowResults.ReclassifyMemoutCommand}" Executed="ReclassifyMemout" CanExecute="canReclassify" />
+                        <CommandBinding Command="{x:Static local:ShowResults.RequeueCommand}" Executed="Requeue" CanExecute="canRequeue" />
+                        <CommandBinding Command="{x:Static local:ShowResults.CopyFilenameCommand}" Executed="CopyFilename" CanExecute="canCopyFilename" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Name="mnuReclassify" Header="_Reclassify">
+                                <MenuItem Name="mnuReclassifyOK" Header="_Success" Command="{x:Static local:ShowResults.ReclassifyOKCommand}" />
+                                <MenuItem Name="mnuReclassifyBug" Header="_Bug" Command="{x:Static local:ShowResults.ReclassifyBugCommand}" />
+                                <MenuItem Name="mnuReclassifyError" Header="_Error" Command="{x:Static local:ShowResults.ReclassifyErrorCommand}" />
+                                <MenuItem Name="mnuReclassifyTimeout" Header="_Timeout" Command="{x:Static local:ShowResults.ReclassifyTimeoutCommand}" />
+                                <MenuItem Name="mnuReclassifyMemout" Header="_OutOfMemory" Command="{x:Static local:ShowResults.ReclassifyMemoutCommand}" />
+                            </MenuItem>
+                            <MenuItem Name="mnuRequeue" Header="Re_queue" Command="{x:Static local:ShowResults.RequeueCommand}" />
+                            <MenuItem Name="mnuCopyFilename" Header="Copy _filename" Command="{x:Static local:ShowResults.CopyFilenameCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+
+                <Grid Name="radioGrid" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" IsEnabled="{Binding IsFiltering, Converter={StaticResource inverseBool}}">
+                        <RadioButton Name="radioAll" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" IsChecked="True" VerticalAlignment="Center">All</RadioButton>
+                        <RadioButton Name="radioSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">SAT</RadioButton>
+                        <RadioButton Name="radioUNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">UNSAT</RadioButton>
+                        <RadioButton Name="radioUNKNOWN" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">UNKNOWN</RadioButton>
+                        <RadioButton Name="radioBUGS" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">BUG</RadioButton>
+                        <RadioButton Name="radioERROR" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">ERROR</RadioButton>
+                        <RadioButton Name="radioMemouts" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">MEMORY</RadioButton>
+                        <RadioButton Name="radioTimeouts" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">TIMEOUT</RadioButton>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" IsEnabled="{Binding IsFiltering, Converter={StaticResource inverseBool}}">
+                        <RadioButton Name="radioOver" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Overperformed</RadioButton>
+                        <RadioButton Name="radioUnder" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Underperformed</RadioButton>
+                        <RadioButton Name="radioMoreThan" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">More than:</RadioButton>
+                        <TextBox Name="txtSeconds" Width="50" Height="20" VerticalAlignment="Center" HorizontalContentAlignment="Right"  KeyUp="txtSeconds_KeyUp" Text="100" />
+                        <Label Content="sec" VerticalAlignment="Center" />
+                        <RadioButton Name="radioOutputContains" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Output contains:</RadioButton>
+                        <TextBox Name="txtOutputMatch" Width="194" Height="20" VerticalAlignment="Center" HorizontalContentAlignment="Left" KeyUp="txtOutputMatch_KeyUp" Text="text" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" IsEnabled="{Binding IsFiltering, Converter={StaticResource inverseBool}}">
+                        <Label Content="Filename contains: " VerticalAlignment="Center" />
+                        <RadioButton Name="radioFNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">"sat"</RadioButton>
+                        <RadioButton Name="radioFNUNSAT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">"unsat"</RadioButton>
+                        <RadioButton Name="radioFNTEXT" GroupName="Option" Padding="5,0,5,0" Click="RadioButton_Click" VerticalAlignment="Center">Text:</RadioButton>
+                        <TextBox Name="txtFilename" Width="100" Height="20" VerticalAlignment="Center" HorizontalContentAlignment="Left" KeyUp="txtFilename_KeyUp" Text="unknown" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
