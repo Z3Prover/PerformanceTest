@@ -291,9 +291,12 @@ namespace AzurePerformanceTest
                         AutoScaleFormula = p.AutoScaleFormula
                     }).ToArray();
 
+                    ODATADetailLevel detailLevel = new ODATADetailLevel();
+                    detailLevel.FilterClause = "state eq 'active'";
+                    detailLevel.SelectClause = "poolInfo";
+
                     var jobPools =
-                        bc.JobOperations.ListJobs()
-                        .Where(j => j.State != null && (j.State == JobState.Enabling || j.State == JobState.Active))
+                        bc.JobOperations.ListJobs(detailLevel)
                         .Select(j => j.PoolInformation.PoolId);
 
                     Dictionary<string, int> count = new Dictionary<string, ExperimentID>();
