@@ -57,6 +57,19 @@
 
  .PARAMETER poolNameForRunner
     Name of the batch pool on which nightly runner application (the one that schedules nightly tests) will run. By default first pool on the account will be used.
+    AAD app service principal, that should have access to secrets in the vault.
+
+ .PARAMETER sendEmailCredentialsSecretId
+    Name of a secret in the Key Vault which keeps user name and password divided by :. E.g. user@foo.com:password. This email is used to send reports of nightly tests.
+
+ .PARAMETER sendEmailCredentials
+    User name and password divided by :. E.g. user@foo.com:password. This email is used to send reports of nightly tests. If the property value is an empty string, no e-mail is sent.
+
+ .PARAMETER reportRecipients
+    String with e-mail addresses to which reports of nightly tests should be sent separated by semicolon ;.
+
+ .PARAMETER smtpServerUrl
+    An address of an SMTP server to send e-mails.
 
  .OUTPUTS
     Connection string to the deployed performance testing environment.
@@ -104,7 +117,19 @@ param(
  $poolNameForNightlyRuns,
 
  [string]
- $poolNameForRunner
+ $poolNameForRunner,
+
+ [string]
+ $sendEmailCredentialsSecretId,
+
+ [string]
+ $sendEmailCredentials,
+
+ [string]
+ $reportRecipients,
+
+ [string]
+ $smtpServerUrl
  )
 
 $ErrorActionPreference = "Stop"
@@ -161,9 +186,9 @@ Write-Host "Deploying storage..."
 Write-Host "Deploying batch account..."
 [Microsoft.Azure.Commands.Batch.BatchAccountContext]$batch = .\Deploy-Batch.ps1 $batchName $rg $storage $cert $certPassword
 Write-Host "Deploying key vault..."
-[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp
+[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials
 Write-Host "Deploying AzureWorker..."
-$null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint
+$null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint $reportRecipients $smtpServerUrl $sendEmailCredentialsSecretId
 Write-Host "Deploying NightlyWebApp..."
 [Microsoft.Azure.Management.WebSites.Models.Site]$webApp = .\Deploy-WebApp.ps1 $webAppName $rg $connectionStringSecretName $storage $vault $sp $cert $certPassword
 if ($referenceJsonPath -and $referenceExecutablePath) {

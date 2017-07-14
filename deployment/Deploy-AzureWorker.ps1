@@ -20,6 +20,15 @@
  .PARAMETER certThumbprint
     Thumbprint of the certificate used as credentials for AAD application.
 
+ .PARAMETER reportRecipients
+    String with e-mail addresses to which reports of nightly tests should be sent separated by semicolon ;.
+
+ .PARAMETER smtpServerUrl
+    An address of an SMTP server to send e-mails.
+
+ .PARAMETER sendEmailCredentialsSecretId
+    Name of a secret in the Key Vault which keeps user name and password divided by :. E.g. user@foo.com:password. If the property value is an empty string, no e-mail is sent.
+
 
  .OUTPUTS
 #>
@@ -42,7 +51,16 @@ param(
  
  [Parameter(Mandatory=$True)]
  [string]
- $certThumbprint
+ $certThumbprint,
+
+ [string]
+ $reportRecipients,
+
+ [string]
+ $smtpServerUrl,
+
+ [string]
+ $sendEmailCredentialsSecretId
 )
 
 $ErrorActionPreference = "Stop"
@@ -64,6 +82,15 @@ $conf = [xml] (Get-Content $confPath)
 ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'AADApplicationId'}).Value = $AADAppServicePrincipal.ApplicationId.ToString()
 ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'AADApplicationCertThumbprint'}).Value = $certThumbprint
 ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'ConnectionStringSecretId'}).Value = $connectionStringSecretName
+if ($reportRecipients) {
+    ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'ReportRecipients'}).Value = $reportRecipients
+}
+if ($smtpServerUrl) {
+    ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'SmtpServerUrl'}).Value = $smtpServerUrl
+}
+if ($sendEmailCredentialsSecretId) {
+    ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'SendEmailCredentialsSecretId'}).Value = $sendEmailCredentialsSecretId
+}
 $conf.Save($confPath)
 
 Write-Host "Retrieving configuration blob container..."

@@ -23,6 +23,12 @@
  .PARAMETER AADAppServicePrincipal
     AAD app service principal, that should have access to secrets in the vault.
 
+ .PARAMETER sendEmailCredentialsSecretId
+    Name of a secret in the Key Vault which keeps user name and password divided by :. E.g. user@foo.com:password. This email is used to send reports of nightly tests.
+
+ .PARAMETER sendEmailCredentials
+    User name and password divided by :. E.g. user@foo.com:password. This email is used to send reports of nightly tests. If the property value is an empty string, no e-mail is sent.
+
 
  .OUTPUTS
     Key vault object.
@@ -49,7 +55,13 @@ param(
  $batchAccount,
 
  [Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADServicePrincipal]
- $AADAppServicePrincipal
+ $AADAppServicePrincipal,
+
+ [string]
+ $sendEmailCredentialsSecretId,
+
+ [string]
+ $sendEmailCredentials
 )
 
 $ErrorActionPreference = "Stop"
@@ -75,6 +87,11 @@ $null = Set-AzureKeyVaultSecret -Name $connectionStringSecretName -SecretValue $
 
 if ($AADAppServicePrincipal) {
     Set-AzureRmKeyVaultAccessPolicy -VaultName $keyVaultName -ObjectId $AADAppServicePrincipal.Id -PermissionsToSecrets all -ResourceGroupName $resourceGroup.ResourceGroupName
+}
+
+if ($sendEmailCredentialsSecretId -and $sendEmailCredentials) {
+    $secureCredentials = ConvertTo-SecureString -String $sendEmailCredentials -Force -AsPlainText
+    $null = Set-AzureKeyVaultSecret -Name $sendEmailCredentialsSecretId -SecretValue $secureCredentials -VaultName $keyVaultName
 }
 
 $keyVault
