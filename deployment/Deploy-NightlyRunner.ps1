@@ -137,6 +137,9 @@ if (-not $schedule) {
 
     $Schedule = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSSchedule"
     $Schedule.RecurrenceInterval = [TimeSpan]::FromDays(1)
+    $startDate = Get-Date
+    $startDate = $startDate.ToUniversalTime().Date.AddHours(42)
+    $Schedule.DoNotRunUntil = $startDate
 
     $null = New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpecification $JobSpecification -BatchContext $batchAccount
 }
