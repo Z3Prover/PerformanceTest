@@ -17,10 +17,21 @@ namespace AzureWorker
 {
     public class SendMail
     {
-        string domain = "@microsoft.com";
         uint retryCount = 3;
-        public SendMail ()
+        string userMail = "";
+        string pwd = "";
+        string serverUrl = "";
+        public SendMail (string credentials, string serverUrl)
         {
+            if (credentials == null) throw new ArgumentNullException("credentials");
+            if (serverUrl == null) throw new ArgumentNullException("serverUrl");
+            if (credentials != "")
+            {
+                string[] parsedCred = credentials.Split(':');
+                this.userMail = parsedCred[0];
+                if (parsedCred.Length > 1) this.pwd = parsedCred[1];
+            }
+            this.serverUrl = serverUrl;
         }
         public async Task SendReport(AzureSummaryManager manager, ExperimentSummary expSummary, ExperimentSummary refSummary, string recipientsStr, string linkPage)
         {
@@ -126,15 +137,14 @@ namespace AzureWorker
         private void Send(string tot, string subject, string msg, bool html = false)
         {
             MailAddress to = new MailAddress(tot);
-            string fromt = Environment.UserName + domain;
-            //string password = "";
-            MailAddress from = new MailAddress(fromt);
+            MailAddress from = new MailAddress(userMail);
             MailMessage mail = new MailMessage(from, to);
             mail.Subject = subject;
             mail.Body = msg;
-            SmtpClient client = new SmtpClient("smtphost");//smtp.gmail.com
-            //client.EnableSsl = true;
-            client.UseDefaultCredentials = true;
+            SmtpClient client = new SmtpClient(serverUrl);
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(userMail, pwd);
             mail.IsBodyHtml = html;
 
             uint retries = 0;

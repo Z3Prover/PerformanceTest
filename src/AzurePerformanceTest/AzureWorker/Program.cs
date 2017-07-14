@@ -322,15 +322,17 @@ namespace AzureWorker
             var result = await manager.Update(summaryName, experimentId);
             try
             {
-                var sendMail = new SendMail();
+                var secretStorage = new SecretStorage(Settings.Default.AADApplicationId, Settings.Default.AADApplicationCertThumbprint, Settings.Default.KeyVaultUrl);
+                string credentials = await secretStorage.GetSecret(Settings.Default.SendEmailCredentialsSecretId);
+                var sendMail = new SendMail(credentials, Settings.Default.SmtpServerUrl);
                 await sendMail.SendReport(manager, result[0], result[1], Settings.Default.ReportRecipients, Settings.Default.LinkPage);
+                Trace.WriteLine("Done.");
             }
             catch(Exception ex)
             {
                 Trace.WriteLine("Can't send email: " + ex.Message);
                 return;
             }
-            Trace.WriteLine("Done.");
         }
         private static void MonitorTasksUntilCompletion(int experimentId, string jobId, Task collectionTask, BatchClient batchClient)
         {
