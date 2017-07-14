@@ -99,6 +99,9 @@ namespace ImportTimeline
                 exp.ExperimentTimeout = 0;
                 exp.GroupName = "";
 
+                exp.AdaptiveRunMaxRepetitions = 1; // turns the adaptive run off
+                exp.AdaptiveRunMaxTimeInSeconds = 0;
+
                 exp.Note = String.Format("Cluster: {0}, cluster job id: {1}, node group: {2}, locality: {3}, finished: {4}, reference: {5}",
                     metadata.Cluster, metadata.ClusterJobId, metadata.Nodegroup, metadata.Locality, metadata.isFinished, metadata.Reference);
 
