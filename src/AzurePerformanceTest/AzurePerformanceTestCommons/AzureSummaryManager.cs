@@ -111,7 +111,7 @@ namespace AzurePerformanceTest
 
                 Trace.WriteLine("Building summary for the experiment " + experimentId);
                 var catSummary = ExperimentSummary.Build(results, domain, ExperimentSummary.DuplicateResolution.Ignore);
-                var expSummary = new ExperimentSummary(experimentId, DateTimeOffset.Now, catSummary);
+                var expSummary = new ExperimentSummary(experimentId, exp.Submitted, catSummary);
                 timeline = ExperimentSummaryStorage.AppendOrReplace(timeline, expSummary);
 
                 Trace.WriteLine("Updating records...");

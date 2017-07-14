@@ -176,7 +176,7 @@ namespace Nightly
                             ser.Points.AddXY(-x, Math.Log10(value) * logMultiplier);
                         else
                             ser.Points.AddXY(-x, value);
-                        ser.Points.Last().ToolTip = date_str + ": " + value.ToString();
+                        ser.Points.Last().ToolTip = string.Concat(date_str, ": ", name, ": ", value);
 
                         if (x == maxdays)
                             need_earliest = false;
@@ -225,13 +225,33 @@ namespace Nightly
             double contravalue = 0.0;
             foreach (string sc in avgcats)
             {
-                if (exp.Summary.CategorySummary.ContainsKey(cat))
+                AggregatedAnalysis catsum;
+                if (exp.Summary.CategorySummary.TryGetValue(cat, out catsum))
                 {
-                    var catsum = exp.Summary.CategorySummary[cat];
                     string s;
                     double d;
-                    if (catsum.Properties.TryGetValue(sc, out s) && double.TryParse(s, out d))
-                        contravalue += d;
+                    switch (sc)
+                    {
+                        case "BUG":
+                            contravalue += catsum.Bugs;
+                            break;
+                        case "ERROR":
+                            contravalue += catsum.Errors;
+                            break;
+                        case "INFERR":
+                            contravalue += catsum.InfrastructureErrors;
+                            break;
+                        case "TIMEOUT":
+                            contravalue += catsum.Timeouts;
+                            break;
+                        case "MEMORY":
+                            contravalue += catsum.MemoryOuts;
+                            break;
+                        default:
+                            if (catsum.Properties.TryGetValue(sc, out s) && double.TryParse(s, out d))
+                                contravalue += d;
+                            break;
+                    }
                 }
             }
 
@@ -428,7 +448,7 @@ namespace Nightly
                 //double vbaBoth = (vbaGoodPart + vbaBadPart) / jstats.Runs;
                 // vbaBoth ~ virtualBestAvg + timeout * (1 - (sat+unsat)/files)
 
-                double vwa = exp.Timeout.TotalSeconds;
+                //double vwa = exp.Timeout.TotalSeconds;
 
                 DateTime pdt = Convert.ToDateTime(exp.SubmissionTime, culture);
                 double x = (now - pdt).TotalDays;

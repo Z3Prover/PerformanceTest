@@ -17,6 +17,8 @@ namespace Nightly
         /// <summary>Ordered by submission time, most recent is last.</summary>
         private readonly ExperimentViewModel[] experiments;
 
+        private string[] categories;
+
         public static async Task<Timeline> Initialize(string connectionString, string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager)
         {
             var summRec = await summaryManager.GetTimelineAndRecords(summaryName);
@@ -28,11 +30,12 @@ namespace Nightly
                 summ
                 .Select(async expSum =>
                 {
-                    var exp = await expManager.TryFindExperiment(expSum.Id);
-                    if (exp == null) return null;
+                    //var exp = await expManager.TryFindExperiment(expSum.Id);
+                    //if (exp == null) return null;
 
                     bool isFinished;
-                    if (exp.Status.SubmissionTime.Subtract(now).TotalDays >= 3)
+                    var date = expSum.Date;
+                    if ((now - date).TotalDays >= 1)
                     {
                         isFinished = true;
                     }
@@ -40,7 +43,7 @@ namespace Nightly
                     {
                         try
                         {
-                            var jobState = await expManager.GetExperimentJobState(new[] { exp.ID });
+                            var jobState = await expManager.GetExperimentJobState(new[] { expSum.Id });
                             isFinished = jobState[0] != ExperimentExecutionState.Active;
                         }
                         catch
@@ -49,7 +52,7 @@ namespace Nightly
                         }
                     }
 
-                    return new ExperimentViewModel(expSum, isFinished, exp.Status.SubmissionTime, exp.Definition.BenchmarkTimeout);
+                    return new ExperimentViewModel(expSum, isFinished);
                 });
 
             var experiments = await Task.WhenAll(expTasks);
@@ -72,7 +75,11 @@ namespace Nightly
         {
             get
             {
-                return experiments.SelectMany(exp => exp.Summary.CategorySummary.Keys).Distinct().ToArray();
+                if (categories == null)
+                {
+                    categories = experiments.SelectMany(exp => exp.Summary.CategorySummary.Keys).Distinct().ToArray();
+                }
+                return categories;
             }
         }
 

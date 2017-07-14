@@ -12,12 +12,10 @@ namespace Nightly
     {
         private ExperimentSummary summary;
 
-        public ExperimentViewModel(ExperimentSummary summary, bool isFinished, DateTime submitted, TimeSpan timeout)
+        public ExperimentViewModel(ExperimentSummary summary, bool isFinished)
         {
             this.summary = summary;
             this.IsFinished = isFinished;
-            this.SubmissionTime = submitted;
-            this.Timeout = timeout;
         }
 
         public AggregatedAnalysis this[string category]
@@ -39,7 +37,7 @@ namespace Nightly
 
         public bool IsFinished { get; internal set; }
 
-        public DateTime SubmissionTime { get; internal set; }
+        public DateTime SubmissionTime { get { return summary.Date.Date; } }
 
         public TimeSpan Timeout { get; internal set; }
 
