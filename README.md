@@ -297,7 +297,7 @@ The Nightly web application uses the summaries to analyze experiments results.
 
 ### Secrets
 
-Azure Key vault allows to safely keep and get credentials for the storage account.
+Azure Key vault allows to safely keep and get credentials for both the storage and batch account.
 It is needed for AzureWorker which runs on Batch nodes and for client applications,
 such as Nightly web application, NightlyRunner and Summary.
 
