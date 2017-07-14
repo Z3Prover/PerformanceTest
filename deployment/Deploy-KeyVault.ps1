@@ -29,6 +29,18 @@
  .PARAMETER sendEmailCredentials
     User name and password divided by :. E.g. user@foo.com:password. This email is used to send reports of nightly tests. If the property value is an empty string, no e-mail is sent.
 
+ .PARAMETER cert
+    Certificate used as credentials for AAD application. If not provided, certificate won't be copied to key vault.
+
+ .PARAMETER certPassword
+    Password to the private key of the certificate used as credentials for AAD application. If not provided, certificate won't be copied to key vault.
+
+ .PARAMETER certSecretId
+    Name of a secret in the Key Vault which keeps certificate used as credentials for AAD application. Defaults to <certificate's CN>Certificate.
+
+ .PARAMETER certPasswordSecretId
+    Name of a secret in the Key Vault which keeps password to the private key of the certificate used as credentials for AAD application. Defaults to <certSecretId>Password.
+
 
  .OUTPUTS
     Key vault object.
@@ -61,7 +73,19 @@ param(
  $sendEmailCredentialsSecretId,
 
  [string]
- $sendEmailCredentials
+ $sendEmailCredentials,
+ 
+ [System.Security.Cryptography.X509Certificates.X509Certificate2]
+ $cert,
+ 
+ [string]
+ $certPassword,
+ 
+ [string]
+ $certSecretId,
+ 
+ [string]
+ $certPasswordSecretId
 )
 
 $ErrorActionPreference = "Stop"
@@ -92,6 +116,21 @@ if ($AADAppServicePrincipal) {
 if ($sendEmailCredentialsSecretId -and $sendEmailCredentials) {
     $secureCredentials = ConvertTo-SecureString -String $sendEmailCredentials -Force -AsPlainText
     $null = Set-AzureKeyVaultSecret -Name $sendEmailCredentialsSecretId -SecretValue $secureCredentials -VaultName $keyVaultName
+}
+
+if ($cert -and $certPassword) {
+    if (-not $certSecretId) {
+        $certSecretId = $cert.Subject.Substring(3) + 'Certificate' #subject == CN=<name>
+    }
+    if (-not $certPasswordSecretId) {
+        $certPasswordSecretId = $certSecretId + 'Password'
+    }
+    $pfx = [System.Convert]::ToBase64String($cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $certPassword))
+    $secret = ConvertTo-SecureString -String $pfx -AsPlainText –Force
+    $secretContentType = 'application/x-pkcs12'
+    $null = Set-AzureKeyVaultSecret -VaultName $keyVaultName -Name $certSecretId -SecretValue $secret -ContentType $secretContentType
+    $securePassword = ConvertTo-SecureString -String $certPassword -AsPlainText –Force
+    $null = Set-AzureKeyVaultSecret -Name $certPasswordSecretId -SecretValue $securePassword -VaultName $keyVaultName
 }
 
 $keyVault

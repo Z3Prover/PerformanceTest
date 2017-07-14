@@ -71,6 +71,12 @@
  .PARAMETER smtpServerUrl
     An address of an SMTP server to send e-mails.
 
+ .PARAMETER certSecretId
+    Name of a secret in the Key Vault which keeps certificate used as credentials for AAD application.
+
+ .PARAMETER certPasswordSecretId
+    Name of a secret in the Key Vault which keeps password to the private key of the certificate used as credentials for AAD application.
+
  .OUTPUTS
     Connection string to the deployed performance testing environment.
 #>
@@ -129,7 +135,13 @@ param(
  $reportRecipients,
 
  [string]
- $smtpServerUrl
+ $smtpServerUrl,
+ 
+ [string]
+ $certSecretId,
+ 
+ [string]
+ $certPasswordSecretId
  )
 
 $ErrorActionPreference = "Stop"
@@ -174,8 +186,8 @@ if($certPfxPath) {
 } else {
     Write-Host "Creating certificate..."
     $now = Get-Date
-    $yearFromNow = $now.AddYears(1)
-    [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert = .\New-Cert.ps1 $name $certPassword $now $yearFromNow
+    $endDate = $now.AddYears(5)
+    [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert = .\New-Cert.ps1 $name $certPassword $now $endDate
 }
 Write-Host "Registering AAD application..."
 [Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADServicePrincipal]$sp = .\Deploy-AADApp.ps1 $name $cert
@@ -186,7 +198,7 @@ Write-Host "Deploying storage..."
 Write-Host "Deploying batch account..."
 [Microsoft.Azure.Commands.Batch.BatchAccountContext]$batch = .\Deploy-Batch.ps1 $batchName $rg $storage $cert $certPassword
 Write-Host "Deploying key vault..."
-[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials
+[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials $cert $certPassword $certSecretId $certPasswordSecretId
 Write-Host "Deploying AzureWorker..."
 $null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint $reportRecipients $smtpServerUrl $sendEmailCredentialsSecretId
 Write-Host "Deploying NightlyWebApp..."
