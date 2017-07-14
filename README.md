@@ -472,7 +472,7 @@ New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpeci
 
 ### How to enable reports sent by e-mail
 
-When an experiment for Z3 nightly build is complete, the job manager build summary and, if enabled,
+When an experiment for Z3 nightly build is complete, the job manager builds summary and, if enabled,
 can send a report by e-mail.
 
 `AzureWorker.exe.config` contains following parameters:
