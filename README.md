@@ -22,6 +22,7 @@ This repository holds test infrastructure and benchmarks used to test Z3.
     - [Requeueing benchmarks](#requeueing-benchmarks)
     - [Nightly Z3 performance tests](#nightly-z3-performance-tests)
         - [How to schedule nightly runs using Azure Batch Schedule](#how-to-schedule-nightly-runs-using-azure-batch-schedule)
+        - [How to enable reports sent by e-mail](#how-to-enable-reports-sent-by-e-mail)
   - [Client applications](#client-applications)
     - [PerformanceTest.Management](#performancetestmanagement)
     - [Z3 Nightly Web Application](#z3-nightly-web-application)
@@ -468,6 +469,18 @@ $Schedule.RecurrenceInterval = [TimeSpan]::FromDays(1)
 $BatchContext = Get-AzureRmBatchAccountKeys 
 New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpecification $JobSpecification -BatchContext $BatchContext
 ```
+
+### How to enable reports sent by e-mail
+
+When an experiment for Z3 nightly build is complete, the job manager build summary and, if enabled,
+can send a report by e-mail.
+
+`AzureWorker.exe.config` contains two parameters:
+
+- `ReportRecipients` contains a string with e-mail addresses separated by semicolon `;`.
+- `SendEmailCredentialsSecretId` contains name of a secret in the [Key Vault](#secrets)
+which keeps user name and password divided by `:`. E.g. `user@foo.com:password`.
+If the property value is an empty string, no e-mail is sent.
 
 
 
