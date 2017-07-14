@@ -17,6 +17,7 @@ This repository holds test infrastructure and benchmarks used to test Z3.
     - [Binaries](#binaries)
     - [Summaries](#summaries)
     - [Secrets](#secrets)
+    - [Certificates](#certificates)
   - [Server-side components](#server-side-components)
     - [Running performance tests](#running-performance-tests)
     - [Requeueing benchmarks](#requeueing-benchmarks)
@@ -320,6 +321,8 @@ An example of the connection string:
 ```
 DefaultEndpointsProtocol=https; AccountName=<<storageAccountName>>; AccountKey=<<storageAccountKey>>; BatchAccessKey=<<batchAccessKey>>; BatchURL=https://???.batch.azure.com; BatchAccount=<<batchAccountName>>;
 ```
+
+### Certificates
 
 In order to retrieve secrets from azure key vault, applications need to authenticate within azure active directory as service entities. For that Azure Active Directory (AAD) application ID and a corresponding certificate are required. Application ID is provided in configuration file (see above). Configuration file also contains a field for the thumbprint, using which certificate can be found, but the certificate itself needs to be installed on the machine separately.
 
