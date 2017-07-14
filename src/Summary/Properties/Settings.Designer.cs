@@ -85,5 +85,23 @@ namespace Summary.Properties {
                 return ((string)(this["ReportRecipients"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("smtp.live.com")]
+        public string SmtpServerUrl {
+            get {
+                return ((string)(this["SmtpServerUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("z3PerfEmailCredentials")]
+        public string SendEmailCredentialsSecretId {
+            get {
+                return ((string)(this["SendEmailCredentialsSecretId"]));
+            }
+        }
     }
 }

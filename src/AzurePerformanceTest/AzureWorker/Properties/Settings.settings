@@ -20,5 +20,11 @@
     <Setting Name="ReportRecipients" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SmtpServerUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">smtp.live.com</Value>
+    </Setting>
+    <Setting Name="SendEmailCredentialsSecretId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">z3PerfEmailCredentials</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
