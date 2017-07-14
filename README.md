@@ -321,6 +321,55 @@ An example of the connection string:
 DefaultEndpointsProtocol=https; AccountName=<<storageAccountName>>; AccountKey=<<storageAccountKey>>; BatchAccessKey=<<batchAccessKey>>; BatchURL=https://???.batch.azure.com; BatchAccount=<<batchAccountName>>;
 ```
 
+In order to retrieve secrets from azure key vault, applications need to authenticate within azure active directory as service entities. For that Azure Active Directory (AAD) application ID and a corresponding certificate are required. Application ID is provided in configuration file (see above). Configuration file also contains a field for the thumbprint, using which certificate can be found, but the certificate itself needs to be installed on the machine separately.
+
+To install certificates on machines in Azure batch, first add it (you'll need a pfx file) to the batch account on the account's "Certificates" blade, then add it on every batch pool's "Certificates" blade. That will ensure, that certificate will be installed on every machine added to these pools.
+
+To install certificate for Azure Web App, upload the certificate on Web App's "SSL Certificates" blade, but don't create any SSL bindings. After that, go to the "Application Settings" blade and add a setting (if not there already) with a key "WEBSITE_LOAD_CERTIFICATES" and value "*" (without quotation marks). This will ensure, that certificates will be present on the server running web app despite not being required for SSL.
+
+Certificates are valid only for limited periods of time (usually, a year), so from time to time they have to be updated.
+
+You can create a self-signed certificate (for our purposes, self-signed is OK) with powershell:
+```powershell
+$startDate = Get-Date
+$endDate = $startDate.AddYears(1)
+$cert = New-SelfSignedCertificate -Subject "CN=<Name>" -CertStoreLocation Cert:\CurrentUser\My -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" -NotBefore $startDate -NotAfter $endDate -Type Custom -KeyExportPolicy ExportableEncrypted
+```
+After that you can export it to pfx file:
+```powershell
+$pwd = ConvertTo-SecureString -String '<Password>' -Force -AsPlainText
+Export-PfxCertificate -cert $cert -FilePath "<Path>.pfx" -Password $pwd
+```
+To import a certificate from a pfx file:
+```powershell
+$pwd = ConvertTo-SecureString -String '<Password>' -Force -AsPlainText
+$cert = Import-PfxCertificate -FilePath $certPfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $pwd -Exportable
+```
+To create an AAD application authentifiable by that certificate
+```powershell
+$credValue = [System.Convert]::ToBase64String($cert.GetRawCertData())
+$adapp = New-AzureRmADApplication -DisplayName $name -HomePage "https://<Name>" -IdentifierUris "https://<Name>" -CertValue $credValue -StartDate $cert.NotBefore -EndDate $cert.NotAfter
+$sp = New-AzureRmADServicePrincipal -ApplicationId $adapp.ApplicationId
+```
+To add a certificate as credentials to an existing AAD application (e.g. when previous certificate is near expiration)
+```powershell
+$credValue = [System.Convert]::ToBase64String($cert.GetRawCertData())
+$cred = New-AzureRmADAppCredential -ApplicationId "<Application ID>" -CertValue $credValue -StartDate $cert.NotBefore -EndDate $cert.NotAfter
+```
+
+You may want to store this certficate in azure key vault, in order not to lose it. To do this with powershell (unfortunately, it's impossible to do with azure portal)
+```powershell
+$pfx = [System.Convert]::ToBase64String($cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, '<Password>'))
+$secret = ConvertTo-SecureString -String $pfx -AsPlainText –Force
+$secretContentType = 'application/x-pkcs12'
+Set-AzureKeyVaultSecret -VaultName '<KeyVaultName>' -Name '<NameOfSecret>' -SecretValue $secret -ContentType $secretContentType
+```
+To retrieve it from key vault after that
+```powershell
+$secretRetrieved = Get-AzureKeyVaultSecret -VaultName '<KeyVaultName>' -Name '<NameOfSecret>'
+$pfxBytes = [System.Convert]::FromBase64String($secretRetrieved.SecretValueText)
+[io.file]::WriteAllBytes("<Path>.pfx", $pfxBytes)
+```
 
 ## Server-side components
 
@@ -548,7 +597,7 @@ For the sake of convenience, a number of powershell scripts is situated in `/dep
     * Azure worker - application that measures performance in azure batch.
     * Nightly runner - application that starts nightly performance tests. Is scheduled to run in batch every 24 hours.
     * Azure Active Directory (AAD) application - an entity required to authenticate azure worker, nightly web app, and nightly runner in azure (if an AAD application with the given name exists already, you will be prompted to use it or create a new one).
-    * A self-signed certificate as credentials for AAD application.
+    * A self-signed certificate as credentials for AAD application. Certificate (as base64-encoded pfx) and the password to its private key are also stored in the key vault.
 
     You should also use this script to update the certificate credentials for AAD application.
 

@@ -186,8 +186,8 @@ if($certPfxPath) {
 } else {
     Write-Host "Creating certificate..."
     $now = Get-Date
-    $yearFromNow = $now.AddYears(1)
-    [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert = .\New-Cert.ps1 $name $certPassword $now $yearFromNow
+    $endDate = $now.AddYears(5)
+    [System.Security.Cryptography.X509Certificates.X509Certificate2]$cert = .\New-Cert.ps1 $name $certPassword $now $endDate
 }
 Write-Host "Registering AAD application..."
 [Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADServicePrincipal]$sp = .\Deploy-AADApp.ps1 $name $cert
