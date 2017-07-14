@@ -29,6 +29,9 @@
  .PARAMETER certPassword
     Password to the private key of the certificate used as credentials for AAD application.
 
+ .PARAMETER location
+    Location of azure datacenter to use. Defaults to one of the resource group.
+
 
  .OUTPUTS
     Web app object.
@@ -64,10 +67,16 @@ param(
  
  [Parameter(Mandatory=$True)]
  [string]
- $certPassword
+ $certPassword,
+
+ [string]
+ $location
 )
 
 $ErrorActionPreference = "Stop"
+if (-not $location) {
+    $location = $rg.Location
+}
 
 $cpath = Get-Location
 $cdir = $cpath.Path
@@ -92,9 +101,9 @@ if(!$app)
     Write-Host "Not found, creating a new one..."
     $plan = Get-AzureRmAppServicePlan -Name $appName -ResourceGroupName $resourceGroup.ResourceGroupName -ErrorAction SilentlyContinue
     if (!$plan) {
-        $plan = New-AzureRmAppServicePlan -Name $appName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $resourceGroup.Location -Tier Basic
+        $plan = New-AzureRmAppServicePlan -Name $appName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $location -Tier Basic
     }
-    $app = New-AzureRmWebApp -Name $appName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $resourceGroup.Location -AppServicePlan $plan.Name
+    $app = New-AzureRmWebApp -Name $appName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $location -AppServicePlan $plan.Name
 }
 $newSettings = @{}
 ForEach ($kvp in $app.SiteConfig.AppSettings) {
@@ -107,16 +116,14 @@ $null = Set-AzureRMWebApp -Name $appName -ResourceGroupName $resourceGroup.Resou
 
 Write-Host "Uploading certificate..."
 #Dirty hack, because Azure PowerDhell lacks required capablities
-#$pfx = New-AzureRmApplicationGatewaySslCertificate -Name $appName -CertificateFile E:\PS\example.pfx -Password $certPassword
 $pfxBlob = [System.Convert]::ToBase64String($cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $certPassword))
-$ResourceLocation = "West Europe"
 $ResourceName = "Newcertificate"
 $PropertiesObject = @{
     pfxBlob = $pfxBlob
     password = $certPassword
 }
 
-$null = New-AzureRmResource -Name $ResourceName -Location $resourceGroup.Location -PropertyObject $PropertiesObject -ResourceGroupName $resourceGroup.ResourceGroupName -ResourceType Microsoft.Web/certificates -ApiVersion 2015-08-01 -Force
+$null = New-AzureRmResource -Name $ResourceName -Location $location -PropertyObject $PropertiesObject -ResourceGroupName $resourceGroup.ResourceGroupName -ResourceType Microsoft.Web/certificates -ApiVersion 2015-08-01 -Force
 
 
 Write-Host "Retrieving publishing credentials..."
