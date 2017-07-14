@@ -1,4 +1,5 @@
 *.pubxml
+!src/NightlyWebApp/Properties/PublishProfiles/DeploymentFolder.pubxml
 
 tests/PerformanceTest.Tests/**/ConnectionString.txt
 src/AzurePerformanceTest/LaunchExperiment/keys.json
