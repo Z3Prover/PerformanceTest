@@ -29,6 +29,9 @@
  .PARAMETER sendEmailCredentialsSecretId
     Name of a secret in the Key Vault which keeps user name and password divided by :. E.g. user@foo.com:password. If the property value is an empty string, no e-mail is sent.
 
+ .PARAMETER linkPage
+    Address of nightly web app. Used in email alerts
+
 
  .OUTPUTS
 #>
@@ -60,7 +63,10 @@ param(
  $smtpServerUrl,
 
  [string]
- $sendEmailCredentialsSecretId
+ $sendEmailCredentialsSecretId,
+
+ [string]
+ $linkPage
 )
 
 $ErrorActionPreference = "Stop"
@@ -90,6 +96,9 @@ if ($smtpServerUrl) {
 }
 if ($sendEmailCredentialsSecretId) {
     ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'SendEmailCredentialsSecretId'}).Value = $sendEmailCredentialsSecretId
+}
+if ($linkPage) {
+    ($conf.configuration.applicationSettings.'AzureWorker.Properties.Settings'.setting | where {$_.name -eq 'LinkPage'}).Value = $linkPage
 }
 $conf.Save($confPath)
 

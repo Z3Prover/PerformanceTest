@@ -198,10 +198,10 @@ Write-Host "Deploying batch account..."
 [Microsoft.Azure.Commands.Batch.BatchAccountContext]$batch = .\Deploy-Batch.ps1 $batchName $rg $storage $cert $certPassword $location
 Write-Host "Deploying key vault..."
 [Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials $cert $certPassword $certSecretId $certPasswordSecretId $location
-Write-Host "Deploying AzureWorker..."
-$null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint $reportRecipients $smtpServerUrl $sendEmailCredentialsSecretId
 Write-Host "Deploying NightlyWebApp..."
 [Microsoft.Azure.Management.WebSites.Models.Site]$webApp = .\Deploy-WebApp.ps1 $webAppName $rg $connectionStringSecretName $storage $vault $sp $cert $certPassword $location
+Write-Host "Deploying AzureWorker..."
+$null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint $reportRecipients $smtpServerUrl $sendEmailCredentialsSecretId ('http://' + $webApp.DefaultHostName + '/')
 if ($referenceJsonPath -and $referenceExecutablePath) {
     Write-Host "Deploying reference experiment..."
     $null = .\Deploy-ReferenceExperiment.ps1 $storage $referenceJsonPath $referenceExecutablePath $referenceInputPath
