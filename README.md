@@ -475,9 +475,10 @@ New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpeci
 When an experiment for Z3 nightly build is complete, the job manager build summary and, if enabled,
 can send a report by e-mail.
 
-`AzureWorker.exe.config` contains two parameters:
+`AzureWorker.exe.config` contains following parameters:
 
 - `ReportRecipients` contains a string with e-mail addresses separated by semicolon `;`.
+- `SmtpServerUrl` is an address of an SMTP server to send e-mails.
 - `SendEmailCredentialsSecretId` contains name of a secret in the [Key Vault](#secrets)
 which keeps user name and password divided by `:`. E.g. `user@foo.com:password`.
 If the property value is an empty string, no e-mail is sent.
