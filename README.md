@@ -330,6 +330,8 @@ To install certificates on machines in Azure batch, first add it (you'll need a 
 
 To install certificate for Azure Web App, upload the certificate on Web App's "SSL Certificates" blade, but don't create any SSL bindings. After that, go to the "Application Settings" blade and add a setting (if not there already) with a key "WEBSITE_LOAD_CERTIFICATES" and value "*" (without quotation marks). This will ensure, that certificates will be present on the server running web app despite not being required for SSL.
 
+NB: in order to be able to use certificates, web app must be running on at least "Basic" service plan. If "Free" service plan is used, web app won't be able to access certificate and, therefore, key vault.
+
 Certificates are valid only for limited periods of time (usually, a year), so from time to time they have to be updated.
 
 You can create a self-signed certificate (for our purposes, self-signed is OK) with powershell:
