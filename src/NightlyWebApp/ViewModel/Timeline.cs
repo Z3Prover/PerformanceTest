@@ -17,6 +17,8 @@ namespace Nightly
         /// <summary>Ordered by submission time, most recent is last.</summary>
         private readonly ExperimentViewModel[] experiments;
 
+        private string[] categories;
+
         public static async Task<Timeline> Initialize(string connectionString, string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager)
         {
             var summRec = await summaryManager.GetTimelineAndRecords(summaryName);
@@ -33,7 +35,7 @@ namespace Nightly
 
                     bool isFinished;
                     var date = expSum.Date;
-                    if ((now - date).TotalDays >= 3)
+                    if ((now - date).TotalDays >= 1)
                     {
                         isFinished = true;
                     }
@@ -73,7 +75,11 @@ namespace Nightly
         {
             get
             {
-                return experiments.SelectMany(exp => exp.Summary.CategorySummary.Keys).Distinct().ToArray();
+                if (categories == null)
+                {
+                    categories = experiments.SelectMany(exp => exp.Summary.CategorySummary.Keys).Distinct().ToArray();
+                }
+                return categories;
             }
         }
 
