@@ -429,7 +429,7 @@ required to enable access to the Azure Key Vault.
     * Parameters `GitHubOwner`, `GitHubZ3Repository`, `GitHubBinariesRepository`, `GitHubBinariesNightlyFolder`, `RegexExecutableFileName`, `RegexExecutableFileName_CommitGroup` define origin of the nightly build results and regular expression pattern for the built binary file name.
     * Parameters `ConnectionString`, `ConnectionStringSecretId`, `AADApplicationId`, `AADApplicationCertThumbprint`, `KeyVaultUrl` allow to connect to Azure Performance test infrastructure. 
         * If the `ConnectionString` is not empty, it must contain both storage account and batch account connection strings. In this case, all other parameters of this group are ignored. **Configuration file having the connection string must not be publicly available.**
-        * Otherwise, other parameters must be provided so the program could access the Azure Key Vault to take the specified connection string. The machine must have the appropriate certificate installed.
+        * Otherwise, other parameters must be provided so the program could access the Azure Key Vault to take the specified connection string. The machine must have the appropriate certificate installed. See also [secrets](#secrets) for more information.
 
 
 1. Create Azure Batch Application package for `NightlyRunner`. 
@@ -505,16 +505,18 @@ The web application can be configured using Web.config file. In Visual Studio, y
 configuration. 
 
 The `SummaryName` property determines which timeline and records are downloaded from the `summary` blob container.
-Default is `Z3Nightly`. Then the application filters only those experiments of the `experiments` table that
-are listed in the timeline.
+Default is `Z3Nightly`. Then the application filters only those experiments of the `experiments` table that are listed in the timeline.
+
+See also [secrets](#secrets) for more information about access configuration.
 
 
 ### Timeline and records builder
 
 The .NET application `/src/Summary` allows to compute timeline entry and records for an experiment and then either append or replace
-corresponding row in a given [summary blob](#summaries). If the given experiment is missing, the program fails.
+corresponding data in a given [summary blob](#summaries). If the given experiment is missing, the program fails.
 
 Settings for the program should be edited in the `Summary.exe.config` file.
+See also [secrets](#secrets) for more information about configuration.
 
 For example, following command updates or adds summary for the experiment 100 in a blob `Z3Nightly.zip` of the container `summary`:
 
