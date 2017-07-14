@@ -41,6 +41,9 @@
  .PARAMETER certPasswordSecretId
     Name of a secret in the Key Vault which keeps password to the private key of the certificate used as credentials for AAD application. Defaults to <certSecretId>Password.
 
+ .PARAMETER location
+    Location of azure datacenter to use. Defaults to one of the resource group.
+
 
  .OUTPUTS
     Key vault object.
@@ -85,16 +88,22 @@ param(
  $certSecretId,
  
  [string]
- $certPasswordSecretId
+ $certPasswordSecretId,
+
+ [string]
+ $location
 )
 
 $ErrorActionPreference = "Stop"
+if (-not $location) {
+    $location = $rg.Location
+}
 
 #Create or check for existing
 $keyVault = Get-AzureRmKeyVault -VaultName $keyVaultName -ResourceGroupName $resourceGroup.ResourceGroupName -ErrorAction SilentlyContinue
 if(!$keyVault)
 {
-    $keyVault = New-AzureRmKeyVault -VaultName $keyVaultName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $resourceGroup.Location
+    $keyVault = New-AzureRmKeyVault -VaultName $keyVaultName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $location
 }
 
 $storageKeys = Get-AzureRmStorageAccountKey -Name $storage.StorageAccountName -ResourceGroupName $resourceGroup.ResourceGroupName

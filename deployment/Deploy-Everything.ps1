@@ -29,7 +29,7 @@
     Path to the pfx file with self-signed certificate to use as credentials for AAD application. If not provided, a new certificate is created and pfx with it is saved in the current directory.
 
  .PARAMETER location
-    Location of azure datacenter to use. Default is "West Europe"
+    Location of azure datacenter to use. Default is one associated with existing resource group. If resource group does not exist and parameter is not provided, you'll be prompted for it during creation of the resource group.
 
  .PARAMETER storageName
     Custom name for the storage account. Defaults to $name.ToLowerInvariant().
@@ -162,11 +162,7 @@ if (-not $webAppName) {
     $webAppName = $name.ToLowerInvariant()
 }
 
-if (-not $location) {
-    $location = "West Europe"
-}
-
- if ([Environment]::Is64BitOperatingSystem) {
+if ([Environment]::Is64BitOperatingSystem) {
     $pfiles = ${env:PROGRAMFILES(X86)}
     $platform = '/p:Platform="x64"'
 } else {
@@ -193,16 +189,19 @@ Write-Host "Registering AAD application..."
 [Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADServicePrincipal]$sp = .\Deploy-AADApp.ps1 $name $cert
 Write-Host "Creating resource group, if needed..."
 [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup]$rg = .\Deploy-ResourceGroup.ps1 $name $location
+if (-not $location) {
+    $location = $rg.Location
+}
 Write-Host "Deploying storage..."
-[Microsoft.Azure.Commands.Management.Storage.Models.PSStorageAccount]$storage = .\Deploy-Storage.ps1 $storageName $rg
+[Microsoft.Azure.Commands.Management.Storage.Models.PSStorageAccount]$storage = .\Deploy-Storage.ps1 $storageName $rg $location
 Write-Host "Deploying batch account..."
-[Microsoft.Azure.Commands.Batch.BatchAccountContext]$batch = .\Deploy-Batch.ps1 $batchName $rg $storage $cert $certPassword
+[Microsoft.Azure.Commands.Batch.BatchAccountContext]$batch = .\Deploy-Batch.ps1 $batchName $rg $storage $cert $certPassword $location
 Write-Host "Deploying key vault..."
-[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials $cert $certPassword $certSecretId $certPasswordSecretId
+[Microsoft.Azure.Commands.KeyVault.Models.PSVault]$vault = .\Deploy-KeyVault.ps1 $keyVaultName $rg $connectionStringSecretName $storage $batch $sp $sendEmailCredentialsSecretId $sendEmailCredentials $cert $certPassword $certSecretId $certPasswordSecretId $location
 Write-Host "Deploying AzureWorker..."
 $null = .\Deploy-AzureWorker.ps1 $connectionStringSecretName $storage $vault $sp $cert.Thumbprint $reportRecipients $smtpServerUrl $sendEmailCredentialsSecretId
 Write-Host "Deploying NightlyWebApp..."
-[Microsoft.Azure.Management.WebSites.Models.Site]$webApp = .\Deploy-WebApp.ps1 $webAppName $rg $connectionStringSecretName $storage $vault $sp $cert $certPassword
+[Microsoft.Azure.Management.WebSites.Models.Site]$webApp = .\Deploy-WebApp.ps1 $webAppName $rg $connectionStringSecretName $storage $vault $sp $cert $certPassword $location
 if ($referenceJsonPath -and $referenceExecutablePath) {
     Write-Host "Deploying reference experiment..."
     $null = .\Deploy-ReferenceExperiment.ps1 $storage $referenceJsonPath $referenceExecutablePath $referenceInputPath

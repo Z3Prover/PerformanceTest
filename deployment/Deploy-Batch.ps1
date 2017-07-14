@@ -20,6 +20,9 @@
  .PARAMETER certPassword
     Password to the certificate's private key.
 
+ .PARAMETER location
+    Location of azure datacenter to use. Defaults to one of the resource group.
+
 
  .OUTPUTS
     Batch context.
@@ -40,19 +43,26 @@ param(
  $cert,
 
  [string]
- $certPassword
+ $certPassword,
+
+ [string]
+ $location
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $location) {
+    $location = $rg.Location
+}
 
 #Create or check for existing
 $batch = Get-AzureRmBatchAccount -AccountName $batchName -ResourceGroupName $resourceGroup.ResourceGroupName -ErrorAction SilentlyContinue
 if(!$batch)
 {
     if ($storage) {
-        $batch = New-AzureRmBatchAccount -AccountName $batchName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $resourceGroup.Location -AutoStorageAccountId $storage.Id
+        $batch = New-AzureRmBatchAccount -AccountName $batchName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $location -AutoStorageAccountId $storage.Id
     } else {
-        $batch = New-AzureRmBatchAccount -AccountName $batchName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $resourceGroup.Location
+        $batch = New-AzureRmBatchAccount -AccountName $batchName -ResourceGroupName $resourceGroup.ResourceGroupName -Location $location
     }
 }
 
