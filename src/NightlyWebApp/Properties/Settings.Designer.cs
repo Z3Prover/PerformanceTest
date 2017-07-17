@@ -34,7 +34,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("z3PerfConnectionString")]
+        [global::System.Configuration.DefaultSettingValueAttribute("connectionString")]
         public string ConnectionStringSecretId {
             get {
                 return ((string)(this["ConnectionStringSecretId"]));
@@ -43,7 +43,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("04fc29f8-a2c2-4242-bc17-18c35730a50d")]
+        [global::System.Configuration.DefaultSettingValueAttribute("c5bf488e-67df-43f4-abed-e1da8c223f6c")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -52,7 +52,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("510E3EB7B2172ACEEF3D297A2305D278F546F443")]
+        [global::System.Configuration.DefaultSettingValueAttribute("918244F81DD3F4BB838E47A8288DBF91ABF5F9C9")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));
@@ -61,7 +61,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://z3perftest.vault.azure.net")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://cz3.vault.azure.net/")]
         public string KeyVaultUrl {
             get {
                 return ((string)(this["KeyVaultUrl"]));

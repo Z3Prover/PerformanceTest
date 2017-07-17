@@ -6,16 +6,16 @@
       <Value Profile="(Default)">90</Value>
     </Setting>
     <Setting Name="ConnectionStringSecretId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">z3PerfConnectionString</Value>
+      <Value Profile="(Default)">connectionString</Value>
     </Setting>
     <Setting Name="AADApplicationId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">04fc29f8-a2c2-4242-bc17-18c35730a50d</Value>
+      <Value Profile="(Default)">c5bf488e-67df-43f4-abed-e1da8c223f6c</Value>
     </Setting>
     <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">510E3EB7B2172ACEEF3D297A2305D278F546F443</Value>
+      <Value Profile="(Default)">918244F81DD3F4BB838E47A8288DBF91ABF5F9C9</Value>
     </Setting>
     <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://z3perftest.vault.azure.net</Value>
+      <Value Profile="(Default)">https://cz3.vault.azure.net/</Value>
     </Setting>
     <Setting Name="ConnectionString" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
