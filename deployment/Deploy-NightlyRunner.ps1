@@ -118,7 +118,7 @@ $zipPath = (Join-Path $cdir "\NightlyRunner.zip")
 $null = New-AzureRmBatchApplicationPackage -AccountName $batchAccount.AccountName -ResourceGroupName $resourceGroup.ResourceGroupName -ApplicationId "NightlyRunner" -ApplicationVersion $version -FilePath $zipPath -Format "zip"
 $null = Set-AzureRmBatchApplication -AccountName $batchAccount.AccountName -ResourceGroupName $resourceGroup.ResourceGroupName -ApplicationId "NightlyRunner" -DefaultVersion $version
 
-$schedule = Get-AzureBatchJobSchedule -Id "NightlyRunSchedule" -BatchContext $batchAccount
+$schedule = Get-AzureBatchJobSchedule -Id "NightlyRunSchedule" -BatchContext $batchAccount -ErrorAction SilentlyContinue
 if (-not $schedule) {
     Write-Host "Scheduling daily execution..."
     $NightlyApp = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSApplicationPackageReference"
@@ -138,7 +138,7 @@ if (-not $schedule) {
     $Schedule = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSSchedule"
     $Schedule.RecurrenceInterval = [TimeSpan]::FromDays(1)
     $startDate = Get-Date
-    $startDate = $startDate.ToUniversalTime().Date.AddHours(42)
+    $startDate = $startDate.ToUniversalTime().Date.AddHours(41)
     $Schedule.DoNotRunUntil = $startDate
 
     $null = New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpecification $JobSpecification -BatchContext $batchAccount
