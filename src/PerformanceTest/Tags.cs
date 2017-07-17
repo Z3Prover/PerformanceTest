@@ -13,8 +13,8 @@ namespace PerformanceTest
 
         public Tags()
         {
-            Dictionary<string, int> _tags = new Dictionary<string, int>();
-            Dictionary<int, string> _ids = new Dictionary<int, string>();
+            _tags = new Dictionary<string, int>();
+            _ids = new Dictionary<int, string>();
         }
 
         public Tags(Dictionary<int, string> idToName)

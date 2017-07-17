@@ -497,8 +497,12 @@ namespace Nightly
         {
             ComparisonStatistics a = cmp.Statistics.subdirs[x];
             ComparisonStatistics b = cmp.Statistics.subdirs[y];
-            if (Math.Abs(a.DeltaSTD) > Math.Abs(b.DeltaSTD))
+            double valA = Math.Abs(a.DeltaSTD);
+            double valB = Math.Abs(b.DeltaSTD);
+            if (valA > valB)
                 return -1;
+            if (valA < valB)
+                return 1;
             return 0;
         }
 

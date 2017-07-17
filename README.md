@@ -27,6 +27,7 @@ This repository holds test infrastructure and benchmarks used to test Z3.
   - [Client applications](#client-applications)
     - [PerformanceTest.Management](#performancetestmanagement)
     - [Z3 Nightly Web Application](#z3-nightly-web-application)
+        - [Experiment tags](#experiment-tags)
     - [Timeline and records builder](#timeline-and-records-builder)
     - [Import experiment from an obsolete data formats](#import-experiment-from-an-obsolete-data-formats)
 - [Run and deploy](#run-and-deploy)
@@ -554,15 +555,26 @@ Web application NightlyWebApp is intended to show history of experiments for Z3 
 
 The web application uses the Azure Key Vault to access storage account. The machine running the web application must have 
 the appropriate certificate installed.
-
-The web application can be configured using Web.config file. In Visual Studio, you can open Settings window for the project to change the 
-configuration. 
-
-The `SummaryName` property determines which timeline and records are downloaded from the `summary` blob container.
-Default is `Z3Nightly`. Then the application filters only those experiments of the `experiments` table that are listed in the timeline.
-
 See also [secrets](#secrets) for more information about access configuration.
 
+The web application can be configured using Web.config file. In Visual Studio, you can open Settings window for the project to change the configuration. 
+
+The `SummaryName` property determines which timeline and records are downloaded from the `summary` blob container.
+Default is `Z3Nightly`. Then the application filters only those experiments of the `experiments` table that are listed in the timeline. See more about summaries [here](#summaries).
+
+#### Experiment tags
+
+The web application identifies experiments either by ID or by tag.
+Tags for a timeline experiments can be listed in a blob `{summaryName}.tags.csv` of the blob container `summary`;
+e.g. `Z3Nightly.tags.csv`.
+
+The file is a CSV table with two columns, ID and Name. First column is for experiment ID, second column contains tag name.
+
+```
+Id,Name
+158,Experiment A
+184,Experiment B
+```
 
 ### Timeline and records builder
 
