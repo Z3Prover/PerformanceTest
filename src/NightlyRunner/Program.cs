@@ -107,7 +107,8 @@ namespace NightlyRunner
                     TimeSpan.FromSeconds(Settings.ExperimentTimeoutSeconds),
                     Settings.Domain,
                     Settings.BenchmarkCategory,
-                    Settings.MemoryLimitMegabytes);
+                    Settings.MemoryLimitMegabytes,
+                    1, 0 /* Run each benchmark once (i.e. adaptive run is off) */);
 
             Trace.WriteLine(string.Format("Starting nightly experiment in Batch pool \"{0}\"...", Settings.AzureBatchPoolId));
             manager.BatchPoolID = Settings.AzureBatchPoolId;
