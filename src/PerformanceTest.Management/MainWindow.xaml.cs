@@ -435,7 +435,7 @@ namespace PerformanceTest.Management
             try
             {
                 var vm = await managerVm.BuildProperties(item.ID);
-                System.ComponentModel.PropertyChangedEventHandler onPropertyChanded = (s, args) =>
+                System.ComponentModel.PropertyChangedEventHandler onPropertyChanged = (s, args) =>
                 {
                     try
                     {
@@ -453,14 +453,14 @@ namespace PerformanceTest.Management
                         uiService.ShowError(ex, "Failed to refresh experiment status");
                     }
                 };
-                vm.PropertyChanged += onPropertyChanded;
+                vm.PropertyChanged += onPropertyChanged;
 
                 ExperimentProperties dlg = new ExperimentProperties();
                 dlg.DataContext = vm;
                 dlg.Owner = this;
                 dlg.Closed += (s, args) =>
                 {
-                    vm.PropertyChanged -= onPropertyChanded;
+                    vm.PropertyChanged -= onPropertyChanged;
                 };
 
                 dlg.Show();

@@ -26,6 +26,7 @@
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -379,6 +380,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
+    <None Include="Properties\PublishProfiles\z3-nightly - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\z3nightly - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Z3NightlyWebApp - Web Deploy.pubxml" />
   </ItemGroup>
   <ItemGroup>

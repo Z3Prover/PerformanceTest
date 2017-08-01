@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PerformanceTest.Management"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="585" Width="457" WindowStartupLocation="CenterOwner" 
+        Title="{Binding Title}" Height="585" Width="457" WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False" ResizeMode="NoResize" Icon="/PerformanceTest.Management;component/Images/servers.ico"
         >
     <Window.Resources>
@@ -15,6 +15,7 @@
     </Window.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="25px"/>
             <RowDefinition Height="Auto" MinHeight="25px"/>
             <RowDefinition Height="Auto" MinHeight="25px"/>
             <RowDefinition Height="Auto" MinHeight="25px"/>
@@ -39,10 +40,10 @@
 
         <TextBlock Text="Submission Time:" Grid.Row="1" Grid.Column="0" />
         <TextBox Name="txtSubmissionTime" IsReadOnly="True" Grid.Row="1" Grid.Column="1" Text="{Binding SubmissionTime, Mode=OneWay}"/>
-        
+
         <TextBlock Text="SAS url:" Grid.Row="2" Grid.Column="0" />
         <TextBox Name="txtSasUri" IsReadOnly="True" Grid.Row="2" Grid.Column="1" Text="{Binding BenchmarkContainerUri, Mode=OneWay}"/>
-        
+
         <TextBlock Text="Category:" Grid.Row="3" Grid.Column="0" />
         <TextBox Name="txtCategory" IsReadOnly="True" Grid.Row="3" Grid.Column="1" Text="{Binding Category, Mode=OneWay}"/>
 
@@ -62,7 +63,7 @@
             <Label Content="Queued" Grid.Row="0" Grid.Column="2"/>
             <Label Name="lblTotal" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right" Content="{Binding BenchmarksTotal, Mode=OneWay, FallbackValue=?}"/>
             <Label Name="lblFinished" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" Content="{Binding BenchmarksDone, Mode=OneWay, FallbackValue=?}"/>
-            <Label Name="lblRunning" Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Right" 
+            <Label Name="lblRunning" Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Right"
                    Foreground="{Binding BenchmarksQueued, Mode=OneWay, Converter={StaticResource countToBrush}, ConverterParameter=Green}" Content="{Binding BenchmarksQueued, Mode=OneWay, FallbackValue=?}"/>
         </Grid>
 
@@ -131,13 +132,13 @@
             <Label Content="Error" Grid.Row="0" Grid.Column="1"/>
             <Label Content="M/O" Grid.Row="0" Grid.Column="2"/>
             <Label Content="T/O" Grid.Row="0" Grid.Column="3"/>
-            <Label Name="lblBug" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right" 
+            <Label Name="lblBug" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right"
                    Foreground="{Binding ProblemBug, Mode=OneWay, Converter={StaticResource countToBrush}}" Content="{Binding ProblemBug, Mode=OneWay, FallbackValue=0}"/>
-            <Label Name="lblNonzero" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" 
+            <Label Name="lblNonzero" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right"
                    Foreground="{Binding ProblemNonZero, Mode=OneWay, Converter={StaticResource countToBrush}}" Content="{Binding ProblemNonZero, Mode=OneWay, FallbackValue=0}"/>
-            <Label Name="lblMemdout" Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Right" 
+            <Label Name="lblMemdout" Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Right"
                    Foreground="{Binding ProblemMemoryout, Mode=OneWay, Converter={StaticResource countToBrush}}" Content="{Binding ProblemMemoryout, Mode=OneWay, FallbackValue=0}"/>
-            <Label Name="lblTimedout" Grid.Row="1" Grid.Column="3" HorizontalContentAlignment="Right" 
+            <Label Name="lblTimedout" Grid.Row="1" Grid.Column="3" HorizontalContentAlignment="Right"
                    Foreground="{Binding ProblemTimeout, Mode=OneWay, Converter={StaticResource countToBrush}}" Content="{Binding ProblemTimeout, Mode=OneWay, FallbackValue=0}"/>
         </Grid>
 
