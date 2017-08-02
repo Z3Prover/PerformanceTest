@@ -100,13 +100,14 @@ namespace AzurePerformanceTest
             if (result.StdOut.Length > MaxStdOutLength)
             {
                 int i = -1;
+                string etag;
                 string stdoutBlobId;
                 do
                 {
                     ++i;
                     stdoutBlobId = BlobNameForStdOut(result.ExperimentID, result.BenchmarkFileName, i.ToString());
-                }
-                while (!await UploadBlobAsync(outputContainer, stdoutBlobId, result.StdOut, UploadBlobMode.CreateNew));
+                    etag = await UploadBlobAsync(outputContainer, stdoutBlobId, result.StdOut, UploadBlobMode.CreateNew);
+                } while (etag == null); // until we find blob name for which there is no existing blob
 
                 Trace.WriteLine(string.Format("Uploaded stdout for experiment {0}", result.ExperimentID));
                 azureResult.StdOut = null;
@@ -138,13 +139,15 @@ namespace AzurePerformanceTest
             if (result.StdErr.Length > MaxStdErrLength)
             {
                 int i = -1;
+                string etag;
                 string stderrBlobId;
                 do
                 {
                     ++i;
                     stderrBlobId = BlobNameForStdErr(result.ExperimentID, result.BenchmarkFileName, i.ToString());
+                    etag = await UploadBlobAsync(outputContainer, stderrBlobId, result.StdErr, UploadBlobMode.CreateNew);
                 }
-                while (!await UploadBlobAsync(outputContainer, stderrBlobId, result.StdErr, UploadBlobMode.CreateNew));
+                while (etag == null);
 
                 Trace.WriteLine(string.Format("Uploaded stderr for experiment {0}", result.ExperimentID));
                 azureResult.StdErr = null;
@@ -238,7 +241,10 @@ namespace AzurePerformanceTest
             return String.Concat(BlobNamePrefix(experimentID), benchmarkFileName, "-stdout", index);
         }
 
-        private static async Task<bool> UploadBlobAsync(CloudBlobContainer container, string blobName, Stream content, UploadBlobMode mode, string etag = null)
+        /// <summary>
+        /// If blob uploaded, returns its etag; otherwise, if precondition failed for the mode, returns null.
+        /// </summary>
+        private static async Task<string> UploadBlobAsync(CloudBlobContainer container, string blobName, Stream content, UploadBlobMode mode, string etag = null)
         {
             if (mode == UploadBlobMode.ReplaceExact && etag == null)
                 throw new ArgumentException("Etag must be provided when using ReplaceExact mode");
@@ -270,11 +276,11 @@ namespace AzurePerformanceTest
                         RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(100), 14)
                     },
                     null);
-                return true;
+                return stdoutBlob.Properties.ETag;
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
             {
-                return false;
+                return null;
             }
             catch (StorageException ex)
             {
@@ -310,9 +316,9 @@ namespace AzurePerformanceTest
         /// Puts the benchmark results of the given experiment to the storage.
         /// </summary>
         /// <param name="results">All results must have same experiment id.
-        /// <returns>True, if results have been uploaded.
-        /// False, if the precondition failed and nothing was uploaded.</returns>
-        public async Task<bool> PutAzureExperimentResults(int expId, AzureBenchmarkResult[] results, UploadBlobMode mode, string etag = null)
+        /// <returns>Blob etag, if results have been uploaded.
+        /// Null, if the precondition failed and nothing was uploaded.</returns>
+        public async Task<string> PutAzureExperimentResults(int expId, AzureBenchmarkResult[] results, UploadBlobMode mode, string etag = null)
         {
             string fileName = GetResultsFileName(expId);
             using (MemoryStream zipStream = new MemoryStream())

@@ -12,11 +12,11 @@ namespace AzurePerformanceTest
 {
     public class AzureExperimentResults : ExperimentResults
     {
-        /// <summary>Etag of the blob which contained the given result. Null means that the blob didn't exist and no results.</summary>
-        private readonly string etag;
         private readonly int expId;
         private readonly Dictionary<BenchmarkResult, AzureBenchmarkResult> externalOutputs;
         private readonly AzureExperimentStorage storage;
+        /// <summary>Etag of the blob which contained the given result. Null means that the blob didn't exist and no results.</summary>
+        private string etag;
 
         public AzureExperimentResults(AzureExperimentStorage storage, int expId, AzureBenchmarkResult[] results, string etag) : base(expId, Parse(results, storage))
         {
@@ -51,7 +51,7 @@ namespace AzurePerformanceTest
                 var b = benchmarks[i];
                 if (!removeSet.Contains(b)) // remains
                 {
-                    var azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
+                    var azureResult = ToAzureResult(b, TryGetExternalOutput(b));
                     newAzureResults.Add(azureResult);
                     newResults.Add(b);
                 }
@@ -69,8 +69,9 @@ namespace AzurePerformanceTest
             if (removeSet.Count != 0) throw new ArgumentException("Some of the given results to remove do not belong to the experiment results");
 
             // Updating blob with results table
-            bool success = await Upload(newAzureResults.ToArray());
-            if (!success) return false;
+            string newEtag = await Upload(newAzureResults.ToArray());
+            if (newEtag == null) return false;
+            etag = newEtag;
 
             // Update benchmarks array
             Replace(newResults.ToArray());
@@ -118,38 +119,18 @@ namespace AzurePerformanceTest
                             status, // <-- new status
                             b.ExitCode, b.StdOut, b.StdErr, b.Properties);
 
-                        azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(newBenchmarks[i]);
+                        azureResult = ToAzureResult(newBenchmarks[i], TryGetExternalOutput(b));
                         mod[b] = newBenchmarks[i];
                     }
                     else // status is as required already
                     {
-                        azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
+                        azureResult = ToAzureResult(b, TryGetExternalOutput(b));
                         mod.Remove(b);
                     }
                 }
                 else // result doesn't change
                 {
-                    azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
-                }
-
-                AzureBenchmarkResult ar;
-                if (externalOutputs.TryGetValue(b, out ar))
-                {
-                    azureResult.StdOut = ar.StdOut;
-                    azureResult.StdOutExtStorageIdx = ar.StdOutExtStorageIdx;
-
-                    azureResult.StdErr = ar.StdErr;
-                    azureResult.StdErrExtStorageIdx = ar.StdErrExtStorageIdx;
-                }
-                else
-                {
-                    b.StdOut.Seek(0, System.IO.SeekOrigin.Begin);
-                    azureResult.StdOut = Utils.StreamToString(b.StdOut, true);
-                    azureResult.StdOutExtStorageIdx = string.Empty;
-
-                    b.StdErr.Seek(0, System.IO.SeekOrigin.Begin);
-                    azureResult.StdErr = Utils.StreamToString(b.StdErr, true);
-                    azureResult.StdErrExtStorageIdx = string.Empty;
+                    azureResult = ToAzureResult(b, TryGetExternalOutput(b));
                 }
 
                 newAzureBenchmarks[i] = azureResult;
@@ -159,23 +140,74 @@ namespace AzurePerformanceTest
             foreach (var item in mod)
                 if (item.Value == null) throw new ArgumentException("Some of the given results to update do not belong to the experiment results");
 
-            bool success = await Upload(newAzureBenchmarks);
-            if (!success) return null;
+            string newEtag = await Upload(newAzureBenchmarks);
+            if (newEtag == null) return null;
 
             // Update benchmarks array
+            etag = newEtag;
             Replace(newBenchmarks.ToArray());
+            foreach (var item in externalOutputs.ToArray())
+            {
+                BenchmarkResult oldB = item.Key;
+                BenchmarkResult newB;
+                if (!mod.TryGetValue(oldB, out newB)) continue;
+
+                AzureBenchmarkResult ar;
+                if (externalOutputs.TryGetValue(oldB, out ar))
+                {
+                    externalOutputs.Remove(oldB);
+                    externalOutputs.Add(newB, ar);
+                }
+            }
 
             return mod;
         }
 
-        private async Task<bool> Upload(AzureBenchmarkResult[] newAzureBenchmarks)
+        private static AzureBenchmarkResult ToAzureResult(BenchmarkResult b, AzureBenchmarkResult externalOutput)
         {
-            bool success;
+            AzureBenchmarkResult azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
+
+            if (externalOutput != null)
+            {
+                azureResult.StdOut = externalOutput.StdOut;
+                azureResult.StdOutExtStorageIdx = externalOutput.StdOutExtStorageIdx;
+
+                azureResult.StdErr = externalOutput.StdErr;
+                azureResult.StdErrExtStorageIdx = externalOutput.StdErrExtStorageIdx;
+            }
+            else
+            {
+                b.StdOut.Position = 0;
+                azureResult.StdOut = Utils.StreamToString(b.StdOut, true);
+                azureResult.StdOutExtStorageIdx = string.Empty;
+
+                b.StdErr.Position = 0;
+                azureResult.StdErr = Utils.StreamToString(b.StdErr, true);
+                azureResult.StdErrExtStorageIdx = string.Empty;
+            }
+
+            return azureResult;
+        }
+
+        private AzureBenchmarkResult TryGetExternalOutput(BenchmarkResult b)
+        {
+            AzureBenchmarkResult azureResult;
+            if (externalOutputs.TryGetValue(b, out azureResult)) return azureResult;
+            return null;
+        }
+
+        /// <summary>
+        /// If uploaded, returns etag for the results table.
+        /// Otherwise, if precondition failed, returns null.
+        /// </summary>
+        private async Task<string> Upload(AzureBenchmarkResult[] newAzureBenchmarks)
+        {
+            string newEtag;
             if (etag != null) // blob already exists
-                success = await storage.PutAzureExperimentResults(expId, newAzureBenchmarks, UploadBlobMode.ReplaceExact, etag);
+                newEtag = await storage.PutAzureExperimentResults(expId, newAzureBenchmarks, UploadBlobMode.ReplaceExact, etag);
             else // blob didn't exist
-                success = await storage.PutAzureExperimentResults(expId, newAzureBenchmarks, UploadBlobMode.CreateNew);
-            return success;
+                newEtag = await storage.PutAzureExperimentResults(expId, newAzureBenchmarks, UploadBlobMode.CreateNew);
+            return newEtag;
         }
 
         private static BenchmarkResult[] Parse(AzureBenchmarkResult[] results, AzureExperimentStorage storage)
