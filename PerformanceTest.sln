@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26724.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTest", "src\PerformanceTest\PerformanceTest.csproj", "{86056F9D-4F4E-492B-BBC2-7A176043E42C}"
 EndProject
@@ -46,8 +46,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Summary", "src\Summary\Summary.csproj", "{12135DAD-FAA7-4E97-B831-C9D55295151F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NightlyWebApp", "src\NightlyWebApp\NightlyWebApp.csproj", "{A6EBDABB-EDE3-4B6E-9EFC-3A71F817E4CA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PythonDomain", "src\PythonDomain\PythonDomain.csproj", "{F7BDB0BE-F8FD-43FC-B1A0-CC17BA321263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,10 +121,6 @@ Global
 		{A6EBDABB-EDE3-4B6E-9EFC-3A71F817E4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6EBDABB-EDE3-4B6E-9EFC-3A71F817E4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6EBDABB-EDE3-4B6E-9EFC-3A71F817E4CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7BDB0BE-F8FD-43FC-B1A0-CC17BA321263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7BDB0BE-F8FD-43FC-B1A0-CC17BA321263}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7BDB0BE-F8FD-43FC-B1A0-CC17BA321263}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7BDB0BE-F8FD-43FC-B1A0-CC17BA321263}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -145,7 +145,7 @@ namespace AzureWorker
                         return new string[] { };
                     }));
                 Console.WriteLine("Done!");
-                    
+
                 string outputQueueUri = storage.GetOutputQueueSASUri(experimentId, TimeSpan.FromHours(48));
                 string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(48));
                 string[] blobsToProcess = benchmarkList.Where(b => !processedBlobs.Contains(b)).ToArray();
@@ -186,7 +186,7 @@ namespace AzureWorker
             var storage = new AzureExperimentStorage(credentials.WithoutBatchData().ToString());
 
             var expInfo = await storage.GetExperiment(experimentId);
-            
+
             string benchmarkContainerUri = expInfo.BenchmarkContainerUri;// args[1];
             string benchmarkDirectory = expInfo.BenchmarkDirectory;// args[2];
             string benchmarkCategory = expInfo.Category;// args[3];
@@ -198,7 +198,7 @@ namespace AzureWorker
             double memoryLimit = expInfo.MemoryLimitMB;// 0; // no limit
             int maxRepetitions = expInfo.AdaptiveRunMaxRepetitions;
             double maxTime = expInfo.AdaptiveRunMaxTimeInSeconds;
-            
+
             //long? outputLimit = null;
             //long? errorLimit = null;
             //if (args.Length > 9)
@@ -307,7 +307,7 @@ namespace AzureWorker
                 {
                     Trace.WriteLine(string.Format("Building summary for experiment {0} and summary name {1}...", experimentId, summaryName));
                     AzureSummaryManager manager = new AzureSummaryManager(credentials.WithoutBatchData().ToString(), MEFDomainResolver.Instance);
-                    await AppendSummary(summaryName, experimentId, domain, manager);
+                    await AppendSummaryAndSendReport(summaryName, experimentId, domain, manager);
                 }
                 else
                 {
@@ -316,19 +316,24 @@ namespace AzureWorker
                 Console.WriteLine("Closing.");
             }
         }
-        private static async Task AppendSummary(string summaryName, int experimentId, Domain domain, AzureSummaryManager manager)
+        private static async Task AppendSummaryAndSendReport(string summaryName, int experimentId, Domain domain, AzureSummaryManager manager)
         {
             Trace.WriteLine("Building summary...");
-            var result = await manager.Update(summaryName, experimentId);
+
+            ExperimentSummary[] summaries = await manager.Update(summaryName, experimentId);
+            if (summaries.Length == 0) return;
+
             try
             {
                 var secretStorage = new SecretStorage(Settings.Default.AADApplicationId, Settings.Default.AADApplicationCertThumbprint, Settings.Default.KeyVaultUrl);
                 string credentials = await secretStorage.GetSecret(Settings.Default.SendEmailCredentialsSecretId);
+
                 var sendMail = new SendMail(credentials, Settings.Default.SmtpServerUrl);
-                await sendMail.SendReport(manager, result[0], result[1], Settings.Default.ReportRecipients, Settings.Default.LinkPage);
+                await sendMail.SendReport(manager, summaries[0], summaries.Length > 1 ? summaries[1] : null, Settings.Default.ReportRecipients, Settings.Default.LinkPage);
+
                 Trace.WriteLine("Done.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.WriteLine("Can't send email: " + ex.Message);
                 return;
@@ -443,7 +448,7 @@ namespace AzureWorker
             if (x.Count != y.Count)
                 return false;
 
-            foreach(var pair in x)
+            foreach (var pair in x)
             {
                 if (!y.ContainsKey(pair.Key) || y[pair.Key] != pair.Value)
                     return false;

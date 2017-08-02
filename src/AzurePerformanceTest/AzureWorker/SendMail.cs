@@ -21,7 +21,7 @@ namespace AzureWorker
         string userMail = "";
         string pwd = "";
         string serverUrl = "";
-        public SendMail (string credentials, string serverUrl)
+        public SendMail(string credentials, string serverUrl)
         {
             if (credentials == null) throw new ArgumentNullException("credentials");
             if (serverUrl == null) throw new ArgumentNullException("serverUrl");
@@ -35,8 +35,8 @@ namespace AzureWorker
         }
         public async Task SendReport(AzureSummaryManager manager, ExperimentSummary expSummary, ExperimentSummary refSummary, string recipientsStr, string linkPage)
         {
-            var expId = expSummary.Id;
-            var refId = refSummary.Id;
+            int expId = expSummary.Id;
+            int? refId = refSummary != null ? (int?)refSummary.Id : null;
             var submissionTime = expSummary.Date;
             var statusSummary = await manager.GetStatusSummary(expId, refId);
 
@@ -86,7 +86,7 @@ namespace AzureWorker
                         Send(recipient, "Z3 Alerts", new_report, true);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Trace.WriteLine("Failed to send email: " + ex.Message);
                 }
@@ -137,33 +137,38 @@ namespace AzureWorker
         private void Send(string tot, string subject, string msg, bool html = false)
         {
             MailAddress to = new MailAddress(tot);
-            MailAddress from = new MailAddress(userMail);
+            MailAddress from = new MailAddress(userMail, "cz3");
+
             MailMessage mail = new MailMessage(from, to);
             mail.Subject = subject;
             mail.Body = msg;
-            SmtpClient client = new SmtpClient(serverUrl);
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(userMail, pwd);
-            mail.IsBodyHtml = html;
 
-            uint retries = 0;
-            bool sent = false;
-            while (!sent)
+            using (SmtpClient client = new SmtpClient(serverUrl))
             {
-                try
+                client.EnableSsl = true;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(userMail, pwd);
+                mail.IsBodyHtml = html;
+
+                uint retries = 0;
+                bool sent = false;
+                while (retries < retryCount && !sent)
                 {
-                    client.Send(mail);
-                    sent = true;
-                }
-                catch (System.Net.Mail.SmtpException ex)
-                {
-                    retries++;
-                    if (retries == retryCount)
-                        Trace.WriteLine("Failed to send email: " + ex.Message);
+                    try
+                    {
+                        client.Send(mail);
+                        sent = true;
+                    }
+                    catch (SmtpException ex)
+                    {
+                        Trace.WriteLine("Attempt to send email: " + ex.Message);
+                        System.Threading.Thread.Sleep(1000);
+                        retries++;
+                        if (retries == retryCount)
+                            Trace.WriteLine("Failed to send email: " + ex.Message);
+                    }
                 }
             }
-            client.Dispose();
         }
     }
 }
