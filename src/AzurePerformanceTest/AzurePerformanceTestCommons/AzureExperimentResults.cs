@@ -106,6 +106,7 @@ namespace AzurePerformanceTest
             for (int i = 0; i < n; i++)
             {
                 var b = newBenchmarks[i];
+                AzureBenchmarkResult azureResult;
 
                 if (mod.ContainsKey(b))
                 {
@@ -117,20 +118,41 @@ namespace AzurePerformanceTest
                             status, // <-- new status
                             b.ExitCode, b.StdOut, b.StdErr, b.Properties);
 
-                        newAzureBenchmarks[i] = AzureExperimentStorage.ToAzureBenchmarkResult(newBenchmarks[i]);
-
+                        azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(newBenchmarks[i]);
                         mod[b] = newBenchmarks[i];
                     }
                     else // status is as required already
                     {
-                        newAzureBenchmarks[i] = AzureExperimentStorage.ToAzureBenchmarkResult(b);
+                        azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
                         mod.Remove(b);
                     }
                 }
                 else // result doesn't change
                 {
-                    newAzureBenchmarks[i] = AzureExperimentStorage.ToAzureBenchmarkResult(b);
+                    azureResult = AzureExperimentStorage.ToAzureBenchmarkResult(b);
                 }
+
+                AzureBenchmarkResult ar;
+                if (externalOutputs.TryGetValue(b, out ar))
+                {
+                    azureResult.StdOut = ar.StdOut;
+                    azureResult.StdOutExtStorageIdx = ar.StdOutExtStorageIdx;
+
+                    azureResult.StdErr = ar.StdErr;
+                    azureResult.StdErrExtStorageIdx = ar.StdErrExtStorageIdx;
+                }
+                else
+                {
+                    b.StdOut.Seek(0, System.IO.SeekOrigin.Begin);
+                    azureResult.StdOut = Utils.StreamToString(b.StdOut, true);
+                    azureResult.StdOutExtStorageIdx = string.Empty;
+
+                    b.StdErr.Seek(0, System.IO.SeekOrigin.Begin);
+                    azureResult.StdErr = Utils.StreamToString(b.StdErr, true);
+                    azureResult.StdErrExtStorageIdx = string.Empty;
+                }
+
+                newAzureBenchmarks[i] = azureResult;
             }
 
             if (mod.Count == 0) return new Dictionary<BenchmarkResult, BenchmarkResult>(); // no changes
