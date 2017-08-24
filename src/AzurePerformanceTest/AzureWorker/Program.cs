@@ -303,7 +303,7 @@ namespace AzureWorker
 
                 MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient);
 
-                if (summaryName != null)
+                if (summaryName != null && expInfo.Creator == "Nightly")
                 {
                     Trace.WriteLine(string.Format("Building summary for experiment {0} and summary name {1}...", experimentId, summaryName));
                     AzureSummaryManager manager = new AzureSummaryManager(credentials.WithoutBatchData().ToString(), MEFDomainResolver.Instance);
