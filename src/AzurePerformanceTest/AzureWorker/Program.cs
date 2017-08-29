@@ -222,8 +222,6 @@ namespace AzureWorker
 
             await FetchSavedResults(experimentId, storage);
             Console.WriteLine("Fetched existing results");
-            var collectionTask = CollectResults(experimentId, storage, false);
-            Console.WriteLine("Started collection thread.");
             Domain domain = ResolveDomain(domainString);
             SortedSet<string> extensions;
             if (string.IsNullOrEmpty(extensionsString))
@@ -300,6 +298,9 @@ namespace AzureWorker
                     Program.totalBenchmarks = expInfo.TotalBenchmarks;
                     totalBenchmarksToProcess = expInfo.TotalBenchmarks;
                 }
+
+                var collectionTask = CollectResults(experimentId, storage);
+                Console.WriteLine("Started collection thread.");
 
                 MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient);
 
@@ -397,16 +398,12 @@ namespace AzureWorker
             }
         }
 
-        static async Task CollectResults(int experimentId, AzureExperimentStorage storage, bool wait=true)
+        static async Task CollectResults(int experimentId, AzureExperimentStorage storage)
         {
             Console.WriteLine("Started collection.");
             var queue = storage.GetResultsQueueReference(experimentId);
             List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();
             int processedBenchmarks = 0;
-
-            if (!queue.ApproximateMessageCount.HasValue ||
-                (queue.ApproximateMessageCount == 0 && !wait))
-                return;
 
             var formatter = new BinaryFormatter();
             bool completed = false;
@@ -437,7 +434,7 @@ namespace AzureWorker
                     queue.DeleteMessage(message);
                 }
                 if (oldCount == results.Count)
-                    Thread.Sleep(500);
+                    Thread.Sleep(2500);
             }
             while (!completed);
             await storage.DeleteResultsQueue(experimentId);

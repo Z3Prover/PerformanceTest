@@ -502,9 +502,6 @@ namespace AzurePerformanceTest
 
         public async Task SetCompletedBenchmarks(int id, int completedBenchmarks)
         {
-            if (completedBenchmarks == 0)
-                return;
-
             TableQuery<ExperimentEntity> query = ExperimentPointQuery(id);
 
             bool changed = false;

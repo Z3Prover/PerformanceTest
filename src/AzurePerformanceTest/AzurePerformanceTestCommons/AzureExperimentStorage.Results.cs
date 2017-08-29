@@ -320,9 +320,6 @@ namespace AzurePerformanceTest
         /// Null, if the precondition failed and nothing was uploaded.</returns>
         public async Task<string> PutAzureExperimentResults(int expId, AzureBenchmarkResult[] results, UploadBlobMode mode, string etag = null)
         {
-            if (results.Length == 0)
-                return null;
-
             string fileName = GetResultsFileName(expId);
             using (MemoryStream zipStream = new MemoryStream())
             {
