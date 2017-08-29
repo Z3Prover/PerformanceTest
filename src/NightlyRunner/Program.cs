@@ -102,7 +102,7 @@ namespace NightlyRunner
                     ExperimentDefinition.DefaultContainerUri,
                     Settings.BenchmarkDirectory,
                     Settings.BenchmarkFileExtension,
-                    Settings.Parameters,
+                    Settings.Parameters.Replace("\"", "\\\""),
                     TimeSpan.FromSeconds(Settings.BenchmarkTimeoutSeconds),
                     TimeSpan.FromSeconds(Settings.ExperimentTimeoutSeconds),
                     Settings.Domain,

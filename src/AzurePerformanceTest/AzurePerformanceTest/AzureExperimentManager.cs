@@ -16,7 +16,7 @@ namespace AzurePerformanceTest
 {
     public class AzureExperimentManager : ExperimentManager
     {
-        const int MaxTaskRetryCount = 5;
+        const int MaxTaskRetryCount = 1;
         const string DefaultPoolID = "testPool";
 
         AzureExperimentStorage storage;
@@ -357,7 +357,7 @@ namespace AzurePerformanceTest
                     string blobSasUri = String.Format("{0}{1}", blob.Uri, sasBlobToken);
                     job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(blobSasUri, blob.Name));
                 }
-                
+
                 string executableFolder = "exec";
                 job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(storage.GetExecutableSasUri(definition.Executable), Path.Combine(executableFolder, definition.Executable)));
 

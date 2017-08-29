@@ -85,7 +85,7 @@ namespace PerformanceTest.Management
             string storedParam = recentValues.ExperimentExecutableParameters;
             if (!string.IsNullOrEmpty(storedParam))
                 parameters = storedParam;
-
+            // string storedDomain = recentValues.Domain;
 
             UseMostRecentExecutable = true;
             RecentBlobDisplayName = "searching...";
@@ -201,7 +201,7 @@ namespace PerformanceTest.Management
                     if (newExt == null || newExt.Length == 0) return;
                     Extension = string.Join("|", newExt);
 
-                    Parameters = d.CommandLineParameters;
+                    // Parameters = d.CommandLineParameters;
                 }
                 catch (Exception ex)
                 {
@@ -413,6 +413,7 @@ namespace PerformanceTest.Management
             recentValues.BenchmarkCategories = categories;
             recentValues.BenchmarkExtension = extension;
             recentValues.ExperimentExecutableParameters = parameters;
+            recentValues.Domain = Domain;
             recentValues.BenchmarkTimeLimit = TimeSpan.FromSeconds(timelimit);
             recentValues.ExperimentTimeLimit = TimeSpan.FromSeconds(exptimelimit);
             recentValues.BenchmarkMemoryLimit = memlimit;
@@ -458,7 +459,7 @@ namespace PerformanceTest.Management
             {
                 isValid = false;
                 service.ShowWarning("Parameters value is null", "Validation failed");
-            }            
+            }
 
             return isValid;
         }

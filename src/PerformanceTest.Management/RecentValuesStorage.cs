@@ -71,6 +71,13 @@ namespace PerformanceTest.Management
             get { return ReadString("ExperimentExecutableParameters"); }
             set { WriteString("ExperimentExecutableParameters", value); }
         }
+
+        public string Domain
+        {
+            get { return ReadString("Domain"); }
+            set { WriteString("Domain", value); }
+        }
+
         public bool AllowAdaptiveRuns
         {
             get { return ReadBool("AllowAdaptiveRuns"); }

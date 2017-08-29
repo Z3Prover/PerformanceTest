@@ -26,7 +26,7 @@ namespace PerformanceTest
                 BenchmarkContainerUri = benchmarkContainerUri,
                 BenchmarkDirectory = benchmarkDirectory,
                 BenchmarkFileExtension = benchmarkFileExtension,
-                Parameters = parameters,
+                Parameters = parameters.Replace("\"", "\\\""),
                 BenchmarkTimeout = benchmarkTimeout,
                 ExperimentTimeout = experimentTimeout,
                 Category = category,
@@ -176,7 +176,7 @@ namespace PerformanceTest
     public class BenchmarkResult : ISerializable
     {
         public BenchmarkResult(int experimentId, string benchmarkFileName, DateTime acquireTime, double normalizedRuntime,
-            TimeSpan totalProcessorTime, TimeSpan wallClockTime, double memorySizeMB, ResultStatus status, int? exitCode, Stream stdout, Stream stderr, 
+            TimeSpan totalProcessorTime, TimeSpan wallClockTime, double memorySizeMB, ResultStatus status, int? exitCode, Stream stdout, Stream stderr,
             IReadOnlyDictionary<string, string> props)
         {
             if (props == null) throw new ArgumentNullException("props");
@@ -263,7 +263,7 @@ namespace PerformanceTest
         /// otherwise, returns null.
         /// </summary>
         public int? ExitCode { get; private set; }
-        
+
         public Stream StdOut { get; private set; }
 
         public Stream StdErr { get; private set; }
