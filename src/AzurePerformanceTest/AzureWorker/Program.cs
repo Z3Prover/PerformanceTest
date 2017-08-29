@@ -222,7 +222,7 @@ namespace AzureWorker
 
             await FetchSavedResults(experimentId, storage);
             Console.WriteLine("Fetched existing results");
-            var collectionTask = CollectResults(experimentId, storage);
+            var collectionTask = CollectResults(experimentId, storage, false);
             Console.WriteLine("Started collection thread.");
             Domain domain = ResolveDomain(domainString);
             SortedSet<string> extensions;
@@ -397,12 +397,16 @@ namespace AzureWorker
             }
         }
 
-        static async Task CollectResults(int experimentId, AzureExperimentStorage storage)
+        static async Task CollectResults(int experimentId, AzureExperimentStorage storage, bool wait=true)
         {
             Console.WriteLine("Started collection.");
             var queue = storage.GetResultsQueueReference(experimentId);
-            List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();// (await storage.GetAzureExperimentResults(experimentId)).ToList();
-            int processedBenchmarks = 0;// goodResults.Count + badResults.Count;// results.Count;
+            List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();
+            int processedBenchmarks = 0;
+
+            if (!queue.ApproximateMessageCount.HasValue ||
+                (queue.ApproximateMessageCount == 0 && !wait))
+                return;
 
             var formatter = new BinaryFormatter();
             bool completed = false;
