@@ -21,7 +21,7 @@ namespace Measurement
         /// <param name="outputLimit">Maximum length of the process standard output stream (characters).</param>
         /// <param name="errorLimit">Maximum length of the process standard error stream (characters).</param>
         /// <returns></returns>
-        public static ProcessRunMeasure Measure(string fileName, string arguments, TimeSpan timeout, double? memoryLimit = 0, long? outputLimit = null, long? errorLimit = null)
+        public static ProcessRunMeasure Measure(string fileName, string arguments, TimeSpan timeout, double? memoryLimit = 0, long? outputLimit = null, long? errorLimit = null, Domain domain = null)
         {
             var stdOut = new MemoryStream();
             var stdErr = new MemoryStream();
@@ -41,6 +41,9 @@ namespace Measurement
             }
             else
                 localFileName = fileName;
+
+            if (domain != null)
+                arguments = domain.Preprocess(arguments, localFileName);
 
             Process p = StartProcess(localFileName, arguments,
                 output => WriteToStream(output, out_writer, ref out_lim),
@@ -112,10 +115,10 @@ namespace Measurement
                 Directory.Delete(tempFolder, true);
             }
 
-            var status = 
-                exhausted_time ? 
+            var status =
+                exhausted_time ?
                     Measurement.Measure.LimitsStatus.TimeOut :
-                        (exhausted_memory || processExitCode == -1073741571) ? 
+                        (exhausted_memory || processExitCode == -1073741571) ?
                             Measurement.Measure.LimitsStatus.MemoryOut : // .NET StackOverflowException
                             Measurement.Measure.LimitsStatus.WithinLimits;
 

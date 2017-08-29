@@ -1,4 +1,8 @@
 Login-AzureRmAccount
+# select right subscription
+# $subscription = Get-AzureRmSubscription -SubscriptionId ... # ?
+# Set-AzureRmContext -SubscriptionId ...
+
 
 $NightlyApp = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSApplicationPackageReference"
 $NightlyApp.ApplicationId = "NightlyRunner" # <-- check application id
@@ -14,10 +18,10 @@ $ManagerTask.CommandLine = "cmd /c %AZ_BATCH_APP_PACKAGE_NIGHTLYRUNNER%\NightlyR
 $JobSpecification = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSJobSpecification"
 $JobSpecification.JobManagerTask = $ManagerTask
 $JobSpecification.PoolInformation = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSPoolInformation"
-$JobSpecification.PoolInformation.PoolId = ...pool id... # <-- enter pool id here
+$JobSpecification.PoolInformation.PoolId = "z3-nightly" # ...pool id... # <-- enter pool id here
 
 $Schedule = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSSchedule"
 $Schedule.RecurrenceInterval = [TimeSpan]::FromDays(1)
 
-$BatchContext = Get-AzureRmBatchAccountKeys 
+$BatchContext = Get-AzureRmBatchAccountKeys -AccountName cz3
 New-AzureBatchJobSchedule -Id "NightlyRunSchedule" -Schedule $Schedule -JobSpecification $JobSpecification -BatchContext $BatchContext

@@ -48,7 +48,7 @@ namespace PerformanceTest
             if (Path.IsPathRooted(experiment.Executable)) executable = experiment.Executable;
             else executable = Path.Combine(rootFolder, experiment.Executable);
             if (!File.Exists(executable)) throw new ArgumentException("Executable not found");
-            
+
             string benchmarkFolder = string.IsNullOrEmpty(experiment.Category) ? experiment.BenchmarkDirectory : Path.Combine(experiment.BenchmarkDirectory, experiment.Category);
             if (!Path.IsPathRooted(benchmarkFolder))
             {
@@ -67,8 +67,8 @@ namespace PerformanceTest
                         Trace.WriteLine("Running benchmark " + Path.GetFileName(inputRelativePath));
 
                         string args = experiment.Parameters;
-                        return RunBenchmark(id, executable, experiment.Parameters, inputRelativePath, inputFullPath, 
-                            repetitions, experiment.BenchmarkTimeout, experiment.MemoryLimitMB, null, null, domain, 
+                        return RunBenchmark(id, executable, experiment.Parameters, inputRelativePath, inputFullPath,
+                            repetitions, experiment.BenchmarkTimeout, experiment.MemoryLimitMB, null, null, domain,
                             normal);
                     }, benchmarkFile, TaskCreationOptions.LongRunning);
                 results.Add(task);
@@ -96,7 +96,7 @@ namespace PerformanceTest
             ProcessRunMeasure m;
             do
             {
-                m = ProcessMeasurer.Measure(executable, args, timeOut, memLimitMB, ouputLimit, errorLimit);
+                m = ProcessMeasurer.Measure(executable, args, timeOut, memLimitMB, ouputLimit, errorLimit, domain);
                 measures.Add(m);
                 count++;
                 total += m.WallClockTime;

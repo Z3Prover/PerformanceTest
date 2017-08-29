@@ -92,7 +92,7 @@ namespace UnitTests
             try
             {
                 Measurement.ProcessRunMeasure m = ProcessMeasurer.Measure(zipname, "100", TimeSpan.FromMilliseconds(1000));
-                
+
                 Assert.AreEqual(0, m.ExitCode, "Exit code");
                 Assert.AreEqual(Measure.LimitsStatus.WithinLimits, m.Limits);
                 Assert.IsTrue(m.PeakMemorySizeMB > 1, "Memory size seems too low");
@@ -130,7 +130,7 @@ namespace UnitTests
             try
             {
                 Measurement.ProcessRunMeasure m = ProcessMeasurer.Measure(zipname, "100", TimeSpan.FromMilliseconds(1000));
-                
+
             }
             catch
             {

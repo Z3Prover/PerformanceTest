@@ -36,12 +36,21 @@ namespace Measurement
         public virtual string CommandLineParameters { get { return ""; } }
 
         /// <summary>
-        /// Adds an input file name to the command line parameters in accordance with the 
+        /// Adds an input file name to the command line parameters in accordance with the
         /// program command line syntax.
         /// </summary>
         public virtual string AddFileNameArgument(string parameters, string fileName)
         {
             return string.Format("{0} {1}", parameters, fileName);
+        }
+
+        /// <summary>
+        /// Preprocesses the input file according to parameter settings. Returns a new
+        /// set of parameters.
+        /// </summary>
+        public virtual string Preprocess(string parameters, string fileName)
+        {
+            return parameters;
         }
 
         /// <summary>
@@ -67,7 +76,7 @@ namespace Measurement
                     case ResultStatus.Timeout:
                         timeouts++;
                         break;
-                    case ResultStatus.Error:                        
+                    case ResultStatus.Error:
                         errors++;
                         break;
                     case ResultStatus.InfrastructureError:
@@ -92,7 +101,7 @@ namespace Measurement
         protected abstract IReadOnlyDictionary<string, string> AggregateProperties(IEnumerable<ProcessRunResults> results);
 
         /// <summary>
-        /// Returns a boolean value that determines of the given process run result 
+        /// Returns a boolean value that determines of the given process run result
         /// can participate in the best result challenge.
         /// </summary>
         /// <param name="result"></param>

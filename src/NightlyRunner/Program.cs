@@ -16,13 +16,13 @@ namespace NightlyRunner
 {
     class Program
     {
-        static Settings Settings = Settings.Default;        
+        static Settings Settings = Settings.Default;
         static Regex regex = new Regex(Settings.RegexExecutableFileName, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
         static int Main(string[] args)
         {
             try
-            {                
+            {
 
                 Run().Wait();
                 return 0;
@@ -118,7 +118,7 @@ namespace NightlyRunner
                 string.Format("{0} for https://github.com/{1}/{2}/commit/{3}", Settings.ExperimentNote, Settings.GitHubOwner, Settings.GitHubZ3Repository, commitSha) :
                 Settings.ExperimentNote;
 
-            var summaryName = Settings.SummaryName == "" ? null : Settings.SummaryName; 
+            var summaryName = Settings.SummaryName == "" ? null : Settings.SummaryName;
             var experimentId = await manager.StartExperiment(definition, Settings.Creator, note, summaryName);
             Trace.WriteLine(string.Format("Done, experiment id {0}.", experimentId));
         }
@@ -131,7 +131,7 @@ namespace NightlyRunner
             var experiments = await manager.FindExperiments(new ExperimentManager.ExperimentFilter() { CreatorEquals = Settings.Creator });
             var mostRecent = experiments.FirstOrDefault();
             if (mostRecent == null) return null;
-                        
+
             var metadata = await manager.Storage.GetExecutableMetadata(mostRecent.Definition.Executable);
             string fileName = null;
             if(metadata.TryGetValue(AzureExperimentStorage.KeyFileName, out fileName))
@@ -153,7 +153,7 @@ namespace NightlyRunner
 
             // Multiple matching files, should take the most recent
             DateTimeOffset max = DateTimeOffset.MinValue;
-            RepositoryContent recent = null; 
+            RepositoryContent recent = null;
 
             foreach (var fm in files)
             {

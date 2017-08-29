@@ -99,7 +99,7 @@ namespace AzureWorker
             AzureBenchmarkStorage benchmarkStorage = CreateBenchmarkStorage(benchmarkContainerUri, storage);
 
             var queue = await storage.CreateResultsQueue(experimentId);
-            Console.Write("Created queue");
+            Console.WriteLine("Created queue");
 
             // We can't tell bad results we got during previous runs on the same experiment from bad results
             // we got during this run when job manager crashed, so we put them all into 'good' list.
@@ -218,7 +218,7 @@ namespace AzureWorker
 
 
             var queue = await storage.CreateResultsQueue(experimentId);
-            Console.Write("Created queue");
+            Console.WriteLine("Created queue");
 
             await FetchSavedResults(experimentId, storage);
             Console.WriteLine("Fetched existing results");

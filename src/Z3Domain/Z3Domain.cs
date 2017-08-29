@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using static Measurement.Measure;
@@ -49,6 +50,36 @@ namespace Measurement
         public override string AddFileNameArgument(string parameters, string fileName)
         {
             return string.Format("{0} -file:{1}", parameters, fileName);
+        }
+
+        public override string Preprocess(string parameters, string fileName)
+        {
+            string res = parameters;
+            if (parameters.Contains("replace-check-sat="))
+            {
+                string new_cs = "";
+                Regex rx = new Regex("replace-check-sat=\"([^\"]+)\"");
+                Match m = rx.Match(parameters);
+                if (m.Groups.Count > 0)
+                {
+                    new_cs = m.Groups[1].Value;
+                    res = parameters.Replace("replace-check-sat=\"" + new_cs + "\"", "");
+
+                    string tmpf = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    using (FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                    using (FileStream ft = new FileStream(tmpf, FileMode.Create, FileAccess.Write))
+                    using (StreamReader fr = new StreamReader(f))
+                    using (StreamWriter ftw = new StreamWriter(ft))
+                        while (!fr.EndOfStream)
+                        {
+                            string s = fr.ReadLine();
+                            ftw.WriteLine(s.Replace("(check-sat)", new_cs));
+                        }
+
+                    File.Move(tmpf, fileName);
+                }
+            }
+            return res;
         }
 
         public override ProcessRunAnalysis Analyze(string inputFile, ProcessRunMeasure measure)

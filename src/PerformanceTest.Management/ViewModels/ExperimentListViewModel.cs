@@ -137,7 +137,7 @@ namespace PerformanceTest.Management
                 var now = DateTime.Now;
                 foreach (var vm in allExperiments)
                 {
-                    if (now.Subtract(vm.Submitted).TotalDays > 7) break; 
+                    if (now.Subtract(vm.Submitted).TotalDays > 7) break;
                     vm.JobStatus = ExperimentExecutionStateVM.Loading;
                     items.Add(vm);
                 }
