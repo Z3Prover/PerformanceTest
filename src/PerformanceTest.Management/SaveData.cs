@@ -13,8 +13,8 @@ namespace PerformanceTest.Management
     class CSVDatum
     {
         public int? rv = null;
-        public double runtime = 0.0;
-        public int sat = 0, unsat = 0, unknown = 0; 
+        public double normalized_time = 0.0, cpu_time = 0.0, wallclock_time = 0.0;
+        public int sat = 0, unsat = 0, unknown = 0;
     }
     public class SaveData
     {
@@ -41,7 +41,7 @@ namespace PerformanceTest.Management
                         data[filename].Add(id, bij.ExitCode);
                 }
             }
-            // find similar for all experiments benchmarks and check exitCode. 
+            // find similar for all experiments benchmarks and check exitCode.
             foreach (KeyValuePair<string, Dictionary<int, int?>> d in data.OrderBy(x => x.Key))
             {
                 int count = d.Value.Count();
@@ -145,9 +145,9 @@ namespace PerformanceTest.Management
                     string note = experiments[i].Note == null ? "" : experiments[i].Note.Trim(' ');
                     var ex_timeout = def.BenchmarkTimeout.TotalSeconds;
 
-                    f.Write(note + ",");
-                    if (ps != "") f.Write("'" + ps + "'");
-                    f.Write(",,,,");
+                    f.Write("\"" + note + "\",");
+                    if (ps != "") f.Write("\"" + ps + "\"");
+                    f.Write(",,,,,,");
 
                     double error_line = 10.0 * ex_timeout;
                     var benchmarks = benchs[i].Benchmarks;
@@ -157,7 +157,9 @@ namespace PerformanceTest.Management
                         BenchmarkResult b = benchmarks[j];
                         CSVDatum cur = new CSVDatum();
                         cur.rv = b.ExitCode.Equals(DBNull.Value) ? null : (int?)b.ExitCode;
-                        cur.runtime = b.NormalizedRuntime.Equals(DBNull.Value) ? ex_timeout : b.NormalizedRuntime;
+                        cur.normalized_time = b.NormalizedRuntime.Equals(DBNull.Value) ? ex_timeout : b.NormalizedRuntime;
+                        cur.cpu_time = b.TotalProcessorTime == null ? ex_timeout : b.TotalProcessorTime.TotalSeconds;
+                        cur.wallclock_time = b.WallClockTime == null ? ex_timeout : b.WallClockTime.TotalSeconds;
                         cur.sat = Int32.Parse(b.Properties[Z3Domain.KeySat], CultureInfo.InvariantCulture);
                         cur.unsat = Int32.Parse(b.Properties[Z3Domain.KeyUnsat], CultureInfo.InvariantCulture);
                         cur.unknown = Int32.Parse(b.Properties[Z3Domain.KeyUnknown], CultureInfo.InvariantCulture);
@@ -166,8 +168,8 @@ namespace PerformanceTest.Management
                                      (b.Status == ResultStatus.Timeout && cur.rv == null ||
                                      (b.Status == ResultStatus.Success && (cur.rv == 0 || cur.rv == 10 || cur.rv == 20)));
 
-                        if (cur.sat == 0 && cur.unsat == 0 && !rv_ok) cur.runtime = error_line;
-                        if (cur.runtime < 0.01) cur.runtime = 0.01;
+                        if (cur.sat == 0 && cur.unsat == 0 && !rv_ok) cur.normalized_time = error_line;
+                        if (cur.normalized_time < 0.01) cur.normalized_time = 0.01;
 
                         string Benchmarkfilename = b.BenchmarkFileName.Contains("/") ? experiments[i].Category + "/" + b.BenchmarkFileName : experiments[i].Category + @"\" + b.BenchmarkFileName;
                         if (!data.ContainsKey(Benchmarkfilename)) data.Add(Benchmarkfilename, new Dictionary<int, CSVDatum>());
@@ -186,7 +188,7 @@ namespace PerformanceTest.Management
                 for (int i = 0; i < count; i++)
                 {
                     int id = experiments[i].ID;
-                    f.Write("R" + id + ",T" + id + ",SAT" + id + ",UNSAT" + id + ",UNKNOWN" + id + ",");
+                    f.Write("\"RV " + id + "\",\"T_norm " + id + "\",\"T_cpu " + id + "\",\"T_wc " + id + "\",\"# SAT " + id + "\",\"# UNSAT " + id + "\",\"# UNKNOWN " + id + "\",");
                 }
                 f.WriteLine();
 
@@ -203,7 +205,7 @@ namespace PerformanceTest.Management
                     if (skip)
                         continue;
 
-                    f.Write(d.Key + ",");
+                    f.Write("\"" + d.Key + "\",");
 
                     for (int i = 0; i < count; i++)
                     {
@@ -215,7 +217,9 @@ namespace PerformanceTest.Management
                         {
                             CSVDatum c = d.Value[id];
                             f.Write(c.rv + ",");
-                            f.Write(c.runtime + ",");
+                            f.Write(c.normalized_time + ",");
+                            f.Write(c.cpu_time + ",");
+                            f.Write(c.wallclock_time + ",");
                             f.Write(c.sat + ",");
                             f.Write(c.unsat + ",");
                             f.Write(c.unknown + ",");
@@ -307,14 +311,14 @@ namespace PerformanceTest.Management
                 else f.Write(@" & \multicolumn{1}{l|}{\rotatebox[origin=c]{90}{\parbox{.5\textwidth}{" + label + @"}}}");
             }
             f.WriteLine(@"\\\hline\hline");
-            
+
 
             int example_value = 0;
 
             for (int i = 0; i < numItems; i++)
             {
                 string label = experiments[i].Note.Replace(@"\", @"\textbackslash ").Replace(@"_", @"\_");
-                f.Write(@"    " + label); 
+                f.Write(@"    " + label);
                 for (int j = 0; j < numItems; j++)
                 {
                     if (i == j)
@@ -394,8 +398,8 @@ namespace PerformanceTest.Management
         }
         private static bool ConditionTrue(int condition, BenchmarkResult elem1, BenchmarkResult elem2, bool isEqual_ij)
         {
-            bool condition1 = elem1.BenchmarkFileName == elem2.BenchmarkFileName && 
-                              (elem1.ExitCode == 0 && elem2.ExitCode != 0 || 
+            bool condition1 = elem1.BenchmarkFileName == elem2.BenchmarkFileName &&
+                              (elem1.ExitCode == 0 && elem2.ExitCode != 0 ||
                                elem1.Status == ResultStatus.Success && elem2.Status == ResultStatus.Success && elem1.NormalizedRuntime < elem2.NormalizedRuntime);
 
             int sat1 = int.Parse(elem1.Properties[Z3Domain.KeySat], CultureInfo.InvariantCulture);
@@ -409,18 +413,18 @@ namespace PerformanceTest.Management
             if (condition == 0) condition1 = condition1 && (unsat1 + unsat2 > 0 || sat1 + sat2 > 0);
             if (condition == 1) condition1 = condition1 && (sat1 + sat2 > 0);
             if (condition == 2) condition1 = condition1 && (unsat1 + unsat2 > 0);
-            
+
             return condition1;
         }
         private static int FindSimilarBenchmarks (BenchmarkResult[] br1, BenchmarkResult[] br2, int condition, bool isEqual_ij)
         {
-            int result = 0; 
+            int result = 0;
 
             for (int i1 = 0, i2 = 0; i1 < br1.Length && i2 < br2.Length;)
             {
                 string filename1 = br1[i1].BenchmarkFileName;
                 string filename2 = br2[i2].BenchmarkFileName;
-                
+
                 int cmp = string.Compare(filename1, filename2);
                 if (cmp == 0)
                 {
@@ -438,6 +442,6 @@ namespace PerformanceTest.Management
             }
             return result;
         }
-        
+
     }
 }

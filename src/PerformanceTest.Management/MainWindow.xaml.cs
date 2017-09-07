@@ -156,6 +156,7 @@ namespace PerformanceTest.Management
         {
             e.CanExecute = dataGrid.SelectedItems.Count >= 1;
         }
+
         private void saveCSV(object target, ExecutedRoutedEventArgs e)
         {
             System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
