@@ -77,7 +77,7 @@ namespace PerformanceTest.Management
             maxRepetitions = recentValues.MaxRepetitions;
             maxTimeForAdaptiveRuns = recentValues.MaxTimeForAdaptiveRuns;
 
-            Domain = Domains[0];
+            Domain = recentValues.Domain;
             // Following will override the defaults given when setting the Domain above.
             string storedExt = recentValues.BenchmarkExtension;
             if (!string.IsNullOrEmpty(storedExt))
@@ -85,7 +85,6 @@ namespace PerformanceTest.Management
             string storedParam = recentValues.ExperimentExecutableParameters;
             if (!string.IsNullOrEmpty(storedParam))
                 parameters = storedParam;
-            // string storedDomain = recentValues.Domain;
 
             UseMostRecentExecutable = true;
             RecentBlobDisplayName = "searching...";
