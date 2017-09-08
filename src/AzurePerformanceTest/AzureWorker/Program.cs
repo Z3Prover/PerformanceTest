@@ -133,15 +133,12 @@ namespace AzureWorker
                 detailLevel.SelectClause = "id,displayName";
 
                 Console.WriteLine("Listing existing tasks.");
-                var processedBlobs = new SortedSet<string>(batchClient.JobOperations.ListTasks(jobId, detailLevel)
+                var processedBlobs = new HashSet<string>(batchClient.JobOperations.ListTasks(jobId, detailLevel)
                     .SelectMany(t =>
                     {
                         int id;
                         if (int.TryParse(t.Id, out id))
-                        {
-                            // we put benchmark file first
                             return new string[] { t.DisplayName };
-                        }
                         return new string[] { };
                     }));
                 Console.WriteLine("Done!");
@@ -173,9 +170,11 @@ namespace AzureWorker
             if (args.Length > 1)
                 summaryName = args[1];
             //Console.WriteLine(String.Format("Params are:\n id: {0}\ncontainer: {8}\ndirectory:{9}\ncategory: {1}\nextensions: {10}\ndomain: {11}\nexec: {2}\nargs: {3}\ntimeout: {4}\nmemlimit: {5}\noutlimit: {6}\nerrlimit: {7}", experimentId, benchmarkCategory, executable, arguments, timeout, memoryLimit, outputLimit, errorLimit, benchmarkContainerUri, benchmarkDirectory, extensionsString, domainString));
-
+#if DEBUG
+            string jobId = "cz3_exp8212";
+#else
             string jobId = Environment.GetEnvironmentVariable(JobIdEnvVariableName);
-
+#endif
             var secretStorage = new SecretStorage(Settings.Default.AADApplicationId, Settings.Default.AADApplicationCertThumbprint, Settings.Default.KeyVaultUrl);
             BatchConnectionString credentials = new BatchConnectionString(await secretStorage.GetSecret(Settings.Default.ConnectionStringSecretId));
             Console.WriteLine("Retrieved credentials.");
@@ -223,32 +222,29 @@ namespace AzureWorker
             await FetchSavedResults(experimentId, storage);
             Console.WriteLine("Fetched existing results");
             Domain domain = ResolveDomain(domainString);
-            SortedSet<string> extensions;
+            HashSet<string> extensions;
             if (string.IsNullOrEmpty(extensionsString))
-                extensions = new SortedSet<string>(domain.BenchmarkExtensions.Distinct());
+                extensions = new HashSet<string>(domain.BenchmarkExtensions.Distinct());
             else
-                extensions = new SortedSet<string>(extensionsString.Split('|').Select(s => s.Trim().TrimStart('.')).Distinct());
+                extensions = new HashSet<string>(extensionsString.Split('|').Select(s => s.Trim().TrimStart('.')).Distinct());
 
             using (BatchClient batchClient = BatchClient.Open(batchCred))
             {
-                if (expInfo.TotalBenchmarks <= 0)
+                //if (expInfo.TotalBenchmarks <= 0)
                 {
-                    //not all experiments started
+                    // potentially, not all experiments have been started
                     ODATADetailLevel detailLevel = new ODATADetailLevel();
                     detailLevel.SelectClause = "id,displayName";
 
                     Console.WriteLine("Listing existing tasks.");
-                    var processedBlobs = new SortedSet<string>(batchClient.JobOperations.ListTasks(jobId, detailLevel)
-                        .SelectMany(t =>
-                        {
-                            int id;
-                            if (int.TryParse(t.Id, out id))
-                            {
-                                // we put benchmark file first
-                                return new string[] { t.DisplayName };
-                            }
-                            return new string[] { };
-                        }));
+                    var ts = batchClient.JobOperations.ListTasks(jobId, detailLevel);
+                    var processedBlobs = new HashSet<string>();
+                    foreach (CloudTask t in ts)
+                    {
+                        int id;
+                        if (int.TryParse(t.Id, out id))
+                            processedBlobs.Add(t.DisplayName);
+                    };
                     Console.WriteLine("Done!");
 
                     BlobContinuationToken continuationToken = null;
@@ -293,11 +289,11 @@ namespace AzureWorker
                     await Task.WhenAll(starterTasks.ToArray());
                     Console.WriteLine("Finished starting tasks");
                 }
-                else
-                {
-                    Program.totalBenchmarks = expInfo.TotalBenchmarks;
-                    totalBenchmarksToProcess = expInfo.TotalBenchmarks;
-                }
+                //else
+                //{
+                //    Program.totalBenchmarks = expInfo.TotalBenchmarks;
+                //    totalBenchmarksToProcess = expInfo.TotalBenchmarks;
+                //}
 
                 var collectionTask = CollectResults(experimentId, storage);
                 Console.WriteLine("Started collection thread.");

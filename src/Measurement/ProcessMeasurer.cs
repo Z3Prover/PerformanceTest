@@ -45,6 +45,8 @@ namespace Measurement
             if (domain != null)
                 arguments = domain.Preprocess(localFileName, arguments);
 
+            Console.Error.WriteLine("Running {0} {1}", localFileName, arguments);
+
             Process p = StartProcess(localFileName, arguments,
                 output => WriteToStream(output, out_writer, ref out_lim),
                 error => WriteToStream(error, err_writer, ref err_lim));

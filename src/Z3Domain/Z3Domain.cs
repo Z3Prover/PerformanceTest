@@ -58,7 +58,7 @@ namespace Measurement
             Regex input_rx = new Regex("-file:(([^\" ]+)|(\"([^\"]+)\"))");
             Match m = input_rx.Match(parameters);
 
-            if (m.Groups.Count > 0)
+            if (m.Success)
                 input_file = m.Groups[1].Value;
             else
                 return parameters;
@@ -67,7 +67,7 @@ namespace Measurement
             Regex rcs_rx = new Regex("replace-check-sat=\"([^\"]+)\"");
 
             m = rcs_rx.Match(parameters);
-            if (m.Groups.Count > 0)
+            if (m.Success)
             {
                 string res = parameters;
                 new_cs = m.Groups[1].Value;
