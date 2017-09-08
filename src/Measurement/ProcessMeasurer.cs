@@ -43,7 +43,7 @@ namespace Measurement
                 localFileName = fileName;
 
             if (domain != null)
-                arguments = domain.Preprocess(arguments, localFileName);
+                arguments = domain.Preprocess(localFileName, arguments);
 
             Process p = StartProcess(localFileName, arguments,
                 output => WriteToStream(output, out_writer, ref out_lim),

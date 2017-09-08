@@ -26,7 +26,7 @@ namespace PerformanceTest
                 BenchmarkContainerUri = benchmarkContainerUri,
                 BenchmarkDirectory = benchmarkDirectory,
                 BenchmarkFileExtension = benchmarkFileExtension,
-                Parameters = parameters.Replace("\"", "\\\""),
+                Parameters = parameters,
                 BenchmarkTimeout = benchmarkTimeout,
                 ExperimentTimeout = experimentTimeout,
                 Category = category,

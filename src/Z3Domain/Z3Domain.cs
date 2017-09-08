@@ -52,34 +52,44 @@ namespace Measurement
             return string.Format("{0} -file:{1}", parameters, fileName);
         }
 
-        public override string Preprocess(string parameters, string fileName)
+        public override string Preprocess(string binary, string parameters)
         {
-            string res = parameters;
-            if (parameters.Contains("replace-check-sat="))
+            string input_file = "";
+            Regex input_rx = new Regex("-file:(([^\" ]+)|(\"([^\"]+)\"))");
+            Match m = input_rx.Match(parameters);
+
+            if (m.Groups.Count > 0)
+                input_file = m.Groups[1].Value;
+            else
+                return parameters;
+
+            string new_cs = "";
+            Regex rcs_rx = new Regex("replace-check-sat=\"([^\"]+)\"");
+
+            m = rcs_rx.Match(parameters);
+            if (m.Groups.Count > 0)
             {
-                string new_cs = "";
-                Regex rx = new Regex("replace-check-sat=\"([^\"]+)\"");
-                Match m = rx.Match(parameters);
-                if (m.Groups.Count > 0)
-                {
-                    new_cs = m.Groups[1].Value;
-                    res = parameters.Replace("replace-check-sat=\"" + new_cs + "\"", "");
+                string res = parameters;
+                new_cs = m.Groups[1].Value;
+                res = parameters.Replace("replace-check-sat=\"" + new_cs + "\"", "");
 
-                    string tmpf = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                    using (FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-                    using (FileStream ft = new FileStream(tmpf, FileMode.Create, FileAccess.Write))
-                    using (StreamReader fr = new StreamReader(f))
-                    using (StreamWriter ftw = new StreamWriter(ft))
-                        while (!fr.EndOfStream)
-                        {
-                            string s = fr.ReadLine();
-                            ftw.WriteLine(s.Replace("(check-sat)", new_cs));
-                        }
+                string tmpf = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                using (FileStream f = new FileStream(input_file, FileMode.Open, FileAccess.Read))
+                using (FileStream ft = new FileStream(tmpf, FileMode.Create, FileAccess.Write))
+                using (StreamReader fr = new StreamReader(f))
+                using (StreamWriter ftw = new StreamWriter(ft))
+                    while (!fr.EndOfStream)
+                    {
+                        string s = fr.ReadLine();
+                        ftw.WriteLine(s.Replace("(check-sat)", new_cs));
+                    }
 
-                    File.Move(tmpf, fileName);
-                }
+                File.Delete(input_file);
+                File.Move(tmpf, input_file);
+                return res;
             }
-            return res;
+            else
+                return parameters;
         }
 
         public override ProcessRunAnalysis Analyze(string inputFile, ProcessRunMeasure measure)

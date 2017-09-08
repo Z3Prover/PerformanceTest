@@ -531,7 +531,14 @@ namespace AzureWorker
                 string taskId = blobNo.ToString();
                 string[] parts = blobName.Split('/');
                 string shortName = parts[parts.Length - 1];
-                string taskCommandLine = String.Format("cmd /c %" + SharedDirEnvVariableName + "%\\%" + JobIdEnvVariableName + "%\\AzureWorker.exe --measure {0} \"{1}\" \"{2}\" \"{3}\" \"{4}\" \"{5}\" \"{6}\" \"{7}\" \"{8}\" \"{9}\" \"{10}\" \"{11}\" \"{12}\" \"{13}\"", experimentId, blobName.Substring(blobFolderPathLength), executable, arguments, shortName, timeout, domainName, queueUri, containerUri, maxRepetitions, maxTime, memoryLimit, NullableLongToString(outputLimit), NullableLongToString(errorLimit));
+                string escaped_args = arguments.Replace("\"", "\\\"");
+                string taskCommandLine = String.Format(
+                    "cmd /c %" + SharedDirEnvVariableName + "%\\%" + JobIdEnvVariableName + "%\\AzureWorker.exe --measure {0} \"{1}\" \"{2}\" \"{3}\" \"{4}\" \"{5}\" \"{6}\" \"{7}\" \"{8}\" \"{9}\" \"{10}\" \"{11}\" \"{12}\" \"{13}\"",
+                    experimentId, blobName.Substring(blobFolderPathLength),
+                    executable, escaped_args, shortName,
+                    timeout, domainName, queueUri, containerUri,
+                    maxRepetitions, maxTime, memoryLimit,
+                    NullableLongToString(outputLimit), NullableLongToString(errorLimit));
                 var resourceFile = new ResourceFile(benchmarkStorage.GetBlobSASUri(blobName), shortName);
                 CloudTask task = new CloudTask(taskId, taskCommandLine);
                 task.ResourceFiles = new List<ResourceFile> { resourceFile };
@@ -600,7 +607,9 @@ namespace AzureWorker
             else
             {
                 Trace.WriteLine("Normal not found within file, computing.");
+#if !DEBUG
                 normal = await RunReference(new string[] { });
+#endif
             }
 
             Domain domain = ResolveDomain(domainName);

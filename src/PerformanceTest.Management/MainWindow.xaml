@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PerformanceTest.Management"
         mc:Ignorable="d"
-        Title="Performance Tests Management" 
+        Title="Performance Tests Management"
         Height="511" Width="900" MinHeight="600" MinWidth="650"
         ResizeMode="CanResizeWithGrip"
         Icon="/PerformanceTest.Management;component/Images/servers.ico"
@@ -72,19 +72,19 @@
                 <Button Content="Update List" Margin="0,0,50,0" Height="23" HorizontalAlignment="Left" Name="btnUpdate" VerticalAlignment="Center" IsEnabled="false" Padding="5,0,5,0" TabIndex="7" Click="btnUpdate_Click" />
                 <Button Content="New Experiment" Margin="0,0,50,0" Height="23" HorizontalAlignment="Left" Name="btnNewJob" VerticalAlignment="Center" Padding="5,0,5,0" IsEnabled="false"  TabIndex="8" Click="btnNewJob_Click" />
                 <Label Content="Filter:" Margin="0,0,10,0" Height="23" HorizontalAlignment="Stretch"/>
-                <TextBox MinWidth="240" x:Name="txtFilter" HorizontalAlignment="Stretch" VerticalAlignment="Center" TabIndex="9" 
+                <TextBox MinWidth="240" x:Name="txtFilter" HorizontalAlignment="Stretch" VerticalAlignment="Center" TabIndex="9"
                          Text="{Binding FilterKeyword, Mode=TwoWay}" KeyUp="txtFilter_KeyUp"
                          Height="18" Margin="0,10,0,5.333" />
-                <CheckBox Content="My experiments" Margin="15,7,10,0" Height="18" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="myExpFilter" IsChecked="{Binding IsMyExperiments}"></CheckBox>
+                <CheckBox Content="Only mine" Margin="15,7,10,0" Height="18" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="myExpFilter" IsChecked="{Binding IsMyExperiments}"></CheckBox>
             </StackPanel>
 
         </Grid>
 
         <TabControl Grid.Row="2" Grid.Column="0" TabStripPlacement="Bottom" Grid.ColumnSpan="2">
             <TabItem Header="Experiments" >
-                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Name="dataGrid" IsReadOnly="False" 
-                          GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended" AlternatingRowBackground="AliceBlue" 
-                          ItemsSource="{Binding Items}" MouseDoubleClick="dataGrid_MouseDoubleClick" 
+                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Name="dataGrid" IsReadOnly="False"
+                          GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended" AlternatingRowBackground="AliceBlue"
+                          ItemsSource="{Binding Items}" MouseDoubleClick="dataGrid_MouseDoubleClick"
                           EnableRowVirtualization="True" EnableColumnVirtualization="True" >
                     <DataGrid.Resources>
                         <DataTemplate x:Key="ProgressTemplate" >
@@ -95,11 +95,11 @@
                         <DataGridTextColumn Binding="{Binding Path=ID, Mode=OneWay}" Header="ID" />
                         <DataGridTextColumn Binding="{Binding Path=Submitted, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Header="Submitted"/>
                         <DataGridTextColumn Binding="{Binding Path=Category, Mode=OneWay}" Header="Category" />
-                        <DataGridTextColumn Binding="{Binding Path=Creator, Mode=OneWay}" Header="Creator" />
+                        <DataGridTextColumn Binding="{Binding Path=Creator, Mode=OneWay}" Header="Creator" Width="125"/>
                         <DataGridTextColumn Binding="{Binding Path=Note, Mode=OneWay}" Header="Note" />
-                        <DataGridTextColumn Binding="{Binding Path=AdaptiveRun, Mode=OneWay}" Header="Adaptive Run" />
+                        <DataGridTextColumn Binding="{Binding Path=AdaptiveRun, Mode=OneWay}" Header="Adaptive Run" Width="25"/>
                         <DataGridCheckBoxColumn Binding="{Binding Path=Flag, UpdateSourceTrigger=PropertyChanged}" Header="Flag" IsThreeState="False" />
-                        <DataGridTextColumn Binding="{Binding Path=WorkerInformation, Mode=OneWay}" Header="Machine" />
+                        <DataGridTextColumn Binding="{Binding Path=WorkerInformation, Mode=OneWay}" Header="Machine" Width="25" />
                         <DataGridTemplateColumn Header="Progress" CellTemplate="{StaticResource ProgressTemplate}" Visibility="Hidden"/>
                         <DataGridTextColumn Binding="{Binding Path=BenchmarksDone, Mode=OneWay}" Header="Done" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
                         <DataGridTextColumn Binding="{Binding Path=BenchmarksQueued, Mode=OneWay}" Header="Queued" TextBlock.TextAlignment="Right" Visibility="Hidden"/>
@@ -117,7 +117,7 @@
                         <CommandBinding Command="{x:Static local:MainWindow.SaveBinaryCommand}" Executed="saveBinary" CanExecute="canSaveBinary" />
                         <CommandBinding Command="{x:Static local:MainWindow.ReinforcementsCommand}" Executed="showReinforcements" CanExecute="canShowReinforcements" />
                         <CommandBinding Command="{x:Static local:MainWindow.RequeueIErrorsCommand}" Executed="requeueIErrors" CanExecute="canRequeueIErrors" />
-                        <CommandBinding Command="{x:Static local:MainWindow.RestartCommand}" Executed="Restart" CanExecute="canRestartCommand" />
+                        <CommandBinding Command="{x:Static local:MainWindow.ResubmitCommand}" Executed="Restart" CanExecute="canRestartCommand" />
                         <CommandBinding Command="{x:Static local:MainWindow.RecoveryCommand}" Executed="recovery" CanExecute="canRecovery" />
                         <CommandBinding Command="{x:Static local:MainWindow.DuplicatesCommand}" Executed="showDuplicates" CanExecute="canShowDuplicates" />
                         <CommandBinding Command="{x:Static local:MainWindow.FlagCommand}" Executed="toggleFlag" CanExecute="canToggleFlag" />
@@ -139,7 +139,7 @@
                             <MenuItem IsEnabled="False" Name="mnuMove" Header="_Move to..." Command="{x:Static local:MainWindow.MoveCommand}" />
                             <MenuItem IsEnabled="False" Name="mnuReinforcements" Header="Call _reinforcements..." Command="{x:Static local:MainWindow.ReinforcementsCommand}" />
                             <MenuItem Name="mnuRequeueIE" Header="Requeue in. errors..." Command="{x:Static local:MainWindow.RequeueIErrorsCommand}" />
-                            <MenuItem Name="mnuRestart" Header="Resubmit" Command="{x:Static local:MainWindow.RestartCommand}" />
+                            <MenuItem Name="mnuRestart" Header="Resubmit" Command="{x:Static local:MainWindow.ResubmitCommand}" />
                             <MenuItem IsEnabled="False" Name="mnuRecovery" Header="Start recovery..." Command="{x:Static local:MainWindow.RecoveryCommand}" />
                             <MenuItem Name="mnuDuplicates" Header="Resolve _duplicates..." Command="{x:Static local:MainWindow.DuplicatesCommand}" />
                             <MenuItem Name="mnuFlag" Header="Toggle _flag" Command="{x:Static local:MainWindow.FlagCommand}" InputGestureText="Ctrl-T" />

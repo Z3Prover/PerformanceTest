@@ -27,7 +27,7 @@ namespace PerformanceTest.Management
         public static RoutedCommand TallyCommand = new RoutedCommand();
         public static RoutedCommand CopyCommand = new RoutedCommand();
         public static RoutedCommand MoveCommand = new RoutedCommand();
-        public static RoutedCommand RestartCommand = new RoutedCommand();
+        public static RoutedCommand ResubmitCommand = new RoutedCommand();
         public static RoutedCommand CreateGroupCommand = new RoutedCommand();
         public static RoutedCommand CompareCommand = new RoutedCommand();
         public static RoutedCommand ScatterplotCommand = new RoutedCommand();

@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:PerformanceTest.Management"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="New Experiment..." Height="900" Width="580" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize">
+        Title="New Experiment..." Height="750" Width="580" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize">
 
     <Window.Resources>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
@@ -19,7 +19,7 @@
         <local:AndExprToVisibilityConverter x:Key="WarningIsVisible" />
 
         <GridLength x:Key="KeyWidth">200</GridLength>
-        <Thickness x:Key="ParameterMargin" Left="5" Top="5" Right="10" Bottom="10" />
+        <Thickness x:Key="ParameterMargin" Left="5" Top="0" Right="10" Bottom="10" />
     </Window.Resources>
 
     <Grid>
@@ -58,10 +58,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="Directory:" Height="28" HorizontalAlignment="Left"  VerticalAlignment="Center" Grid.Row="0" />
-                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtSharedDir" VerticalAlignment="Center" Grid.Row="0"  Grid.Column="1" 
+                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtSharedDir" VerticalAlignment="Center" Grid.Row="0"  Grid.Column="1"
                              ToolTip="{Binding BenchmarkLibaryDescription}"
                              Text="{Binding BenchmarkDirectory, Mode=TwoWay}" />
-                <Button Width="23" Height="23" HorizontalAlignment="Stretch" Name="btnSelectSharedDir" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="2"  Margin="2" 
+                <Button Width="23" Height="23" HorizontalAlignment="Stretch" Name="btnSelectSharedDir" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="2"  Margin="2"
                             Command="{Binding ChooseDirectoryCommand}">
                     <Image Source="/PerformanceTest.Management;component/Images/taskbrowse.ico" />
                 </Button>
@@ -75,10 +75,10 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Content="Categories:" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0"/>
-                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtCategories" 
+                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtCategories"
                              Text="{Binding Categories, Mode=TwoWay}"
                              VerticalAlignment="Center" Width="Auto" Grid.Column="1" ToolTip="The categories to draw the benchmarks from." />
-                <Button Width="23" Height="23" HorizontalAlignment="Stretch" Name="btnSelectCategories" VerticalAlignment="Stretch" Grid.Column="2" Margin="2" 
+                <Button Width="23" Height="23" HorizontalAlignment="Stretch" Name="btnSelectCategories" VerticalAlignment="Stretch" Grid.Column="2" Margin="2"
                             Command="{Binding ChooseCategoriesCommand}">
                     <Image Source="/PerformanceTest.Management;component/Images/taskbrowse.ico" />
                 </Button>
@@ -110,7 +110,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Label Content="Benchmark extension(s):" Height="28" HorizontalAlignment="Left" Name="label14" VerticalAlignment="Center" Grid.Column="0"/>
-                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtExtension" VerticalAlignment="Center" Grid.Column="1" TabIndex="3" 
+                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtExtension" VerticalAlignment="Center" Grid.Column="1" TabIndex="3"
                          ToolTip="The extension of benchmark files, e.g., smt2 for SMT-Lib version 2 files.\nMultiple extensions can be provided through pipe, e.g. smt2 | smt." Margin="0,2"
                          Text="{Binding Extension}"/>
             </Grid>
@@ -131,30 +131,30 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <RadioButton Name="chkOriginalBinary" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                    <RadioButton Name="chkOriginalBinary" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                                  Margin="0,0,0,7"
                                  IsChecked="{Binding UseOriginalExecutable}"
                                  IsEnabled="{Binding HasOriginalExecutable, Mode=OneWay}"
                                  Visibility="{Binding Path=HasOriginalExecutable, Converter={StaticResource BoolToVisibility}}">
                         <TextBlock>Use original <Run Text="{Binding Executable, Mode=OneWay, StringFormat=({0})}"/></TextBlock>
                     </RadioButton>
-                    <RadioButton Name="chkMostRecentBinary" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                    <RadioButton Name="chkMostRecentBinary" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                  Margin="0,0,0,7"
                                  IsChecked="{Binding UseMostRecentExecutable}"
                                  IsEnabled="{Binding CanUseMostRecent, Mode=OneWay}">
                         <TextBlock>Use most recent <Run Text="{Binding RecentBlobDisplayName, Mode=OneWay, StringFormat=({0})}"/></TextBlock>
                     </RadioButton>
-                    <RadioButton Content="New" Name="chkNewBinary" Grid.Row="2" Grid.Column="0" Margin="0,0,0,2" 
+                    <RadioButton Content="New" Name="chkNewBinary" Grid.Row="2" Grid.Column="0" Margin="0,0,0,2"
                                 IsChecked="{Binding UseNewExecutable}"  />
-                    <Grid Grid.Column="0" Grid.Row="3"
-                        Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisibility}, ElementName=chkNewBinary}">
+                    <Grid Grid.Column="0" Grid.Row="3">
+                        <!-- Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisibility}, ElementName=chkNewBinary} -->
 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <ListBox Height="75" HorizontalAlignment="Stretch" Name="txtExecutable" VerticalAlignment="Center" Grid.Column="0" ToolTip="The target executable." 
-                                 IsEnabled="{Binding UseNewExecutable}" 
+                        <ListBox Height="25" HorizontalAlignment="Stretch" Name="txtExecutable" VerticalAlignment="Center" Grid.Column="0" ToolTip="The target executable."
+                                 IsEnabled="{Binding UseNewExecutable}"
                                  ItemsSource="{Binding ExecutableFileNames, Mode=OneWay}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -184,7 +184,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Parameters:" Height="28" HorizontalAlignment="Left" Name="labelParameters" VerticalAlignment="Center" Grid.Column="0" />
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center"  Grid.Column="1">
-                    <TextBox Height="24" Margin="0,5,0,0" HorizontalAlignment="Stretch" Name="txtParameters" ToolTip="Parameters for the executable." 
+                    <TextBox Height="24" Margin="0,5,0,0" HorizontalAlignment="Stretch" Name="txtParameters" ToolTip="Parameters for the executable."
                                  Text="{Binding Parameters}"/>
                     <TextBlock Margin="0,5,10,10">Use {0} as a placeholder for an input file name.</TextBlock>
                 </StackPanel>
@@ -198,7 +198,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="Memory limit:" Height="28" HorizontalAlignment="Left" Name="labelMemout" VerticalAlignment="Center" Grid.Column="0"/>
-                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtMemout" VerticalAlignment="Center" TabIndex="15" Grid.Row="9" Grid.Column="1" ToolTip="The memory limit (per benchmark)." Margin="0,2" 
+                <TextBox Height="24" HorizontalAlignment="Stretch" Name="txtMemout" VerticalAlignment="Center" TabIndex="15" Grid.Row="9" Grid.Column="1" ToolTip="The memory limit (per benchmark)." Margin="0,2"
                              Text="{Binding BenchmarkMemoryLimitMb}"/>
                 <Label Content="MB" HorizontalAlignment="Left" Grid.Column="2"/>
             </Grid>
@@ -278,11 +278,11 @@
                 <TextBox Height="24" HorizontalAlignment="Stretch"
                              Text="{Binding Pool, Mode=TwoWay}"
                              VerticalAlignment="Center" Width="Auto" Grid.Column="1" ToolTip="The categories to draw the benchmarks from." />
-                <Button Width="23" Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Margin="2" 
+                <Button Width="23" Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Margin="2"
                             Command="{Binding ChoosePoolCommand}">
                     <Image Source="/PerformanceTest.Management;component/Images/taskbrowse.ico" />
                 </Button>
-                <!--<ComboBox Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Center" TabIndex="15" Grid.Column="1" 
+                <!--<ComboBox Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Center" TabIndex="15" Grid.Column="1"
                           Visibility="{Binding AvailablePools, Converter={StaticResource NotNullToVisibility}}"
                           SelectedItem="{Binding Pool}"
                           ItemsSource="{Binding AvailablePools}">

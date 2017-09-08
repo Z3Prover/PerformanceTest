@@ -48,7 +48,7 @@ namespace Measurement
         /// Preprocesses the input file according to parameter settings. Returns a new
         /// set of parameters.
         /// </summary>
-        public virtual string Preprocess(string parameters, string fileName)
+        public virtual string Preprocess(string binary, string parameters)
         {
             return parameters;
         }
