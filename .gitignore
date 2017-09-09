@@ -37,3 +37,4 @@ TestResults
 .vs
 obj
 bin
+*.exe.config
