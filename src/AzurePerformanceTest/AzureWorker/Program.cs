@@ -328,7 +328,7 @@ namespace AzureWorker
 
                 await storage.SetTotalBenchmarks(experimentId, totalBenchmarks);
                 Program.totalBenchmarks = totalBenchmarks;
-                totalBenchmarksToProcess = totalBenchmarks;
+                totalBenchmarksToProcess = totalBenchmarks - goodResults.Count;
                 Console.WriteLine(" took {0}.", (DateTime.Now - before));
 
                 before = DateTime.Now;
@@ -396,7 +396,6 @@ namespace AzureWorker
             {
                 Console.WriteLine("Fetching failed tasks...");
                 var ts = batchClient.JobOperations.ListTasks(jobId, failedMonitorLevel);
-                badResults = new List<AzureBenchmarkResult>();
                 foreach (var t in ts) {
                     if (t == null)
                     {
@@ -459,7 +458,7 @@ namespace AzureWorker
             Console.WriteLine("Started collection.");
             var queue = storage.GetResultsQueueReference(experimentId);
             List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();
-            int processedBenchmarks = goodResults.Count();
+            int processedBenchmarks = 0;
 
             var formatter = new BinaryFormatter();
             bool completed = false;

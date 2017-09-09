@@ -114,7 +114,14 @@ namespace Measurement
 
             if (isZip)
             {
-                Directory.Delete(tempFolder, true);
+                try
+                {
+                    Directory.Delete(tempFolder, true);
+                }
+                catch (IOException)
+                {
+                    /* OK */
+                }
             }
 
             var status =
