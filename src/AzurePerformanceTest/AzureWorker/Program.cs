@@ -185,7 +185,7 @@ namespace AzureWorker
                 summaryName = args[1];
             //Console.WriteLine(String.Format("Params are:\n id: {0}\ncontainer: {8}\ndirectory:{9}\ncategory: {1}\nextensions: {10}\ndomain: {11}\nexec: {2}\nargs: {3}\ntimeout: {4}\nmemlimit: {5}\noutlimit: {6}\nerrlimit: {7}", experimentId, benchmarkCategory, executable, arguments, timeout, memoryLimit, outputLimit, errorLimit, benchmarkContainerUri, benchmarkDirectory, extensionsString, domainString));
 #if DEBUG
-            string jobId = "cz3_exp8212";
+            string jobId = "cz3_exp8141";
 #else
             string jobId = Environment.GetEnvironmentVariable(JobIdEnvVariableName);
 #endif
@@ -240,53 +240,61 @@ namespace AzureWorker
                 detailLevel.FilterClause = "(state eq 'active') or (state eq 'running') or (state eq 'preparing')";
                 detailLevel.SelectClause = "id,displayName";
 
-                before = DateTime.Now;
-                Console.Write("Listing existing tasks...");
-                var ts = batchClient.JobOperations.ListTasks(jobId, detailLevel);
-                foreach (CloudTask t in ts)
-                {
-                    int id;
-                    if (int.TryParse(t.Id, out id))
-                        processedBlobs.Add(t.DisplayName);
-                };
-                Console.WriteLine(" took {0}.", (DateTime.Now - before));
+                CloudJob old_job = null;
+                try { old_job = batchClient.JobOperations.GetJob(jobId); } catch { /* OK */ }
 
-                // Create new job if the old one is already sealed off
-                switch (batchClient.JobOperations.GetJob(jobId).State)
+                if (old_job != null)
                 {
-                    case Microsoft.Azure.Batch.Common.JobState.Completed:
-                    case Microsoft.Azure.Batch.Common.JobState.Deleting:
-                    case Microsoft.Azure.Batch.Common.JobState.Disabled:
-                    case Microsoft.Azure.Batch.Common.JobState.Disabling:
-                    case Microsoft.Azure.Batch.Common.JobState.Terminating:
-                        {
-                            before = DateTime.Now;
-                            Console.Write("Creating fresh job...");
-                            CloudJob old_job = batchClient.JobOperations.GetJob(jobId);
-                            PoolInformation pool_info = batchClient.JobOperations.GetJob(jobId).PoolInformation;
-                            string new_jid;
-                            int cnt = 1;
-                            bool have_jid = false;
-                            do {
-                                new_jid = String.Format("{0}-{1}", jobId, cnt++);
-                                try
+                    before = DateTime.Now;
+                    Console.Write("Listing existing tasks...");
+                    var ts = batchClient.JobOperations.ListTasks(jobId, detailLevel);
+                    foreach (CloudTask t in ts)
+                    {
+                        int id;
+                        if (int.TryParse(t.Id, out id))
+                            processedBlobs.Add(t.DisplayName);
+                    };
+                    Console.WriteLine(" took {0}.", (DateTime.Now - before));
+
+                    // Create new job if the old one is already sealed off
+                    switch (old_job.State)
+                    {
+                        case Microsoft.Azure.Batch.Common.JobState.Completed:
+                        case Microsoft.Azure.Batch.Common.JobState.Deleting:
+                        case Microsoft.Azure.Batch.Common.JobState.Disabled:
+                        case Microsoft.Azure.Batch.Common.JobState.Disabling:
+                        case Microsoft.Azure.Batch.Common.JobState.Terminating:
+                            {
+                                before = DateTime.Now;
+                                Console.Write("Creating fresh job...");
+                                PoolInformation pool_info = old_job.PoolInformation;
+                                string new_jid;
+                                int cnt = 1;
+                                bool have_jid = false;
+                                do
                                 {
-                                    CloudJob new_job = batchClient.JobOperations.CreateJob(new_jid, pool_info);
-                                    new_job.OnAllTasksComplete = Microsoft.Azure.Batch.Common.OnAllTasksComplete.NoAction;
-                                    new_job.OnTaskFailure = old_job.OnTaskFailure;
-                                    new_job.Constraints = old_job.Constraints;
-                                    new_job.DisplayName = old_job.DisplayName;
-                                    new_job.Commit();
-                                    have_jid = true;
-                                } catch (Microsoft.Azure.Batch.Common.BatchException) {
-                                    Console.Write(".");
+                                    new_jid = String.Format("{0}-{1}", jobId, cnt++);
+                                    try
+                                    {
+                                        CloudJob new_job = batchClient.JobOperations.CreateJob(new_jid, pool_info);
+                                        new_job.OnAllTasksComplete = Microsoft.Azure.Batch.Common.OnAllTasksComplete.NoAction;
+                                        new_job.OnTaskFailure = old_job.OnTaskFailure;
+                                        new_job.Constraints = old_job.Constraints;
+                                        new_job.DisplayName = old_job.DisplayName;
+                                        new_job.Commit();
+                                        have_jid = true;
+                                    }
+                                    catch (Microsoft.Azure.Batch.Common.BatchException)
+                                    {
+                                        Console.Write(".");
+                                    }
                                 }
+                                while (!have_jid);
+                                jobId = new_jid;
+                                Console.WriteLine(" took {0}.", (DateTime.Now - before));
+                                break;
                             }
-                            while (!have_jid);
-                            jobId = new_jid;
-                            Console.WriteLine(" took {0}.", (DateTime.Now - before));
-                            break;
-                        }
+                    }
                 }
 
                 BlobContinuationToken continuationToken = null;
