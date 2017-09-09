@@ -220,6 +220,11 @@ namespace Measurement
             return new string[0];
         }
 
+        public override string FailureFilter()
+        {
+            return "(state eq 'completed') and (executionInfo/exitCode ne 0)";
+        }
+
         private ResultStatus GetBugCode(ProcessRunMeasure measure)
         {
             ResultStatus status = ResultStatus.Error; // no bug found means general error.

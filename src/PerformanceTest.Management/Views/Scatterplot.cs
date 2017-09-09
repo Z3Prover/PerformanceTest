@@ -73,15 +73,23 @@ namespace PerformanceTest.Management
         {
             bool empty = vm.CompareItems == null || vm.CompareItems.Length == 0;
 
-            timeoutXmin = empty ? timeoutX : vm.CompareItems.Min(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MaxValue);
-            timeoutXmax = empty ? timeoutX : vm.CompareItems.Max(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MinValue);
-            if (timeoutXmin == UInt32.MaxValue && timeoutXmax == UInt32.MinValue)
-                timeoutXmin = timeoutXmax = timeoutX;
+            if (rbNonNormalized.Checked)
+            {
+                timeoutXmin = empty ? timeoutX : vm.CompareItems.Min(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MaxValue);
+                timeoutXmax = empty ? timeoutX : vm.CompareItems.Max(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MinValue);
+                if (timeoutXmin == UInt32.MaxValue && timeoutXmax == UInt32.MinValue)
+                    timeoutXmin = timeoutXmax = timeoutX;
 
-            timeoutYmin = empty ? timeoutY : vm.CompareItems.Min(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MaxValue);
-            timeoutYmax = empty ? timeoutY : vm.CompareItems.Max(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MinValue);
-            if (timeoutYmin == UInt32.MaxValue && timeoutYmax == UInt32.MinValue)
+                timeoutYmin = empty ? timeoutY : vm.CompareItems.Min(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MaxValue);
+                timeoutYmax = empty ? timeoutY : vm.CompareItems.Max(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MinValue);
+                if (timeoutYmin == UInt32.MaxValue && timeoutYmax == UInt32.MinValue)
+                    timeoutYmin = timeoutYmax = timeoutY;
+            }
+            else
+            {
+                timeoutXmin = timeoutXmax = timeoutX;
                 timeoutYmin = timeoutYmax = timeoutY;
+            }
         }
 
         private void UpdateStatus(bool isBusy)
@@ -228,11 +236,7 @@ namespace PerformanceTest.Management
                 int m3 = inx % 3;
                 int d3 = inx / 3;
                 newSeries.ChartType = SeriesChartType.Point;
-                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                newSeries.MarkerStyle = MarkerStyle.Star4;
+                newSeries.MarkerStyle = MarkerStyle.Cross;
 
                 newSeries.MarkerSize = 6;
                 switch (m3)
@@ -250,11 +254,7 @@ namespace PerformanceTest.Management
                 Series newSeries = chart.Series.Last();
 
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                newSeries.MarkerStyle = MarkerStyle.Star4;
+                newSeries.MarkerStyle = MarkerStyle.Cross;
 
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Blue;
@@ -264,10 +264,8 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Winners");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                else newSeries.MarkerStyle = MarkerStyle.Triangle;
+
+                newSeries.MarkerStyle = MarkerStyle.Cross;
 
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Green;
@@ -277,11 +275,8 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Losers");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                newSeries.MarkerStyle = MarkerStyle.Star4;
+
+                newSeries.MarkerStyle = MarkerStyle.Cross;
 
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.OrangeRed;
@@ -291,7 +286,7 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Timeout");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerStyle = MarkerStyle.Cross;
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Blue;
                 newSeries.XAxisType = AxisType.Primary;
@@ -300,7 +295,7 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Timeout Winners");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerStyle = MarkerStyle.Cross;
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Green;
                 newSeries.XAxisType = AxisType.Primary;
@@ -309,7 +304,7 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Timeout Losers");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerStyle = MarkerStyle.Cross;
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.OrangeRed;
                 newSeries.XAxisType = AxisType.Primary;

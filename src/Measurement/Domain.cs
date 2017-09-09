@@ -121,6 +121,16 @@ namespace Measurement
         {
             return new string[0];
         }
+
+        /// <summary>
+        /// Returns an ODATADetailLevel-compatible filter clause to distinguish
+        /// failed tasks from successful ones.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string FailureFilter()
+        {
+            return "(state eq 'completed') and (executionInfo/exitCode ne 0)";
+        }
     }
 
 

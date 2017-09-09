@@ -169,7 +169,7 @@ namespace AzureWorker
                     Console.WriteLine("Finished starting tasks");
                 }
 
-                MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient);
+                MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient, domain);
             }
 
             Console.WriteLine("Deleting blob with benchmark list.");
@@ -192,7 +192,6 @@ namespace AzureWorker
             Console.WriteLine("Retrieving credentials...");
             var secretStorage = new SecretStorage(Settings.Default.AADApplicationId, Settings.Default.AADApplicationCertThumbprint, Settings.Default.KeyVaultUrl);
             BatchConnectionString credentials = new BatchConnectionString(await secretStorage.GetSecret(Settings.Default.ConnectionStringSecretId));
-
 
             var batchCred = new BatchSharedKeyCredentials(credentials.BatchURL, credentials.BatchAccountName, credentials.BatchAccessKey);
             var storage = new AzureExperimentStorage(credentials.WithoutBatchData().ToString());
@@ -345,7 +344,7 @@ namespace AzureWorker
                 var collectionTask = CollectResults(experimentId, storage);
                 Console.WriteLine(" took {0}.", (DateTime.Now - before));
 
-                MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient);
+                MonitorTasksUntilCompletion(experimentId, jobId, collectionTask, batchClient, domain);
 
                 if (summaryName != null && expInfo.Creator == "Nightly")
                 {
@@ -357,6 +356,26 @@ namespace AzureWorker
                 {
                     Trace.WriteLine("No summary requested.");
                 }
+
+                try
+                {
+                    int? amc = storage.GetResultsQueueReference(experimentId).ApproximateMessageCount;
+
+                    if (amc.HasValue && amc.Value == 0)
+                    {
+                        switch (batchClient.JobOperations.GetJob(jobId).State)
+                        {
+                            case Microsoft.Azure.Batch.Common.JobState.Completed:
+                            case Microsoft.Azure.Batch.Common.JobState.Disabled:
+                                Console.WriteLine("Deleting Batch job and results queue.");
+                                await batchClient.JobOperations.DeleteJobAsync(jobId);
+                                await storage.DeleteResultsQueue(experimentId);
+                                break;
+                        }
+                    }
+                }
+                catch { /* OK */ }
+
                 Console.WriteLine("Closing.");
             }
         }
@@ -383,25 +402,19 @@ namespace AzureWorker
                 return;
             }
         }
-        private static void MonitorTasksUntilCompletion(int experimentId, string jobId, Task collectionTask, BatchClient batchClient)
+
+        private static void MonitorTasksUntilCompletion(int experimentId, string jobId, Task collectionTask, BatchClient batchClient, Domain domain)
         {
             // Monitoring tasks
-            ODATADetailLevel failedMonitorLevel = new ODATADetailLevel();
-            failedMonitorLevel.FilterClause = "(state eq 'completed') and (executionInfo/exitCode ne 0)";
-            failedMonitorLevel.SelectClause = "id,displayName,executionInfo";
-            ODATADetailLevel completedMonitorLevel = new ODATADetailLevel();
-            completedMonitorLevel.FilterClause = "(state eq 'completed')";
-            failedMonitorLevel.SelectClause = "id";
+            ODATADetailLevel fLvl = new ODATADetailLevel(domain.FailureFilter(), "id,displayName");
+
             do
             {
                 Console.WriteLine("Fetching failed tasks...");
-                var ts = batchClient.JobOperations.ListTasks(jobId, failedMonitorLevel);
-                foreach (var t in ts) {
+                var ts = batchClient.JobOperations.ListTasks(jobId, fLvl);
+                foreach (CloudTask t in ts) {
                     if (t == null)
-                    {
                         Console.Error.WriteLine("improbable task == null condition.");
-                        continue;
-                    }
                     else
                     {
                         badResults.Add(new AzureBenchmarkResult()
@@ -425,7 +438,7 @@ namespace AzureWorker
                 }
                 Console.WriteLine("Done fetching failed tasks. Got {0}.", badResults.Count);
                 Console.WriteLine("Fetching completed tasks...");
-                completedTasksCount = batchClient.JobOperations.ListTasks(jobId, completedMonitorLevel).Count();
+                completedTasksCount = batchClient.JobOperations.GetJobTaskCounts(jobId).Completed;
                 Console.WriteLine("Done fetching completed tasks. Got {0}.", completedTasksCount);
             }
             while (!collectionTask.Wait(30000));
@@ -494,7 +507,7 @@ namespace AzureWorker
             while (!completed);
             await storage.DeleteResultsQueue(experimentId);
 
-            var totalRuntime = results.Sum(r => r.NormalizedCPUTime);
+            var totalRuntime = results.Sum(r => r.CPUTime.TotalSeconds);
             await storage.SetTotalRuntime(experimentId, totalRuntime);
             Console.WriteLine("Collected all results.");
         }

@@ -349,7 +349,7 @@
             // rbNormalized
             //
             this.rbNormalized.AutoSize = true;
-            this.rbNormalized.Checked = true;
+            this.rbNormalized.Checked = false;
             this.rbNormalized.Location = new System.Drawing.Point(3, 6);
             this.rbNormalized.Name = "rbNormalized";
             this.rbNormalized.Size = new System.Drawing.Size(139, 17);
@@ -361,6 +361,7 @@
             // rbNonNormalized
             //
             this.rbNonNormalized.AutoSize = true;
+            this.rbNonNormalized.Checked = true;
             this.rbNonNormalized.Location = new System.Drawing.Point(3, 25);
             this.rbNonNormalized.Name = "rbNonNormalized";
             this.rbNonNormalized.Size = new System.Drawing.Size(160, 17);
@@ -371,6 +372,7 @@
             // rbWallClock
             //
             this.rbWallClock.AutoSize = true;
+            this.rbWallClock.Checked = false;
             this.rbWallClock.Location = new System.Drawing.Point(3, 43);
             this.rbWallClock.Name = "rbWallClock";
             this.rbWallClock.Size = new System.Drawing.Size(122, 17);
@@ -381,6 +383,7 @@
             // rbMemoryUsed
             //
             this.rbMemoryUsed.AutoSize = true;
+            this.rbMemoryUsed.Checked = false;
             this.rbMemoryUsed.Location = new System.Drawing.Point(3, 60);
             this.rbMemoryUsed.Name = "rbMemoryUsed";
             this.rbMemoryUsed.Size = new System.Drawing.Size(113, 17);
