@@ -101,7 +101,7 @@ namespace PerformanceTest.Management
             foreach (BenchmarkResult r in duplicates)
             {
                 ResultStatus status = r.Status;
-                double time = r.NormalizedRuntime;
+                double time = r.CPUTime.TotalSeconds;
                 if (status != ResultStatus.Timeout && status != ResultStatus.InfrastructureError) { all_timeouts = false; }
                 if (status != ResultStatus.Success && status != ResultStatus.InfrastructureError) { all_ok = false; }
                 if (status != ResultStatus.OutOfMemory && status != ResultStatus.InfrastructureError) { all_memouts = false; }

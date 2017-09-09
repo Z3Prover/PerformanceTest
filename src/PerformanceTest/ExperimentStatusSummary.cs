@@ -11,7 +11,7 @@ namespace PerformanceTest
     /// Stores for which benchmark files there are issues in an experiment.
     /// </summary>
     public class ExperimentStatusSummary
-    {        
+    {
         private readonly Dictionary<string, List<string>> errorsByCategory;
         private readonly Dictionary<string, List<string>> bugsByCategory;
         private readonly Dictionary<string, Dictionary<string, List<string>>> tagsByCategory;
@@ -64,7 +64,7 @@ namespace PerformanceTest
                 foreach (var r in refResults)
                 {
                     if (r.Status == Measurement.ResultStatus.Success)
-                        referenceTimes[r.BenchmarkFileName] = r.NormalizedRuntime;
+                        referenceTimes[r.BenchmarkFileName] = r.CPUTime.TotalSeconds;
                 }
             }
 
@@ -92,10 +92,10 @@ namespace PerformanceTest
 
                         if (referenceTimes != null && referenceTimes.ContainsKey(fn))
                         {
-                            double new_time = r.NormalizedRuntime;
+                            double new_time = r.CPUTime.TotalSeconds;
                             double old_time = referenceTimes[fn];
 
-                            if (new_time > 1 && old_time > 1 &&
+                            if (new_time > 1.0 && old_time > 1.0 &&
                                 new_time >= 10.0 * old_time)
                             {
                                 string msg = fn + " [" + (new_time - old_time) + " sec. slower]";
@@ -109,16 +109,16 @@ namespace PerformanceTest
                         {
                             double old_time = referenceTimes[fn];
                             string msg = fn + " [went from " + old_time + " sec. to memory-out]";
-                            AddToList(dippersByCategory, cat, msg);                            
+                            AddToList(dippersByCategory, cat, msg);
                         }
                         break;
                     case Measurement.ResultStatus.Timeout:
                         if (referenceTimes != null && referenceTimes.ContainsKey(fn))
                         {
                             double old_time = referenceTimes[fn];
-                            double new_time = r.NormalizedRuntime;
+                            double new_time = r.CPUTime.TotalSeconds;
 
-                            if (new_time - old_time > 10)
+                            if (new_time - old_time > 10.0)
                             {
                                 string msg = fn + " [more than " + (new_time - old_time) + " sec. slower]";
                                 AddToList(dippersByCategory, cat, msg);

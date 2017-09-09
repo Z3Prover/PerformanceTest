@@ -107,7 +107,8 @@ namespace PerformanceTest
             var stats = new Dictionary<string, AggregatedAnalysis>(categories.Count);
             foreach (var cr in categories)
             {
-                var catSummary = domain.Aggregate(cr.Value.Select(r => new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.NormalizedRuntime)));
+                var catSummary = domain.Aggregate(cr.Value.Select(r =>
+                    new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.CPUTime.TotalSeconds)));
                 stats.Add(cr.Key, catSummary);
             }
             return stats;

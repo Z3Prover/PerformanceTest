@@ -66,7 +66,7 @@ namespace UnitTests
             var res = results[0];
             Assert.AreEqual(0, res.ExitCode, "exit code");
             Assert.AreEqual(ResultStatus.Success, res.Status, "status");
-            Assert.IsTrue(res.TotalProcessorTime.TotalSeconds < 1, "Total runtime");
+            Assert.IsTrue(res.CPUTime.TotalSeconds < 1, "Total runtime");
         }
 
         [TestMethod]
@@ -85,7 +85,7 @@ namespace UnitTests
             {
                 Assert.AreEqual(0, res.ExitCode, "exit code");
                 Assert.AreEqual(ResultStatus.Success, res.Status, "status");
-                Assert.IsTrue(res.TotalProcessorTime.TotalSeconds < 10, "Total runtime");
+                Assert.IsTrue(res.CPUTime.TotalSeconds < 10, "Total runtime");
             }
         }
 

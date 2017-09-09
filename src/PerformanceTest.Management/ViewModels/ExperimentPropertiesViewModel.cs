@@ -28,7 +28,7 @@ namespace PerformanceTest.Management
         private static async Task<ExperimentStatistics> GetStatistics(ExperimentManager manager, int id, Measurement.Domain domain)
         {
             var results = await manager.GetResults(id);
-            var aggr = domain.Aggregate(results.Benchmarks.Select(r => new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.NormalizedRuntime)));
+            var aggr = domain.Aggregate(results.Benchmarks.Select(r => new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.CPUTime.TotalSeconds)));
             return new ExperimentStatistics(aggr);
         }
 

@@ -37,9 +37,9 @@ namespace AzurePerformanceTest
         /// <summary>
         /// A normalized total processor time that indicates the amount of time that the associated process has spent utilizing the CPU.
         /// </summary>
-        public double NormalizedRuntime { get; set; }
+        public double NormalizedCPUTime { get; set; }
 
-        public TimeSpan TotalProcessorTime { get; set; }
+        public TimeSpan CPUTime { get; set; }
 
         public TimeSpan WallClockTime { get; set; }
 
@@ -72,11 +72,13 @@ namespace AzurePerformanceTest
                     case nameof(ExperimentID):
                         ExperimentID = (int)entry.Value; break;
                     case nameof(BenchmarkFileName):
-                        BenchmarkFileName = (string)entry.Value; break;                    
-                    case nameof(NormalizedRuntime):
-                        NormalizedRuntime = (double)entry.Value; break;
-                    case nameof(TotalProcessorTime):
-                        TotalProcessorTime = (TimeSpan)entry.Value; break;
+                        BenchmarkFileName = (string)entry.Value; break;
+                    case nameof(NormalizedCPUTime):
+                    case "NormalizedRuntime":
+                        NormalizedCPUTime = (double)entry.Value; break;
+                    case nameof(CPUTime):
+                    case "TotalProcessorTime":
+                        CPUTime = (TimeSpan)entry.Value; break;
                     case nameof(WallClockTime):
                         WallClockTime = (TimeSpan)entry.Value; break;
                     case nameof(PeakMemorySizeMB):
@@ -105,13 +107,13 @@ namespace AzurePerformanceTest
         {
             info.AddValue(nameof(ExperimentID), this.ExperimentID);
             info.AddValue(nameof(BenchmarkFileName), this.BenchmarkFileName, typeof(string));
-            info.AddValue(nameof(NormalizedRuntime), this.NormalizedRuntime);
-            info.AddValue(nameof(TotalProcessorTime), this.TotalProcessorTime, typeof(TimeSpan));
+            info.AddValue(nameof(NormalizedCPUTime), this.NormalizedCPUTime);
+            info.AddValue(nameof(CPUTime), this.CPUTime, typeof(TimeSpan));
             info.AddValue(nameof(WallClockTime), this.WallClockTime, typeof(TimeSpan));
             info.AddValue(nameof(PeakMemorySizeMB), this.PeakMemorySizeMB);
             if (this.ExitCode.HasValue) info.AddValue(nameof(ExitCode), this.ExitCode);
             info.AddValue(nameof(AcquireTime), this.AcquireTime);
-            info.AddValue(nameof(Status), (int)this.Status);            
+            info.AddValue(nameof(Status), (int)this.Status);
             info.AddValue(nameof(Properties), this.Properties, typeof(Dictionary<string, string>));
             info.AddValue(nameof(StdOut), this.StdOut);
             info.AddValue(nameof(StdErr), this.StdErr);
@@ -126,8 +128,8 @@ namespace AzurePerformanceTest
             {
                 Column.Create("BenchmarkFileName", benchmarks.Select(b => b.BenchmarkFileName), length),
                 Column.Create("AcquireTime", benchmarks.Select(b => b.AcquireTime.ToUniversalTime().ToString(System.Globalization.CultureInfo.InvariantCulture)), length),
-                Column.Create("NormalizedRuntime", benchmarks.Select(b => b.NormalizedRuntime), length),
-                Column.Create("TotalProcessorTime", benchmarks.Select(b => b.TotalProcessorTime.TotalSeconds), length),
+                Column.Create("NormalizedRuntime", benchmarks.Select(b => b.NormalizedCPUTime), length),
+                Column.Create("TotalProcessorTime", benchmarks.Select(b => b.CPUTime.TotalSeconds), length),
                 Column.Create("WallClockTime", benchmarks.Select(b => b.WallClockTime.TotalSeconds), length),
                 Column.Create("PeakMemorySizeMB", benchmarks.Select(b => b.PeakMemorySizeMB), length),
                 Column.Create("Status", benchmarks.Select(b => StatusToString(b.Status)), length),
@@ -210,7 +212,7 @@ namespace AzurePerformanceTest
                 results[i].BenchmarkFileName = fileName[i];
                 results[i].ExitCode = string.IsNullOrEmpty(exitcode[i]) ? null : (int?)int.Parse(exitcode[i], CultureInfo.InvariantCulture);
                 results[i].ExperimentID = expId;
-                results[i].NormalizedRuntime = double.Parse(norm[i], CultureInfo.InvariantCulture);
+                results[i].NormalizedCPUTime = double.Parse(norm[i], CultureInfo.InvariantCulture);
                 results[i].PeakMemorySizeMB = double.Parse(mem[i], CultureInfo.InvariantCulture);
                 results[i].Properties = props;
                 results[i].Status = StatusFromString(stat[i]);
@@ -218,7 +220,7 @@ namespace AzurePerformanceTest
                 results[i].StdErrExtStorageIdx = stderrext[i];
                 results[i].StdOut = stdout[i];
                 results[i].StdOutExtStorageIdx = stdoutext[i];
-                results[i].TotalProcessorTime = TimeSpan.FromSeconds(double.Parse(runtime[i], CultureInfo.InvariantCulture));
+                results[i].CPUTime = TimeSpan.FromSeconds(double.Parse(runtime[i], CultureInfo.InvariantCulture));
                 results[i].WallClockTime = TimeSpan.FromSeconds(double.Parse(wctime[i], CultureInfo.InvariantCulture));
             }
             return results;

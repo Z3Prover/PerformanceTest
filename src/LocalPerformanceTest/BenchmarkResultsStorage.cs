@@ -21,8 +21,8 @@ namespace PerformanceTest
             {
                 Column.Create("BenchmarkFileName", benchmarks.Select(b => b.BenchmarkFileName), length),
                 Column.Create("AcquireTime", benchmarks.Select(b => b.AcquireTime.ToString(System.Globalization.CultureInfo.InvariantCulture)), length),
-                Column.Create("NormalizedRuntime", benchmarks.Select(b => b.NormalizedRuntime), length),
-                Column.Create("TotalProcessorTime", benchmarks.Select(b => b.TotalProcessorTime.TotalSeconds), length),
+                Column.Create("NormalizedRuntime", benchmarks.Select(b => b.NormalizedCPUTime), length),
+                Column.Create("TotalProcessorTime", benchmarks.Select(b => b.CPUTime.TotalSeconds), length),
                 Column.Create("WallClockTime", benchmarks.Select(b => b.WallClockTime.TotalSeconds), length),
                 Column.Create("PeakMemorySizeMB", benchmarks.Select(b => b.PeakMemorySizeMB), length),
                 Column.Create("Status", benchmarks.Select(b => StatusToString(b.Status)), length),

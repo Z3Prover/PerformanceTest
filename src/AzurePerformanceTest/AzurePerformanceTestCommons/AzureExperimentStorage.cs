@@ -528,19 +528,19 @@ namespace AzurePerformanceTest
             } while (changed);
         }
 
-        public async Task IncreaseCompletedBenchmarks(int id, int completedBenchmarksRaise)
-        {
-            TableQuery<ExperimentEntity> query = ExperimentPointQuery(id);
+        //public async Task IncreaseCompletedBenchmarks(int id, int completedBenchmarksRaise)
+        //{
+        //    TableQuery<ExperimentEntity> query = ExperimentPointQuery(id);
 
-            bool changed = false;
-            do
-            {
-                ExperimentEntity experiment = await FirstExperimentInQuery(query);
-                experiment.CompletedBenchmarks += completedBenchmarksRaise;
+        //    bool changed = false;
+        //    do
+        //    {
+        //        ExperimentEntity experiment = await FirstExperimentInQuery(query);
+        //        experiment.CompletedBenchmarks += completedBenchmarksRaise;
 
-                changed = !(await TryUpdateTableEntity(experimentsTable, experiment));
-            } while (changed);
-        }
+        //        changed = !(await TryUpdateTableEntity(experimentsTable, experiment));
+        //    } while (changed);
+        //}
 
         public async Task UpdateStatusFlag(ExperimentID id, bool flag)
         {

@@ -312,9 +312,7 @@ namespace PerformanceTest.Management
                 int n = dataGrid.SelectedItems.Count;
                 var experiments = new ExperimentStatusViewModel[n];
                 for (int i = 0; i < n; i++)
-                {
                     experiments[i] = (ExperimentStatusViewModel)dataGrid.SelectedItems[i];
-                }
 
                 for (int i = 0; i < n; i++)
                 {
@@ -339,7 +337,7 @@ namespace PerformanceTest.Management
                     vm.MaxTimeForAdaptiveRuns = experiment.Definition.AdaptiveRunMaxTimeInSeconds;
                     vm.AllowAdaptiveRuns = experiment.Definition.AdaptiveRunMaxRepetitions != 1 || experiment.Definition.AdaptiveRunMaxTimeInSeconds != 0;
                     vm.Executable = experiment.Definition.Executable;
-
+                    vm.UseOriginalExecutable = true;
                     SubmitNewJob(vm);
                 }
             }
@@ -656,11 +654,43 @@ namespace PerformanceTest.Management
         }
         private void canShowReinforcements(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = dataGrid.SelectedItems.Count == 1;
+            e.CanExecute = dataGrid.SelectedItems.Count > 0;
         }
-        private void showReinforcements(object target, ExecutedRoutedEventArgs e)
+        private async void showReinforcements(object target, ExecutedRoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var handle = uiService.StartIndicateLongOperation("Calling reinforcements...");
+            try
+            {
+                string creator = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                int n = dataGrid.SelectedItems.Count;
+                var experiments = new ExperimentStatusViewModel[n];
+                for (int i = 0; i < n; i++)
+                    experiments[i] = (ExperimentStatusViewModel)dataGrid.SelectedItems[i];
+
+                for (int i = 0; i < n; i++)
+                {
+                    try
+                    {
+                        var experiment = experiments[i];
+                        await managerVm.Reinforce(experiment.ID, experiment.Definition);
+                    }
+                    catch (Exception ex)
+                    {
+                        uiService.ShowError(ex, "Failed to submit an experiment");
+                        return;
+                    }
+                }
+
+                experimentsVm.Refresh();
+            }
+            catch (Exception ex)
+            {
+                uiService.ShowError(ex, "Failed to call reinforcements");
+            }
+            finally
+            {
+                uiService.StopIndicateLongOperation(handle);
+            }
         }
         private void canRequeueIErrors(object sender, CanExecuteRoutedEventArgs e)
         {

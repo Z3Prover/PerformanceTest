@@ -17,7 +17,7 @@ namespace AzurePerformanceTest
     public class AzureExperimentManager : ExperimentManager
     {
         const int MaxTaskRetryCount = 1;
-        const string DefaultPoolID = "testPool";
+        const string DefaultPoolID = "z3-main";
 
         AzureExperimentStorage storage;
         BatchSharedKeyCredentials batchCreds;
@@ -416,6 +416,117 @@ namespace AzurePerformanceTest
             }
 
             return id;
+        }
+
+        public async Task<bool> Reinforce(int id, ExperimentDefinition def)
+        {
+            if (!CanStart) throw new InvalidOperationException("Cannot start experiment since the manager is in read mode");
+
+            var refExp = await storage.GetReferenceExperiment();
+            ExperimentEntity ee = await storage.GetExperiment(id);
+            string poolId = "z3-nightly";
+
+            using (var bc = BatchClient.Open(batchCreds))
+            {
+                var pool = await bc.PoolOperations.GetPoolAsync(poolId);
+                CloudJob job = bc.JobOperations.CreateJob();
+                string jid_prefix = BuildJobId(id);
+                string jid = "";
+                bool have_jid = false;
+                int cnt = 1;
+                while (!have_jid)
+                {
+                    try
+                    {
+                        jid = String.Format("{0}-{1}", jid_prefix, cnt++);
+                        bc.JobOperations.GetJob(jid);
+                    } catch (BatchException) {
+                        have_jid = true;
+                    }
+                }
+
+                job.Id = jid;
+                job.OnAllTasksComplete = OnAllTasksComplete.TerminateJob;
+                job.PoolInformation = new PoolInformation { PoolId = poolId };
+                job.JobPreparationTask = new JobPreparationTask
+                {
+                    CommandLine = "cmd /c (robocopy %AZ_BATCH_TASK_WORKING_DIR% %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID% /e /purge) ^& IF %ERRORLEVEL% LEQ 1 exit 0",
+                    ResourceFiles = new List<ResourceFile>(),
+                    WaitForSuccess = true
+                };
+
+                SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy
+                {
+                    SharedAccessExpiryTime = DateTime.UtcNow.AddHours(48),
+                    Permissions = SharedAccessBlobPermissions.Read
+                };
+
+                foreach (CloudBlockBlob blob in storage.ListAzureWorkerBlobs())
+                {
+                    string sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
+                    string blobSasUri = String.Format("{0}{1}", blob.Uri, sasBlobToken);
+                    job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(blobSasUri, blob.Name));
+                }
+
+                string executableFolder = "exec";
+                job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(storage.GetExecutableSasUri(def.Executable), Path.Combine(executableFolder, def.Executable)));
+
+                if (refExp != null)
+                {
+                    string refContentFolder = "refdata";
+                    string refBenchFolder = Path.Combine(refContentFolder, "data");
+                    var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
+                    job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
+                    AzureBenchmarkStorage benchStorage;
+                    if (refExp.Definition.BenchmarkContainerUri == ExperimentDefinition.DefaultContainerUri)
+                        benchStorage = storage.DefaultBenchmarkStorage;
+                    else
+                        benchStorage = new AzureBenchmarkStorage(refExp.Definition.BenchmarkContainerUri);
+
+                    Domain refdomain;
+                    if (refExp.Definition.DomainName == "Z3")
+                        refdomain = new Z3Domain();
+                    else
+                        throw new InvalidOperationException("Reference experiment uses unknown domain.");
+
+                    SortedSet<string> extensions;
+                    if (string.IsNullOrEmpty(refExp.Definition.BenchmarkFileExtension))
+                        extensions = new SortedSet<string>(refdomain.BenchmarkExtensions.Distinct());
+                    else
+                        extensions = new SortedSet<string>(refExp.Definition.BenchmarkFileExtension.Split('|').Select(s => s.Trim().TrimStart('.')).Distinct());
+
+                    foreach (CloudBlockBlob blob in benchStorage.ListBlobs(refExp.Definition.BenchmarkDirectory, refExp.Definition.Category))
+                    {
+                        string[] parts = blob.Name.Split('/');
+                        string shortName = parts[parts.Length - 1];
+                        var shortnameParts = shortName.Split('.');
+                        if (shortnameParts.Length == 1 && !extensions.Contains(""))
+                            continue;
+                        var ext = shortnameParts[shortnameParts.Length - 1];
+                        if (!extensions.Contains(ext))
+                            continue;
+
+                        job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
+                    }
+                }
+
+                job.Constraints = new JobConstraints();
+
+                if (def.ExperimentTimeout != TimeSpan.Zero)
+                    job.Constraints.MaxWallClockTime = def.ExperimentTimeout;
+
+                job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
+                string taskId = "taskStarter";
+
+                string summaryName = ee.Creator != "Nightly" ? "" : "Z3Nightly";
+                string taskCommandLine = string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-tasks {0} \"{1}\"", id, summaryName);
+
+                job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
+
+                await job.CommitAsync();
+            }
+
+            return true;
         }
 
         public async override Task RestartBenchmarks(int id, IEnumerable<string> benchmarkNames, string newBenchmarkContainerUri = null)

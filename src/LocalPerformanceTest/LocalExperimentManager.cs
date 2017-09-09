@@ -215,20 +215,20 @@ namespace PerformanceTest
             {
                 total = experiment.Results.Length;
                 done = experiment.Results.Count(t => t.IsCompleted);
-                totalRuntime = done > 0 ? TimeSpan.FromTicks(experiment.Results.Sum(r => r.Result.TotalProcessorTime.Ticks)) : TimeSpan.FromSeconds(0);
+                totalRuntime = done > 0 ? TimeSpan.FromTicks(experiment.Results.Sum(r => r.Result.CPUTime.Ticks)) : TimeSpan.FromSeconds(0);
             }
             else
             {
                 var results = storage.GetResults(id);
                 done = total = results.Length;
-                totalRuntime = done > 0 ? TimeSpan.FromTicks(results.Sum(r => r.TotalProcessorTime.Ticks)) : TimeSpan.FromSeconds(0);
+                totalRuntime = done > 0 ? TimeSpan.FromTicks(results.Sum(r => r.CPUTime.Ticks)) : TimeSpan.FromSeconds(0);
             }
             return new ExperimentStatus(id, expRow.Category, expRow.Submitted, expRow.Creator, expRow.Note, expRow.Flag, done, total, totalRuntime, GetWorkerInformation());
         }
         private async Task<double> ComputeNormal()
         {
             var benchmarks = await Task.WhenAll(runner.Enqueue(-1, reference.Definition, 1.0, reference.Repetitions));
-            var m = benchmarks.Sum(b => b.TotalProcessorTime.TotalSeconds);
+            var m = benchmarks.Sum(b => b.CPUTime.TotalSeconds);
             double n = reference.ReferenceValue / m;
             Trace.WriteLine(String.Format("Median reference duration: {0}, normal: {1}", m, n));
             return n;

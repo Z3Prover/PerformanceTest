@@ -126,13 +126,13 @@ namespace Measure
 
             if (lastResult == null)
                 info = String.Format("{1:0.0000}\t{2:0.00} MB\t{0.0}",
-                    result.BenchmarkFileName, result.NormalizedRuntime, result.PeakMemorySizeMB);
+                    result.BenchmarkFileName, result.NormalizedCPUTime, result.PeakMemorySizeMB);
             else
             {
-                speedup = (lastResult.NormalizedRuntime / result.NormalizedRuntime);
+                speedup = (lastResult.NormalizedCPUTime / result.NormalizedCPUTime);
                 extraMem = result.PeakMemorySizeMB - lastResult.PeakMemorySizeMB;
                 info = String.Format("{0:0.0000} ({1:0.00}{2})\t{3:0.00} MB ({4}{5:0.00})\t{6}",
-                        result.NormalizedRuntime,
+                        result.NormalizedCPUTime,
                         speedup,
                         speedup == 1 ? " same" : speedup > 1 ? " faster" : " slower",
                         result.PeakMemorySizeMB,

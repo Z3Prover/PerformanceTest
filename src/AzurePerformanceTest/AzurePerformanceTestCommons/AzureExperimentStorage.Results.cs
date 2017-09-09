@@ -189,7 +189,9 @@ namespace AzurePerformanceTest
             azureResult.BenchmarkFileName = b.BenchmarkFileName;
             azureResult.ExitCode = b.ExitCode;
             azureResult.ExperimentID = b.ExperimentID;
-            azureResult.NormalizedRuntime = b.NormalizedRuntime;
+            azureResult.NormalizedCPUTime = b.NormalizedCPUTime;
+            azureResult.CPUTime = b.CPUTime;
+            azureResult.WallClockTime = b.WallClockTime;
             azureResult.PeakMemorySizeMB = b.PeakMemorySizeMB;
             azureResult.Properties = new Dictionary<string, string>();
             foreach (var prop in b.Properties)
@@ -202,9 +204,6 @@ namespace AzurePerformanceTest
             azureResult.StdErr = string.Empty;
             azureResult.StdErrExtStorageIdx = string.Empty;
 
-            azureResult.TotalProcessorTime = b.TotalProcessorTime;
-            azureResult.WallClockTime = b.WallClockTime;
-
             return azureResult;
         }
 
@@ -214,8 +213,8 @@ namespace AzurePerformanceTest
                 azureResult.ExperimentID,
                 azureResult.BenchmarkFileName,
                 azureResult.AcquireTime,
-                azureResult.NormalizedRuntime,
-                azureResult.TotalProcessorTime,
+                azureResult.NormalizedCPUTime,
+                azureResult.CPUTime,
                 azureResult.WallClockTime,
                 azureResult.PeakMemorySizeMB,
                 azureResult.Status,

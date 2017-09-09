@@ -43,11 +43,10 @@ namespace PerformanceTest.Records
                 if (domain.CanConsiderAsRecord(new ProcessRunAnalysis(r.Status, r.Properties)))
                 {
                     Record record;
-                    if (!records.TryGetValue(r.BenchmarkFileName, out record) || record.Runtime > r.NormalizedRuntime)
+                    if (!records.TryGetValue(r.BenchmarkFileName, out record) || record.Runtime > r.CPUTime.TotalSeconds)
                     {
                         // New record found
-                        records[r.BenchmarkFileName] = new Record(r.ExperimentID, r.NormalizedRuntime);
-                        string category = GetCategory(r.BenchmarkFileName);
+                        records[r.BenchmarkFileName] = new Record(r.ExperimentID, r.CPUTime.TotalSeconds);                        string category = GetCategory(r.BenchmarkFileName);
                     }
                 }
             }

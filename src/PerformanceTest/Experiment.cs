@@ -175,16 +175,16 @@ namespace PerformanceTest
     [Serializable]
     public class BenchmarkResult : ISerializable
     {
-        public BenchmarkResult(int experimentId, string benchmarkFileName, DateTime acquireTime, double normalizedRuntime,
-            TimeSpan totalProcessorTime, TimeSpan wallClockTime, double memorySizeMB, ResultStatus status, int? exitCode, Stream stdout, Stream stderr,
+        public BenchmarkResult(int experimentId, string benchmarkFileName, DateTime acquireTime, double normalizedCPUTime,
+            TimeSpan CPUTime, TimeSpan wallClockTime, double memorySizeMB, ResultStatus status, int? exitCode, Stream stdout, Stream stderr,
             IReadOnlyDictionary<string, string> props)
         {
             if (props == null) throw new ArgumentNullException("props");
 
             this.ExperimentID = experimentId;
             this.BenchmarkFileName = benchmarkFileName;
-            this.NormalizedRuntime = normalizedRuntime;
-            this.TotalProcessorTime = totalProcessorTime;
+            this.NormalizedCPUTime = normalizedCPUTime;
+            this.CPUTime = CPUTime;
             this.WallClockTime = wallClockTime;
             this.PeakMemorySizeMB = memorySizeMB;
             this.ExitCode = exitCode;
@@ -205,10 +205,12 @@ namespace PerformanceTest
                         ExperimentID = (int)entry.Value; break;
                     case nameof(BenchmarkFileName):
                         BenchmarkFileName = (string)entry.Value; break;
-                    case nameof(NormalizedRuntime):
-                        NormalizedRuntime = (double)entry.Value; break;
-                    case nameof(TotalProcessorTime):
-                        TotalProcessorTime = (TimeSpan)entry.Value; break;
+                    case nameof(NormalizedCPUTime):
+                    case "NormalizedRuntime":
+                        NormalizedCPUTime = (double)entry.Value; break;
+                    case nameof(CPUTime):
+                    case "TotalProcessorTime":
+                        CPUTime = (TimeSpan)entry.Value; break;
                     case nameof(WallClockTime):
                         WallClockTime = (TimeSpan)entry.Value; break;
                     case nameof(PeakMemorySizeMB):
@@ -247,9 +249,9 @@ namespace PerformanceTest
         /// <summary>
         /// A normalized total processor time that indicates the amount of time that the associated process has spent utilizing the CPU.
         /// </summary>
-        public double NormalizedRuntime { get; private set; }
+        public double NormalizedCPUTime { get; private set; }
 
-        public TimeSpan TotalProcessorTime { get; private set; }
+        public TimeSpan CPUTime { get; private set; }
 
         public TimeSpan WallClockTime { get; private set; }
 
@@ -280,8 +282,8 @@ namespace PerformanceTest
 
             info.AddValue(nameof(ExperimentID), this.ExperimentID);
             info.AddValue(nameof(BenchmarkFileName), this.BenchmarkFileName, typeof(string));
-            info.AddValue(nameof(NormalizedRuntime), this.NormalizedRuntime);
-            info.AddValue(nameof(TotalProcessorTime), this.TotalProcessorTime, typeof(TimeSpan));
+            info.AddValue(nameof(NormalizedCPUTime), this.NormalizedCPUTime);
+            info.AddValue(nameof(CPUTime), this.CPUTime, typeof(TimeSpan));
             info.AddValue(nameof(WallClockTime), this.WallClockTime, typeof(TimeSpan));
             info.AddValue(nameof(PeakMemorySizeMB), this.PeakMemorySizeMB);
             if(this.ExitCode.HasValue) info.AddValue(nameof(ExitCode), this.ExitCode);

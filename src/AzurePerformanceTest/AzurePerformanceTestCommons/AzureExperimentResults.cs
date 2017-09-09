@@ -114,7 +114,7 @@ namespace AzurePerformanceTest
                     if (b.Status != status) // updating status of this result
                     {
                         newBenchmarks[i] = new BenchmarkResult(b.ExperimentID, b.BenchmarkFileName,
-                            b.AcquireTime, b.NormalizedRuntime, b.TotalProcessorTime, b.WallClockTime,
+                            b.AcquireTime, b.NormalizedCPUTime, b.CPUTime, b.WallClockTime,
                             b.PeakMemorySizeMB,
                             status, // <-- new status
                             b.ExitCode, b.StdOut, b.StdErr, b.Properties);

@@ -343,7 +343,7 @@ namespace Nightly
             ca.AxisX.Maximum = 0.0;
             ca.AxisX.LabelStyle.Enabled = false;
 
-            // ca.AxisY.TextOrientation = TextOrientation.Rotated270;            
+            // ca.AxisY.TextOrientation = TextOrientation.Rotated270;
             ca.AxisY.Minimum = 0.0;
             ca.AxisY.Maximum = 100.0;
             ca.AxisY.LabelStyle.IsEndLabelVisible = true;
@@ -454,7 +454,7 @@ namespace Nightly
                 double x = (now - pdt).TotalDays;
                 if (x <= maxdays)
                 {
-                    double y = 0.0, y2 = 0.0, y3 = 0.0, y4 = 0.0;
+                    double y = 0.0, y2 = 0.0; // y3 = 0.0, y4 = 0.0;
                     string tt = "";
 
                     if (category == "" || exp.Summary.CategorySummary.ContainsKey(category))
@@ -518,17 +518,17 @@ namespace Nightly
                 }
             }
 
-            //if (need_latest)
-            //{
-            //    ser.Points.AddXY(0.0, latest_y);
-            //    ser.Points.Last().ToolTip = "Latest: " + latest_y.ToString();
-            //}
+            if (need_latest)
+            {
+                ser2.Points.AddXY(0.0, latest_y);
+                ser2.Points.Last().ToolTip = "Latest: " + latest_y.ToString();
+            }
 
-            //if (need_earliest)
-            //{
-            //    ser.Points.InsertXY(0, -maxdays, earliest_y);
-            //    ser.Points.First().ToolTip = "Before: " + earliest_y.ToString();
-            //}
+            if (need_earliest)
+            {
+                ser2.Points.InsertXY(0, -maxdays, earliest_y);
+                ser2.Points.First().ToolTip = "Before: " + earliest_y.ToString();
+            }
 
             //chart.Series.Add(ser);
             chart.Series.Add(ser2);
@@ -619,7 +619,7 @@ namespace Nightly
                         double avg_time = (csZ3.TimeSat + csZ3.TimeUnsat) / (double)solved;
                         double top_speed = virtualBestAvg;
 
-                        double x = 100.0 * solved / (double)cs.Files; // % solved.                
+                        double x = 100.0 * solved / (double)cs.Files; // % solved.
                         double y = 100.0 * top_speed / avg_time; // rel. speed?
 
                         int inx = series.Points.AddXY(x, y);

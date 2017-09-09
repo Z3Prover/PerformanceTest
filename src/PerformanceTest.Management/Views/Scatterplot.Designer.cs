@@ -71,9 +71,9 @@
             this.gbStatistics.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // chart
-            // 
+            //
             chartArea1.Name = "ChartArea1";
             this.chart.ChartAreas.Add(chartArea1);
             this.chart.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -90,9 +90,9 @@
             title1.Name = "Title1";
             title1.Text = "Title";
             this.chart.Titles.Add(title1);
-            // 
+            //
             // cbFancy
-            // 
+            //
             this.cbFancy.AutoSize = true;
             this.cbFancy.Location = new System.Drawing.Point(6, 19);
             this.cbFancy.Name = "cbFancy";
@@ -101,27 +101,27 @@
             this.cbFancy.Text = "Fancy";
             this.cbFancy.UseVisualStyleBackColor = true;
             this.cbFancy.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // lblAvgSpeedupTxt
-            // 
+            //
             this.lblAvgSpeedupTxt.AutoSize = true;
             this.lblAvgSpeedupTxt.Location = new System.Drawing.Point(6, 19);
             this.lblAvgSpeedupTxt.Name = "lblAvgSpeedupTxt";
             this.lblAvgSpeedupTxt.Size = new System.Drawing.Size(130, 13);
             this.lblAvgSpeedupTxt.TabIndex = 2;
             this.lblAvgSpeedupTxt.Text = "Avg. speedup (excl. T/O):";
-            // 
+            //
             // lblAvgSpeedup
-            // 
+            //
             this.lblAvgSpeedup.Location = new System.Drawing.Point(141, 19);
             this.lblAvgSpeedup.Name = "lblAvgSpeedup";
             this.lblAvgSpeedup.Size = new System.Drawing.Size(72, 16);
             this.lblAvgSpeedup.TabIndex = 3;
             this.lblAvgSpeedup.Text = "label1";
             this.lblAvgSpeedup.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
+            //
             // ckSAT
-            // 
+            //
             this.ckSAT.AutoSize = true;
             this.ckSAT.Checked = true;
             this.ckSAT.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -132,9 +132,9 @@
             this.ckSAT.Text = "SAT";
             this.ckSAT.UseVisualStyleBackColor = true;
             this.ckSAT.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckUNSAT
-            // 
+            //
             this.ckUNSAT.AutoSize = true;
             this.ckUNSAT.Checked = true;
             this.ckUNSAT.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -145,18 +145,18 @@
             this.ckUNSAT.Text = "UNSAT";
             this.ckUNSAT.UseVisualStyleBackColor = true;
             this.ckUNSAT.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // lblIgnore
-            // 
+            //
             this.lblIgnore.Location = new System.Drawing.Point(6, 92);
             this.lblIgnore.Name = "lblIgnore";
             this.lblIgnore.Size = new System.Drawing.Size(47, 18);
             this.lblIgnore.TabIndex = 6;
             this.lblIgnore.Text = "Ignore:";
             this.lblIgnore.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // ckIgnorePrefix
-            // 
+            //
             this.ckIgnorePrefix.AutoSize = true;
             this.ckIgnorePrefix.Checked = false;
             this.ckIgnorePrefix.CheckState = System.Windows.Forms.CheckState.Unchecked;
@@ -167,9 +167,9 @@
             this.ckIgnorePrefix.Text = "Prefix";
             this.ckIgnorePrefix.UseVisualStyleBackColor = true;
             this.ckIgnorePrefix.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckIgnorePostfix
-            // 
+            //
             this.ckIgnorePostfix.AutoSize = true;
             this.ckIgnorePostfix.Checked = false;
             this.ckIgnorePostfix.CheckState = System.Windows.Forms.CheckState.Unchecked;
@@ -180,9 +180,9 @@
             this.ckIgnorePostfix.Text = "Postfix";
             this.ckIgnorePostfix.UseVisualStyleBackColor = true;
             this.ckIgnorePostfix.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckIgnoreCategory
-            // 
+            //
             this.ckIgnoreCategory.AutoSize = true;
             this.ckIgnoreCategory.Checked = false;
             this.ckIgnoreCategory.CheckState = System.Windows.Forms.CheckState.Unchecked;
@@ -193,9 +193,9 @@
             this.ckIgnoreCategory.Text = "Category";
             this.ckIgnoreCategory.UseVisualStyleBackColor = true;
             this.ckIgnoreCategory.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // gpOptions
-            // 
+            //
             this.gpOptions.Controls.Add(this.panel1);
             this.gpOptions.Controls.Add(this.gbStatistics);
             this.gpOptions.Controls.Add(this.ckMEMORY);
@@ -217,9 +217,9 @@
             this.gpOptions.TabIndex = 6;
             this.gpOptions.TabStop = false;
             this.gpOptions.Text = "Options";
-            // 
+            //
             // ckMEMORY
-            // 
+            //
             this.ckMEMORY.AutoSize = true;
             this.ckMEMORY.Checked = true;
             this.ckMEMORY.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -230,9 +230,9 @@
             this.ckMEMORY.Text = "MEMORY";
             this.ckMEMORY.UseVisualStyleBackColor = true;
             this.ckMEMORY.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckBUG
-            // 
+            //
             this.ckBUG.AutoSize = true;
             this.ckBUG.Checked = true;
             this.ckBUG.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -243,9 +243,9 @@
             this.ckBUG.Text = "BUG";
             this.ckBUG.UseVisualStyleBackColor = true;
             this.ckBUG.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckERROR
-            // 
+            //
             this.ckERROR.AutoSize = true;
             this.ckERROR.Checked = true;
             this.ckERROR.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -256,72 +256,72 @@
             this.ckERROR.Text = "ERROR";
             this.ckERROR.UseVisualStyleBackColor = true;
             this.ckERROR.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // lblSlower
-            // 
+            //
             this.lblSlower.Location = new System.Drawing.Point(122, 73);
             this.lblSlower.Name = "lblSlower";
             this.lblSlower.Size = new System.Drawing.Size(91, 13);
             this.lblSlower.TabIndex = 25;
             this.lblSlower.Text = "label1";
             this.lblSlower.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
+            //
             // label5
-            // 
+            //
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(73, 73);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(49, 13);
             this.label5.TabIndex = 24;
             this.label5.Text = "Y Slower";
-            // 
+            //
             // lblFaster
-            // 
+            //
             this.lblFaster.Location = new System.Drawing.Point(122, 58);
             this.lblFaster.Name = "lblFaster";
             this.lblFaster.Size = new System.Drawing.Size(91, 13);
             this.lblFaster.TabIndex = 23;
             this.lblFaster.Text = "label1";
             this.lblFaster.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(73, 58);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(46, 13);
             this.label3.TabIndex = 22;
             this.label3.Text = "Y Faster";
-            // 
+            //
             // lblTotal
-            // 
+            //
             this.lblTotal.Location = new System.Drawing.Point(122, 42);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(91, 16);
             this.lblTotal.TabIndex = 21;
             this.lblTotal.Text = "label1";
             this.lblTotal.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(73, 43);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(31, 13);
             this.label1.TabIndex = 20;
             this.label1.Text = "Total";
-            // 
+            //
             // lblDatapoints
-            // 
+            //
             this.lblDatapoints.AutoSize = true;
             this.lblDatapoints.Location = new System.Drawing.Point(6, 42);
             this.lblDatapoints.Name = "lblDatapoints";
             this.lblDatapoints.Size = new System.Drawing.Size(61, 13);
             this.lblDatapoints.TabIndex = 19;
             this.lblDatapoints.Text = "Datapoints:";
-            // 
+            //
             // ckTIME
-            // 
+            //
             this.ckTIME.AutoSize = true;
             this.ckTIME.Checked = true;
             this.ckTIME.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -332,9 +332,9 @@
             this.ckTIME.Text = "TIMEOUT";
             this.ckTIME.UseVisualStyleBackColor = true;
             this.ckTIME.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // ckUNKNOWN
-            // 
+            //
             this.ckUNKNOWN.AutoSize = true;
             this.ckUNKNOWN.Checked = true;
             this.ckUNKNOWN.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -345,9 +345,9 @@
             this.ckUNKNOWN.Text = "UNKNOWN";
             this.ckUNKNOWN.UseVisualStyleBackColor = true;
             this.ckUNKNOWN.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // rbNormalized
-            // 
+            //
             this.rbNormalized.AutoSize = true;
             this.rbNormalized.Checked = true;
             this.rbNormalized.Location = new System.Drawing.Point(3, 6);
@@ -355,31 +355,31 @@
             this.rbNormalized.Size = new System.Drawing.Size(139, 17);
             this.rbNormalized.TabIndex = 0;
             this.rbNormalized.TabStop = true;
-            this.rbNormalized.Text = "Normalized runtime (sec)";
+            this.rbNormalized.Text = "Normalized CPU time (sec)";
             this.rbNormalized.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // rbNonNormalized
-            // 
+            //
             this.rbNonNormalized.AutoSize = true;
             this.rbNonNormalized.Location = new System.Drawing.Point(3, 25);
             this.rbNonNormalized.Name = "rbNonNormalized";
             this.rbNonNormalized.Size = new System.Drawing.Size(160, 17);
             this.rbNonNormalized.TabIndex = 0;
-            this.rbNonNormalized.Text = "Non-normalized runtime (sec)";
+            this.rbNonNormalized.Text = "CPU time (sec)";
             this.rbNonNormalized.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // rbWallClock
-            // 
+            //
             this.rbWallClock.AutoSize = true;
             this.rbWallClock.Location = new System.Drawing.Point(3, 43);
             this.rbWallClock.Name = "rbWallClock";
             this.rbWallClock.Size = new System.Drawing.Size(122, 17);
             this.rbWallClock.TabIndex = 0;
-            this.rbWallClock.Text = "Wall clock time (sec)";
+            this.rbWallClock.Text = "Wall-clock time (sec)";
             this.rbWallClock.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // rbMemoryUsed
-            // 
+            //
             this.rbMemoryUsed.AutoSize = true;
             this.rbMemoryUsed.Location = new System.Drawing.Point(3, 60);
             this.rbMemoryUsed.Name = "rbMemoryUsed";
@@ -387,29 +387,29 @@
             this.rbMemoryUsed.TabIndex = 0;
             this.rbMemoryUsed.Text = "Memory used (MB)";
             this.rbMemoryUsed.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
-            // 
+            //
             // splitContainer1
-            // 
+            //
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer1.IsSplitterFixed = true;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitContainer1.Panel1
-            // 
+            //
             this.splitContainer1.Panel1.Controls.Add(this.chart);
-            // 
+            //
             // splitContainer1.Panel2
-            // 
+            //
             this.splitContainer1.Panel2.Controls.Add(this.gpOptions);
             this.splitContainer1.Size = new System.Drawing.Size(681, 649);
             this.splitContainer1.SplitterDistance = 529;
             this.splitContainer1.TabIndex = 7;
-            // 
+            //
             // gbStatistics
-            // 
+            //
             this.gbStatistics.Controls.Add(this.lblAvgSpeedupTxt);
             this.gbStatistics.Controls.Add(this.lblDatapoints);
             this.gbStatistics.Controls.Add(this.label1);
@@ -424,9 +424,9 @@
             this.gbStatistics.Size = new System.Drawing.Size(222, 116);
             this.gbStatistics.TabIndex = 30;
             this.gbStatistics.TabStop = false;
-            // 
+            //
             // panel1
-            // 
+            //
             this.panel1.Controls.Add(this.rbMemoryUsed);
             this.panel1.Controls.Add(this.rbWallClock);
             this.panel1.Controls.Add(this.rbNonNormalized);
@@ -435,9 +435,9 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(170, 91);
             this.panel1.TabIndex = 31;
-            // 
+            //
             // Scatterplot
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(681, 815);

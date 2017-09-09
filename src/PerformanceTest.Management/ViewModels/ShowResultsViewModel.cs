@@ -203,7 +203,7 @@ namespace PerformanceTest.Management
             IsFiltering = true;
             try
             {
-                Results = allResults.Where(e => e.NormalizedRuntime >= limit).ToArray();
+                Results = allResults.Where(e => e.NormalizedCPUTime >= limit).ToArray();
             }
             finally
             {

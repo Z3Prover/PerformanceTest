@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceTest.Management
 {
-
     public class BenchmarkResultViewModel : INotifyPropertyChanged
     {
         private readonly IUIService uiService;
@@ -40,9 +39,9 @@ namespace PerformanceTest.Management
         {
             get { return result.WallClockTime.TotalSeconds; }
         }
-        public double TotalProcessorTime
+        public double CPUTime
         {
-            get { return result.TotalProcessorTime.TotalSeconds; }
+            get { return result.CPUTime.TotalSeconds; }
         }
         public ResultStatus Status
         {
@@ -72,9 +71,9 @@ namespace PerformanceTest.Management
         {
             get { return GetProperty(Z3Domain.KeyTargetUnknown); }
         }
-        public double NormalizedRuntime
+        public double NormalizedCPUTime
         {
-            get { return result.NormalizedRuntime; }
+            get { return result.NormalizedCPUTime; }
         }
 
         public double MemorySizeMB
@@ -141,7 +140,7 @@ namespace PerformanceTest.Management
             NotifyPropertyChanged(nameof(Filename));
             NotifyPropertyChanged(nameof(ExitCode));
             NotifyPropertyChanged(nameof(WallClockTime));
-            NotifyPropertyChanged(nameof(TotalProcessorTime));
+            NotifyPropertyChanged(nameof(CPUTime));
             NotifyPropertyChanged(nameof(Status));
             NotifyPropertyChanged(nameof(Sat));
             NotifyPropertyChanged(nameof(Unsat));
@@ -149,7 +148,7 @@ namespace PerformanceTest.Management
             NotifyPropertyChanged(nameof(TargetSat));
             NotifyPropertyChanged(nameof(TargetUnsat));
             NotifyPropertyChanged(nameof(TargetUnknown));
-            NotifyPropertyChanged(nameof(NormalizedRuntime));
+            NotifyPropertyChanged(nameof(NormalizedCPUTime));
             NotifyPropertyChanged(nameof(MemorySizeMB));
         }
 

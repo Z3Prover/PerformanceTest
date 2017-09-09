@@ -74,7 +74,7 @@ namespace PerformanceTest.Management
                             else
                             {
                                 if (!uiService.AskYesNo(
-                                    string.Format("Results of the experiment {0} have been changed since resolution started. Resolve again?", eid), 
+                                    string.Format("Results of the experiment {0} have been changed since resolution started. Resolve again?", eid),
                                     "Conflict when saving results"))
                                     return;
                             }
@@ -239,6 +239,10 @@ namespace PerformanceTest.Management
             return res;
         }
 
+        public async Task Reinforce(int id, ExperimentDefinition d)
+        {
+            await manager.Reinforce(id, d);
+        }
 
         public Task<Stream> SaveExecutable(string filename, string exBlobName)
         {

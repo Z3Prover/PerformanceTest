@@ -235,7 +235,7 @@ namespace PerformanceTest.Management
                 JoinResults();
                 IsFiltering = false;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 uiService.ShowError(ex, "Failed to get results for the experiments");
             }
@@ -265,7 +265,7 @@ namespace PerformanceTest.Management
                     else return 1;
                 if (y == null) return -1;
 
-                double diff = Math.Abs(x.Diff) - Math.Abs(y.Diff);
+                double diff = Math.Abs(x.Diff) - Math.Abs(y.Diff); // This is always cpu time diff; but it's only used for sorting?!
                 if (diff < 0) return 1;
                 else if (diff > 0) return -1;
                 else return 0;
@@ -362,7 +362,6 @@ namespace PerformanceTest.Management
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-
         public CompareBenchmarksViewModel(string filename, BenchmarkResultViewModel res1, BenchmarkResultViewModel res2, IUIService message)
         {
             if (res1 == null || res2 == null) throw new ArgumentNullException("results");
@@ -378,7 +377,7 @@ namespace PerformanceTest.Management
             get { return filename; }
         }
 
-        public double Diff { get { return result1.NormalizedRuntime - result2.NormalizedRuntime; } }
+        public double Diff { get { return result1.CPUTime - result2.CPUTime; } }
 
         public BenchmarkResultViewModel Results1 { get { return result1; } }
 

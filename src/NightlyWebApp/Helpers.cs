@@ -50,15 +50,17 @@ namespace AzurePerformanceTest
 
             var benchResults = (await expManager.GetResults(id)).Benchmarks;
             ComparableResult[] results = new ComparableResult[benchResults.Length];
-            double maxTimeout = 0;
+            double maxTimeout = exp.Definition.BenchmarkTimeout.TotalSeconds;
             for (int i = 0; i < benchResults.Length; i++)
             {
                 var b = benchResults[i];
                 results[i] = new ComparableResult(b);
+#if USE_NORMALIZED_TIME
                 if(b.Status == Measurement.ResultStatus.Timeout && b.NormalizedRuntime > maxTimeout)
                 {
                     maxTimeout = b.NormalizedRuntime;
                 }
+#endif
             }
 
             return new ComparableExperiment(id, exp.Status.SubmissionTime, maxTimeout, results);

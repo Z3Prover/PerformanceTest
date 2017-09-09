@@ -47,18 +47,17 @@ namespace PerformanceTest.Management
             this.vm = vm;
             this.experiment1 = exp1;
             this.experiment2 = exp2;
-            
+
             string category1 = experiment1.Category == null ? "" : experiment1.Category;
             string category2 = experiment2.Category == null ? "" : experiment2.Category;
             category = (category1 == category2) ? category1 : category1 + " -vs- " + category2;
             timeoutX = (uint)timeout1;
             timeoutY = (uint)timeout2;
             timeoutXmin = timeoutXmax = timeoutX;
-            timeoutYmin = timeoutYmax = timeoutY; 
+            timeoutYmin = timeoutYmax = timeoutY;
             memoutX = (uint)memout1;
             memoutY = (uint)memout2;
             UpdateStatus(true);
-
 
             vm.PropertyChanged += (s, a) =>
             {
@@ -69,19 +68,18 @@ namespace PerformanceTest.Management
                     RefreshChart();
                 }
             };
-
         }
         private void updateTimeouts()
         {
             bool empty = vm.CompareItems == null || vm.CompareItems.Length == 0;
 
-            timeoutXmin = empty ? timeoutX : vm.CompareItems.Min(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedRuntime : UInt32.MaxValue);
-            timeoutXmax = empty ? timeoutX : vm.CompareItems.Max(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedRuntime : UInt32.MinValue);
+            timeoutXmin = empty ? timeoutX : vm.CompareItems.Min(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MaxValue);
+            timeoutXmax = empty ? timeoutX : vm.CompareItems.Max(item => item.Results1.Status == ResultStatus.Timeout ? (uint)item.Results1.NormalizedCPUTime : UInt32.MinValue);
             if (timeoutXmin == UInt32.MaxValue && timeoutXmax == UInt32.MinValue)
                 timeoutXmin = timeoutXmax = timeoutX;
-            
-            timeoutYmin = empty ? timeoutY : vm.CompareItems.Min(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedRuntime : UInt32.MaxValue);
-            timeoutYmax = empty ? timeoutY : vm.CompareItems.Max(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedRuntime : UInt32.MinValue);
+
+            timeoutYmin = empty ? timeoutY : vm.CompareItems.Min(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MaxValue);
+            timeoutYmax = empty ? timeoutY : vm.CompareItems.Max(item => item.Results2.Status == ResultStatus.Timeout ? (uint)item.Results2.NormalizedCPUTime : UInt32.MinValue);
             if (timeoutYmin == UInt32.MaxValue && timeoutYmax == UInt32.MinValue)
                 timeoutYmin = timeoutYmax = timeoutY;
         }
@@ -230,11 +228,12 @@ namespace PerformanceTest.Management
                 int m3 = inx % 3;
                 int d3 = inx / 3;
                 newSeries.ChartType = SeriesChartType.Point;
-                if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                
+                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
+                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
+                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
+                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newSeries.MarkerStyle = MarkerStyle.Star4;
+
                 newSeries.MarkerSize = 6;
                 switch (m3)
                 {
@@ -251,11 +250,12 @@ namespace PerformanceTest.Management
                 Series newSeries = chart.Series.Last();
 
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                
+                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
+                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
+                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
+                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newSeries.MarkerStyle = MarkerStyle.Star4;
+
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Blue;
                 newSeries.XAxisType = AxisType.Primary;
@@ -268,7 +268,7 @@ namespace PerformanceTest.Management
                 else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
                 else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
                 else newSeries.MarkerStyle = MarkerStyle.Triangle;
-                
+
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.Green;
                 newSeries.XAxisType = AxisType.Primary;
@@ -277,11 +277,12 @@ namespace PerformanceTest.Management
                 chart.Series.Add("Losers");
                 newSeries = chart.Series.Last();
                 newSeries.ChartType = SeriesChartType.FastPoint;
-                if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
-                else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
-                else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
-                else newSeries.MarkerStyle = MarkerStyle.Triangle;
-               
+                //if (rbNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Cross;
+                //else if (rbNonNormalized.Checked) newSeries.MarkerStyle = MarkerStyle.Star4;
+                //else if (rbWallClock.Checked) newSeries.MarkerStyle = MarkerStyle.Star6;
+                //else newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newSeries.MarkerStyle = MarkerStyle.Star4;
+
                 newSeries.MarkerSize = 6;
                 newSeries.MarkerColor = Color.OrangeRed;
                 newSeries.XAxisType = AxisType.Primary;
@@ -345,8 +346,8 @@ namespace PerformanceTest.Management
                         double x = 0.0, y = 0.0;
                         if (rbNonNormalized.Checked)
                         {
-                            x = item.Results1.TotalProcessorTime;
-                            y = item.Results2.TotalProcessorTime;
+                            x = item.Results1.CPUTime;
+                            y = item.Results2.CPUTime;
                         } else if (rbWallClock.Checked)
                         {
                             x = item.Results1.WallClockTime;
@@ -355,10 +356,10 @@ namespace PerformanceTest.Management
                         {
                             x = item.Results1.MemorySizeMB;
                             y = item.Results2.MemorySizeMB;
-                        } else 
+                        } else
                         {
-                            x = item.Results1.NormalizedRuntime;
-                            y = item.Results2.NormalizedRuntime;
+                            x = item.Results1.NormalizedCPUTime;
+                            y = item.Results2.NormalizedCPUTime;
                         }
 
                         if (x < axisMinimum) x = axisMinimum;
@@ -378,17 +379,17 @@ namespace PerformanceTest.Management
                              (!ckmemory && (rc1 == ResultStatus.OutOfMemory || rc2 == ResultStatus.OutOfMemory)))
                             continue;
 
-                        if (rbMemoryUsed.Checked && (rc1 != ResultStatus.Success && rc1 != ResultStatus.OutOfMemory || x < memoutX && res1 == 0) 
+                        if (rbMemoryUsed.Checked && (rc1 != ResultStatus.Success && rc1 != ResultStatus.OutOfMemory || x < memoutX && res1 == 0)
                             || (rbNonNormalized.Checked || rbWallClock.Checked) && (rc1 != ResultStatus.Success && rc1 != ResultStatus.Timeout || x != timeoutX && res1 == 0)
                             || rbNormalized.Checked && (rc1 != ResultStatus.Success && rc1 != ResultStatus.Timeout || res1 == 0 && (x < timeoutXmin || x > timeoutXmax)))
                             x = errorLine;
-                        if (rbMemoryUsed.Checked && (rc2 != ResultStatus.Success && rc2 != ResultStatus.OutOfMemory || y < memoutY && res2 == 0) 
+                        if (rbMemoryUsed.Checked && (rc2 != ResultStatus.Success && rc2 != ResultStatus.OutOfMemory || y < memoutY && res2 == 0)
                             || (rbNonNormalized.Checked || rbWallClock.Checked) && (rc2 != ResultStatus.Success && rc2 != ResultStatus.Timeout || y != timeoutY && res2 == 0)
                             || rbNormalized.Checked && (rc2 != ResultStatus.Success && rc2 != ResultStatus.Timeout || res2 == 0 && (y < timeoutYmin || y > timeoutYmax)))
                             y = errorLine;
                         if (rbMemoryUsed.Checked && (rc1 == ResultStatus.OutOfMemory)) x = memoutX;
                         if (rbMemoryUsed.Checked && (rc2 == ResultStatus.OutOfMemory)) y = memoutY;
-                        if (rbMemoryUsed.Checked && rc1 != ResultStatus.OutOfMemory && rc2 != ResultStatus.OutOfMemory && x < memoutX && y < memoutY 
+                        if (rbMemoryUsed.Checked && rc1 != ResultStatus.OutOfMemory && rc2 != ResultStatus.OutOfMemory && x < memoutX && y < memoutY
                             || (rbNonNormalized.Checked || rbWallClock.Checked) && rc1 != ResultStatus.Timeout && rc2 != ResultStatus.Timeout && x < timeoutX && y < timeoutY
                             || rbNormalized.Checked && rc1 != ResultStatus.Timeout && rc2 != ResultStatus.Timeout && x < timeoutXmax && y < timeoutYmax)
                         {
@@ -467,7 +468,7 @@ namespace PerformanceTest.Management
 
             lblTotal.Text = total.ToString();
             lblFaster.Text = y_faster.ToString();
-            lblSlower.Text = y_slower.ToString();            
+            lblSlower.Text = y_slower.ToString();
         }
         private void scatterTest_Load(object sender, EventArgs e)
         {
@@ -480,13 +481,13 @@ namespace PerformanceTest.Management
             SetupChart();
             if (rbMemoryUsed.Checked)
             {
-                lblAvgSpeedupTxt.Text = "Avg.memory used(excl.OOM):";
+                lblAvgSpeedupTxt.Text = "Avg. memory used (excl. M/O):";
                 label3.Text = "Y Less Memory";
                 label5.Text = "Y More Memory";
             }
             else
             {
-                lblAvgSpeedupTxt.Text = "Avg.speedup(excl. T/O):";
+                lblAvgSpeedupTxt.Text = "Avg. speedup (excl. T/O):";
                 label3.Text = "Y Faster";
                 label5.Text = "Y Slower";
             }

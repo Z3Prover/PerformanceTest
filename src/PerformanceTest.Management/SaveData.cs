@@ -13,7 +13,7 @@ namespace PerformanceTest.Management
     class CSVDatum
     {
         public int? rv = null;
-        public double normalized_time = 0.0, cpu_time = 0.0, wallclock_time = 0.0;
+        public double normalized_cpu_time = 0.0, cpu_time = 0.0, wallclock_time = 0.0;
         public int sat = 0, unsat = 0, unknown = 0;
     }
     public class SaveData
@@ -83,7 +83,7 @@ namespace PerformanceTest.Management
                 for (var i = 0; i < count; i++)
                 {
                     var domain = domainResolver.GetDomain(experiments[i].Definition.DomainName ?? "Z3");
-                    var aggr = domain.Aggregate(b[i].Benchmarks.Select(r => new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.NormalizedRuntime)));
+                    var aggr = domain.Aggregate(b[i].Benchmarks.Select(r => new ProcessRunResults(new ProcessRunAnalysis(r.Status, r.Properties), r.CPUTime.TotalSeconds)));
                     var statistics = new ExperimentStatistics(aggr);
                     var def = experiments[i].Definition;
                     string ps = def.Parameters.Trim(' ');
@@ -157,8 +157,8 @@ namespace PerformanceTest.Management
                         BenchmarkResult b = benchmarks[j];
                         CSVDatum cur = new CSVDatum();
                         cur.rv = b.ExitCode.Equals(DBNull.Value) ? null : (int?)b.ExitCode;
-                        cur.normalized_time = b.NormalizedRuntime.Equals(DBNull.Value) ? ex_timeout : b.NormalizedRuntime;
-                        cur.cpu_time = b.TotalProcessorTime == null ? ex_timeout : b.TotalProcessorTime.TotalSeconds;
+                        cur.normalized_cpu_time = b.NormalizedCPUTime.Equals(DBNull.Value) ? ex_timeout : b.NormalizedCPUTime;
+                        cur.cpu_time = b.CPUTime == null ? ex_timeout : b.CPUTime.TotalSeconds;
                         cur.wallclock_time = b.WallClockTime == null ? ex_timeout : b.WallClockTime.TotalSeconds;
                         cur.sat = Int32.Parse(b.Properties[Z3Domain.KeySat], CultureInfo.InvariantCulture);
                         cur.unsat = Int32.Parse(b.Properties[Z3Domain.KeyUnsat], CultureInfo.InvariantCulture);
@@ -168,8 +168,8 @@ namespace PerformanceTest.Management
                                      (b.Status == ResultStatus.Timeout && cur.rv == null ||
                                      (b.Status == ResultStatus.Success && (cur.rv == 0 || cur.rv == 10 || cur.rv == 20)));
 
-                        if (cur.sat == 0 && cur.unsat == 0 && !rv_ok) cur.normalized_time = error_line;
-                        if (cur.normalized_time < 0.01) cur.normalized_time = 0.01;
+                        if (cur.sat == 0 && cur.unsat == 0 && !rv_ok) cur.normalized_cpu_time = error_line;
+                        if (cur.normalized_cpu_time < 0.01) cur.normalized_cpu_time = 0.01;
 
                         string Benchmarkfilename = b.BenchmarkFileName.Contains("/") ? experiments[i].Category + "/" + b.BenchmarkFileName : experiments[i].Category + @"\" + b.BenchmarkFileName;
                         if (!data.ContainsKey(Benchmarkfilename)) data.Add(Benchmarkfilename, new Dictionary<int, CSVDatum>());
@@ -217,7 +217,7 @@ namespace PerformanceTest.Management
                         {
                             CSVDatum c = d.Value[id];
                             f.Write(c.rv + ",");
-                            f.Write(c.normalized_time + ",");
+                            f.Write(c.normalized_cpu_time + ",");
                             f.Write(c.cpu_time + ",");
                             f.Write(c.wallclock_time + ",");
                             f.Write(c.sat + ",");
@@ -400,7 +400,9 @@ namespace PerformanceTest.Management
         {
             bool condition1 = elem1.BenchmarkFileName == elem2.BenchmarkFileName &&
                               (elem1.ExitCode == 0 && elem2.ExitCode != 0 ||
-                               elem1.Status == ResultStatus.Success && elem2.Status == ResultStatus.Success && elem1.NormalizedRuntime < elem2.NormalizedRuntime);
+                               (elem1.Status == ResultStatus.Success &&
+                                elem2.Status == ResultStatus.Success &&
+                                elem1.CPUTime < elem2.CPUTime));
 
             int sat1 = int.Parse(elem1.Properties[Z3Domain.KeySat], CultureInfo.InvariantCulture);
             int unsat1 = int.Parse(elem1.Properties[Z3Domain.KeyUnsat], CultureInfo.InvariantCulture);

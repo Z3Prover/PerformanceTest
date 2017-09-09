@@ -186,7 +186,6 @@ namespace Measurement
             this.outputProperties = outputProperties;
         }
 
-
         public ResultStatus Status { get { return status; } }
         public IReadOnlyDictionary<string, string> OutputProperties { get { return outputProperties; } }
     }

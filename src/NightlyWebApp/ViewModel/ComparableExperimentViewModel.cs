@@ -43,10 +43,8 @@ namespace Nightly
         }
 
         public string Filename { get { return result.BenchmarkFileName; } }
-
         public ResultStatus Status { get { return result.Status; } }
-
-        public double Runtime { get { return result.NormalizedRuntime; } }
+        public double Runtime { get { return result.CPUTime.TotalSeconds; } }
         public int SAT { get { return sat; } }
         public int UNSAT { get { return unsat; } }
         public int UNKNOWN { get { return unknown; } }
