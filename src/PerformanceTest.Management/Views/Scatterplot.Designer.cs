@@ -43,8 +43,8 @@
             this.ckBUG = new System.Windows.Forms.CheckBox();
             this.ckERROR = new System.Windows.Forms.CheckBox();
             this.lblIgnore = new System.Windows.Forms.Label();
-            this.ckIgnorePrefix = new System.Windows.Forms.CheckBox();
-            this.ckIgnorePostfix = new System.Windows.Forms.CheckBox();
+            this.ckIgnoreContainer = new System.Windows.Forms.CheckBox();
+            this.ckIgnoreExtension = new System.Windows.Forms.CheckBox();
             this.ckIgnoreCategory = new System.Windows.Forms.CheckBox();
             this.lblSlower = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -157,29 +157,29 @@
             //
             // ckIgnorePrefix
             //
-            this.ckIgnorePrefix.AutoSize = true;
-            this.ckIgnorePrefix.Checked = false;
-            this.ckIgnorePrefix.CheckState = System.Windows.Forms.CheckState.Unchecked;
-            this.ckIgnorePrefix.Location = new System.Drawing.Point(59, 92);
-            this.ckIgnorePrefix.Name = "ckIgnorePrefix";
-            this.ckIgnorePrefix.Size = new System.Drawing.Size(63, 18);
-            this.ckIgnorePrefix.TabIndex = 7;
-            this.ckIgnorePrefix.Text = "Prefix";
-            this.ckIgnorePrefix.UseVisualStyleBackColor = true;
-            this.ckIgnorePrefix.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
+            this.ckIgnoreContainer.AutoSize = true;
+            this.ckIgnoreContainer.Checked = false;
+            this.ckIgnoreContainer.CheckState = System.Windows.Forms.CheckState.Unchecked;
+            this.ckIgnoreContainer.Location = new System.Drawing.Point(59, 92);
+            this.ckIgnoreContainer.Name = "ckIgnorePrefix";
+            this.ckIgnoreContainer.Size = new System.Drawing.Size(63, 18);
+            this.ckIgnoreContainer.TabIndex = 7;
+            this.ckIgnoreContainer.Text = "Container";
+            this.ckIgnoreContainer.UseVisualStyleBackColor = true;
+            this.ckIgnoreContainer.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
             //
             // ckIgnorePostfix
             //
-            this.ckIgnorePostfix.AutoSize = true;
-            this.ckIgnorePostfix.Checked = false;
-            this.ckIgnorePostfix.CheckState = System.Windows.Forms.CheckState.Unchecked;
-            this.ckIgnorePostfix.Location = new System.Drawing.Point(128, 92);
-            this.ckIgnorePostfix.Name = "ckIgnorePostfix";
-            this.ckIgnorePostfix.Size = new System.Drawing.Size(63, 18);
-            this.ckIgnorePostfix.TabIndex = 8;
-            this.ckIgnorePostfix.Text = "Postfix";
-            this.ckIgnorePostfix.UseVisualStyleBackColor = true;
-            this.ckIgnorePostfix.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
+            this.ckIgnoreExtension.AutoSize = true;
+            this.ckIgnoreExtension.Checked = false;
+            this.ckIgnoreExtension.CheckState = System.Windows.Forms.CheckState.Unchecked;
+            this.ckIgnoreExtension.Location = new System.Drawing.Point(128, 92);
+            this.ckIgnoreExtension.Name = "ckIgnorePostfix";
+            this.ckIgnoreExtension.Size = new System.Drawing.Size(63, 18);
+            this.ckIgnoreExtension.TabIndex = 8;
+            this.ckIgnoreExtension.Text = "Extension";
+            this.ckIgnoreExtension.UseVisualStyleBackColor = true;
+            this.ckIgnoreExtension.CheckedChanged += new System.EventHandler(this.ckCheckedChanged);
             //
             // ckIgnoreCategory
             //
@@ -207,8 +207,8 @@
             this.gpOptions.Controls.Add(this.ckUNSAT);
             this.gpOptions.Controls.Add(this.ckSAT);
             this.gpOptions.Controls.Add(this.lblIgnore);
-            this.gpOptions.Controls.Add(this.ckIgnorePrefix);
-            this.gpOptions.Controls.Add(this.ckIgnorePostfix);
+            this.gpOptions.Controls.Add(this.ckIgnoreContainer);
+            this.gpOptions.Controls.Add(this.ckIgnoreExtension);
             this.gpOptions.Controls.Add(this.ckIgnoreCategory);
             this.gpOptions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gpOptions.Location = new System.Drawing.Point(0, 0);
@@ -493,8 +493,8 @@
         private System.Windows.Forms.GroupBox gbStatistics;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label lblIgnore;
-        private System.Windows.Forms.CheckBox ckIgnorePrefix;
-        private System.Windows.Forms.CheckBox ckIgnorePostfix;
+        private System.Windows.Forms.CheckBox ckIgnoreContainer;
+        private System.Windows.Forms.CheckBox ckIgnoreExtension;
         private System.Windows.Forms.CheckBox ckIgnoreCategory;
     }
 }

@@ -101,7 +101,7 @@ namespace PerformanceTest.Management
                     case ExperimentExecutionStateVM.Loading:
                         return "(loading...)";
                     case ExperimentExecutionStateVM.NotFound:
-                        return "Not found";
+                        return "";
                     case ExperimentExecutionStateVM.Completed:
                         return "Completed";
                     case ExperimentExecutionStateVM.Terminated:

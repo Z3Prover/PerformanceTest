@@ -132,27 +132,13 @@ namespace PerformanceTest.Management
         {
             get { return checkIgnorePostfix; }
         }
-        public string Extension1
-        {
-            get { return extension1; }
-            set
-            {
-                extension1 = value;
-                JoinResults();
-            }
-        }
-        public string Extension2
-        {
-            get { return extension2; }
-            set
-            {
-                extension2 = value;
-                JoinResults();
-            }
-        }
 
-        public string Runtime1Title { get { return "Runtime (" + id1.ToString() + ")"; } }
-        public string Runtime2Title { get { return "Runtime (" + id2.ToString() + ")"; } }
+        public string CPUTime1Title { get { return "CPUTime (" + id1.ToString() + ")"; } }
+        public string CPUTime2Title { get { return "CPUTime (" + id2.ToString() + ")"; } }
+        public string NormalizedCPUTime1Title { get { return "Norm. CPUTime (" + id1.ToString() + ")"; } }
+        public string NormalizedCPUTime2Title { get { return "Norm. CPUTime (" + id2.ToString() + ")"; } }
+        public string WallClockTime1Title { get { return "WCTime (" + id1.ToString() + ")"; } }
+        public string WallClockTime2Title { get { return "WCTime (" + id2.ToString() + ")"; } }
         public string Status1Title { get { return "Status (" + id1.ToString() + ")"; } }
         public string Status2Title { get { return "Status (" + id2.ToString() + ")"; } }
         public string Exitcode1Title { get { return "ExitCode (" + id1.ToString() + ")"; } }
@@ -265,11 +251,35 @@ namespace PerformanceTest.Management
                     else return 1;
                 if (y == null) return -1;
 
-                double diff = Math.Abs(x.Diff) - Math.Abs(y.Diff); // This is always cpu time diff; but it's only used for sorting?!
-                if (diff < 0) return 1;
-                else if (diff > 0) return -1;
-                else return 0;
+                return x.Filename.CompareTo(y.Filename);
+
+                //double diff = Math.Abs(x.CPUDiff) - Math.Abs(y.CPUDiff);
+                //if (diff < 0) return 1;
+                //else if (diff > 0) return -1;
+                //else return 0;
             }
+        }
+
+        private static string MakeDatapointName(
+            bool ignoreContainer, bool ignoreCategory, bool ignore_extension,
+            string container, string category, string filename_ext)
+        {
+            string cntrt = container.Trim('/');
+            string dir_fn_ext = filename_ext.Replace('\\', '/').Trim('/');
+            string[] dir_fn_exts = dir_fn_ext.Split('/');
+            string directory = string.Join("/", dir_fn_exts.Take(dir_fn_exts.Count() - 1));
+            string[] fn_ext = dir_fn_exts.Last().Split('.');
+            string filename = string.Join(".", fn_ext.Take(fn_ext.Count() - 1));
+            string extension = fn_ext.Last();
+
+            List<string> elems = new List<string>();
+            if (!ignoreContainer && cntrt != "") elems.Add(cntrt);
+            if (!ignoreCategory) elems.Add(category.Trim('/'));
+            elems.Add(directory);
+            elems.Add(filename);
+            string res = string.Join("/", elems);
+            if (!ignore_extension) res += "." + extension;
+            return res;
         }
 
         private static CompareBenchmarksViewModel[] InnerJoinOrderedResults(BenchmarkResult[] r1, BenchmarkResult[] r2, CheckboxParameters param, IUIService uiService)
@@ -277,23 +287,16 @@ namespace PerformanceTest.Management
             int n1 = r1.Length;
             int n2 = r2.Length;
             var join = new CompareBenchmarksViewModel[Math.Min(n1, n2)];
-            if (!param.IsCategoryChecked && param.Category1 != param.Category2) return new CompareBenchmarksViewModel[0];
-            if (!param.IsPrefixChecked && param.Dir1 != param.Dir2) return new CompareBenchmarksViewModel[0];
             int i = 0;
             for (int i1 = 0, i2 = 0; i1 < n1 && i2 < n2;)
             {
-                string filename1 = r1[i1].BenchmarkFileName;
-                string filename2 = r2[i2].BenchmarkFileName;
-                if (!param.IsCategoryChecked)
-                {
-                    filename1 = param.Category1 + "/" + filename1;
-                    filename2 = param.Category2 + "/" + filename2;
-                }
-                if (param.IsPostfixChecked)
-                {
-                    filename1 = filename1.Substring(0, filename1.Length - param.Ext1.Length);
-                    filename2 = filename2.Substring(0, filename2.Length - param.Ext2.Length);
-                }
+                string filename1 = MakeDatapointName(
+                    param.IsPrefixChecked, param.IsCategoryChecked, param.IsPostfixChecked,
+                    param.Container1, param.Category1, r1[i1].BenchmarkFileName);
+                string filename2 = MakeDatapointName(
+                    param.IsPrefixChecked, param.IsCategoryChecked, param.IsPostfixChecked,
+                    param.Container2, param.Category2, r2[i2].BenchmarkFileName);
+
                 int cmp = string.Compare(filename1, filename2);
                 if (cmp == 0)
                 {
@@ -327,11 +330,11 @@ namespace PerformanceTest.Management
     }
     public class CheckboxParameters
     {
-        private readonly bool isCategoryChecked, isPrefixChecked, isPostfixChecked;
+        private readonly bool isIgnoreCategoryChecked, isPrefixChecked, isPostfixChecked;
         private readonly string category1, category2, ext1, ext2, dir1, dir2;
         public CheckboxParameters(bool isCategoryChecked, bool isPrefixChecked, bool isPostfixChecked, string category1, string category2, string ext1, string ext2, string dir1, string dir2)
         {
-            this.isCategoryChecked = isCategoryChecked;
+            this.isIgnoreCategoryChecked = isCategoryChecked;
             this.isPrefixChecked = isPrefixChecked;
             this.isPostfixChecked = isPostfixChecked;
             this.category1 = category1;
@@ -341,15 +344,15 @@ namespace PerformanceTest.Management
             this.dir1 = dir1;
             this.dir2 = dir2;
         }
-        public bool IsCategoryChecked { get { return isCategoryChecked; } }
+        public bool IsCategoryChecked { get { return isIgnoreCategoryChecked; } }
         public bool IsPrefixChecked { get { return isPrefixChecked; } }
         public bool IsPostfixChecked { get { return isPostfixChecked; } }
         public string Category1 { get { return category1; } }
         public string Category2 { get { return category2; } }
         public string Ext1 { get { return ext1; } }
         public string Ext2 { get { return ext2; } }
-        public string Dir1 { get { return dir1; } }
-        public string Dir2 { get { return dir2; } }
+        public string Container1 { get { return dir1; } }
+        public string Container2 { get { return dir2; } }
     }
 
 
@@ -377,7 +380,9 @@ namespace PerformanceTest.Management
             get { return filename; }
         }
 
-        public double Diff { get { return result1.CPUTime - result2.CPUTime; } }
+        public double CPUDiff { get { return result1.CPUTime - result2.CPUTime; } }
+        public double NormalizedCPUDiff { get { return result1.NormalizedCPUTime - result2.NormalizedCPUTime; } }
+        public double WallClockDiff { get { return result1.WallClockTime - result2.WallClockTime; } }
 
         public BenchmarkResultViewModel Results1 { get { return result1; } }
 

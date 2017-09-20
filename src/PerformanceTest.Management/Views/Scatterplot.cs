@@ -330,8 +330,8 @@ namespace PerformanceTest.Management
                 bool ckmemory = ckMEMORY.Checked;
                 if (vm.CompareItems != null)
                 {
-                    vm.CheckIgnorePrefix = ckIgnorePrefix.Checked;
-                    vm.CheckIgnorePostfix = ckIgnorePostfix.Checked;
+                    vm.CheckIgnorePrefix = ckIgnoreContainer.Checked;
+                    vm.CheckIgnorePostfix = ckIgnoreExtension.Checked;
                     vm.CheckIgnoreCategory = ckIgnoreCategory.Checked;
                 }
                 if (vm.CompareItems != null && vm.CompareItems.Length > 0)

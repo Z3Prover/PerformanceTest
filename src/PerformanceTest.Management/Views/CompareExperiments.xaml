@@ -22,24 +22,52 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="dataGrid" IsReadOnly="True" RowHeight="23" 
+            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0" Name="dataGrid" IsReadOnly="True" RowHeight="23"
                       AlternatingRowBackground="AliceBlue" GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended"
                       MouseDoubleClick="dataGrid_MouseDoubleClick"
                       EnableRowVirtualization="True" EnableColumnVirtualization="True"
                       ItemsSource="{Binding CompareItems}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding Path=Filename, Mode=OneWay}" Header="Filename"/>
-                    <DataGridTextColumn Binding="{Binding Path=Results1.NormalizedRuntime, Mode=OneWay, StringFormat={}{0:F3}}">
+                    <DataGridTextColumn Binding="{Binding Path=Results1.CPUTime, Mode=OneWay, StringFormat={}{0:F3}}">
                         <DataGridTextColumn.HeaderTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DataContext.Runtime1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                <TextBlock Text="{Binding DataContext.CPUTime1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                             </DataTemplate>
                         </DataGridTextColumn.HeaderTemplate>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Path=Results2.NormalizedRuntime, Mode=OneWay, StringFormat={}{0:F3}}" >
+                    <DataGridTextColumn Binding="{Binding Path=Results2.CPUTime, Mode=OneWay, StringFormat={}{0:F3}}" >
                         <DataGridTextColumn.HeaderTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DataContext.Runtime2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                <TextBlock Text="{Binding DataContext.CPUTime2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.NormalizedCPUTime, Mode=OneWay, StringFormat={}{0:F3}}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.NormalizedCPUTime1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.NormalizedCPUTime, Mode=OneWay, StringFormat={}{0:F3}}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.NormalizedCPUTime2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results1.WallClockTime, Mode=OneWay, StringFormat={}{0:F3}}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.WallClockTime1Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Path=Results2.WallClockTime, Mode=OneWay, StringFormat={}{0:F3}}" >
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.WallClockTime2Title, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                             </DataTemplate>
                         </DataGridTextColumn.HeaderTemplate>
                     </DataGridTextColumn>
@@ -72,7 +100,9 @@
                         </DataGridTextColumn.HeaderTemplate>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Binding="{Binding Path=Diff, Mode=OneWay, StringFormat={}{0:F3}}" Header="Diff"/>
+                    <DataGridTextColumn Binding="{Binding Path=CPUDiff, Mode=OneWay, StringFormat={}{0:F3}}" Header="Diff(CPU)"/>
+                    <DataGridTextColumn Binding="{Binding Path=NormalizedCPUDiff, Mode=OneWay, StringFormat={}{0:F3}}" Header="Diff(Norm. CPU)"/>
+                    <DataGridTextColumn Binding="{Binding Path=WallClockDiff, Mode=OneWay, StringFormat={}{0:F3}}" Header="Diff(WallClock)"/>
 
                     <DataGridTextColumn Binding="{Binding Path=Results1.Sat, Mode=OneWay}" >
                         <DataGridTextColumn.HeaderTemplate>
@@ -171,15 +201,9 @@
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical"  Grid.RowSpan="4">
                     <Label Content="Ignore:"/>
-                    <CheckBox Name="chkIgnoreFNPrefix" Content="Prefix (shared directory)" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePrefix, Mode=TwoWay}"/>
+                    <CheckBox Name="chkIgnoreFNContainer" Content="Container" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePrefix, Mode=TwoWay}"/>
                     <CheckBox Name="chkIgnoreFNCategory" Content="Category" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnoreCategory, Mode=TwoWay}"/>
-                    <CheckBox Name="chkIgnoreFNPostfix" Content="Postfix (extensions):" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePostfix, Mode=TwoWay}"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="10,0,0,0">
-                        <Label Name="lblLeft" Content=""/>
-                        <TextBox Name="txtExtensionLeft" MinWidth="75" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="{Binding Extension1}" IsEnabled="{Binding EnableFirstExtension}" KeyUp="txtExtensionLeft_KeyUp"/>
-                        <Label Name="lblRight" Content=""/>
-                        <TextBox Name="txtExtensionRight" MinWidth="75" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="{Binding Extension2}" IsEnabled="{Binding EnableSecondExtension}" KeyUp="txtExtensionRight_KeyUp"/>
-                    </StackPanel>
+                    <CheckBox Name="chkIgnoreFNExtension" Content="Extension" Margin="10,0,0,0" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CheckIgnorePostfix, Mode=TwoWay}"/>
                 </StackPanel>
             </Grid>
         </Grid>

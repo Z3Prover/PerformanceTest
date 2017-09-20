@@ -104,26 +104,5 @@ namespace PerformanceTest.Management
                 }
             }
         }
-        private void txtExtensionLeft_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                var vm = DataContext as CompareExperimentsViewModel;
-                if (vm != null)
-                    vm.Extension1 = txtExtensionLeft.Text;
-            }
-        }
-
-        private void txtExtensionRight_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                var vm = DataContext as CompareExperimentsViewModel;
-                if (vm != null)
-                    vm.Extension2 = txtExtensionRight.Text;
-            }
-        }
-
-
     }
 }
