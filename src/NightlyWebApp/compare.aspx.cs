@@ -944,15 +944,15 @@ namespace Nightly
             ca.AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
 
             ca.AxisX.CustomLabels.Add(new CustomLabel(-0.5, 0.5, "Lost", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(0.5, 1.5, "[>-T;-500]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(1.5, 2.5, "[-500;-50]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(2.5, 3.5, "[-50;-5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(3.5, 4.5, "[-5;-1]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(4.5, 5.5, "[-.5;+.5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(5.5, 6.5, "[+1;+5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(6.5, 7.5, "[+5;+50]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(7.5, 8.5, "[+50;+500]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
-            ca.AxisX.CustomLabels.Add(new CustomLabel(8.5, 9.5, "[+500;+T]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(0.5, 1.5, "[>+T/O;+500]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(1.5, 2.5, "[+500;+50]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(2.5, 3.5, "[+50;+5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(3.5, 4.5, "[+5;+1]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(4.5, 5.5, "[+.5;-.5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(5.5, 6.5, "[-1;-5]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(6.5, 7.5, "[-5;-50]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(7.5, 8.5, "[-50;-500]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
+            ca.AxisX.CustomLabels.Add(new CustomLabel(8.5, 9.5, "[-500;-T/O]", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
             ca.AxisX.CustomLabels.Add(new CustomLabel(9.5, 10.5, "Gained", 0, LabelMarkStyle.SideMark, GridTickTypes.TickMark));
 
             chart.ChartAreas.Add(ca);

@@ -102,26 +102,48 @@ namespace Nightly
 
             foreach (double d in deltas)
             {
+                //if (d <= lost)
+                //    res[0]++;
+                //else if (d < -500.0)
+                //    res[1]++;
+                //else if (d < -50.0)
+                //    res[2]++;
+                //else if (d < -5.0)
+                //    res[3]++;
+                //else if (d < -0.5)
+                //    res[4]++;
+                //else if (d < +0.5)
+                //    res[5]++;
+                //else if (d < +5.0)
+                //    res[6]++;
+                //else if (d < +50.0)
+                //    res[7]++;
+                //else if (d < +500.0)
+                //    res[8]++;
+                //else if (d < gained)
+                //    res[9]++;
+                //else
+                //    res[10]++;
                 if (d <= lost)
                     res[0]++;
                 else if (d < -500.0)
-                    res[1]++;
+                    res[9]++;
                 else if (d < -50.0)
-                    res[2]++;
+                    res[8]++;
                 else if (d < -5.0)
-                    res[3]++;
+                    res[7]++;
                 else if (d < -0.5)
-                    res[4]++;
+                    res[6]++;
                 else if (d < +0.5)
                     res[5]++;
                 else if (d < +5.0)
-                    res[6]++;
+                    res[4]++;
                 else if (d < +50.0)
-                    res[7]++;
+                    res[3]++;
                 else if (d < +500.0)
-                    res[8]++;
+                    res[2]++;
                 else if (d < gained)
-                    res[9]++;
+                    res[1]++;
                 else
                     res[10]++;
             }
@@ -161,9 +183,10 @@ namespace Nightly
         {
             _jX = jX;
             _jY = jY;
+            if (prefix != "" && !prefix.EndsWith("/"))
+                prefix += "/";
             _prefix = prefix;
             _prefixLength = prefix.Length;
-            if (_prefix != "") _prefixLength++;
             if (tags != null) _tags = tags;
 
             if (_jX != null)
