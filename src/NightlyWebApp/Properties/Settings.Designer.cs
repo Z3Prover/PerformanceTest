@@ -12,7 +12,7 @@ namespace Nightly.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -43,7 +43,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c5bf488e-67df-43f4-abed-e1da8c223f6c")]
+        [global::System.Configuration.DefaultSettingValueAttribute("895a5b60-9798-4f21-9b8c-88f2278ebf68")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -52,7 +52,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("918244F81DD3F4BB838E47A8288DBF91ABF5F9C9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));
@@ -70,19 +70,19 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ConnectionString {
+        [global::System.Configuration.DefaultSettingValueAttribute("Z3Nightly")]
+        public string SummaryName {
             get {
-                return ((string)(this["ConnectionString"]));
+                return ((string)(this["SummaryName"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Z3Nightly")]
-        public string SummaryName {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ConnectionString {
             get {
-                return ((string)(this["SummaryName"]));
+                return ((string)(this["ConnectionString"]));
             }
         }
     }

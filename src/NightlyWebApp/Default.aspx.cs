@@ -62,10 +62,10 @@ namespace Nightly
                 catch (Exception ex)
                 {
                     Label l = new Label();
-                    l.Text = "Error loading dataset: " + ex.Message;
+                    l.Text = "Error loading dataset:<br/><p>" + ex.Message.Replace(Environment.NewLine, "<br/>") + "</p>";
                     phMain.Controls.Add(l);
                     l = new Label();
-                    l.Text = "Stacktrace: " + ex.StackTrace;
+                    l.Text = "Stacktrace:<br/><p>" + ex.StackTrace.Replace(Environment.NewLine, "<br/>") + "</p>";
                     phMain.Controls.Add(l);
                 }
             }
@@ -76,12 +76,13 @@ namespace Nightly
             get { return DateTime.Now - _startTime; }
         }
 
-        protected string selfLink(string cat = null, string days = null)
+        protected string selfLink(string cat = null, string days = null, string job = null)
         {
             string res = Request.FilePath;
             Dictionary<string, string> p = new Dictionary<string, string>();
             p.Add("cat", (cat != null) ? cat : _defaultParams["cat"]);
             p.Add("days", (days != null) ? days : _defaultParams["days"]);
+            if (job != null) p.Add("job", job);
             p.Add("summary", vm.SummaryName);
             bool first = true;
             foreach (KeyValuePair<string, string> kvp in p)
@@ -1172,7 +1173,7 @@ namespace Nightly
             return dict[cat];
         }
 
-        public Control buildFooter(string category)
+        public Control buildFooter(string category, string days, string job)
         {
             Panel space = new Panel();
             space.Height = 15;
@@ -1201,7 +1202,7 @@ namespace Nightly
             {
                 HyperLink h = new HyperLink();
                 h.Text = "Overall";
-                h.NavigateUrl = selfLink("");
+                h.NavigateUrl = selfLink("", days, job);
                 h.Style["text-decoration"] = "none";
                 h.Font.Size = 8;
                 h.Font.Name = "helvetica";
@@ -1228,7 +1229,7 @@ namespace Nightly
                 {
                     HyperLink h = new HyperLink();
                     h.Text = cat;
-                    h.NavigateUrl = selfLink(cat);
+                    h.NavigateUrl = selfLink(cat, days, job);
                     h.Style["text-decoration"] = "none";
                     h.Font.Size = 8;
                     h.Font.Name = "helvetica";
@@ -1247,6 +1248,9 @@ namespace Nightly
 
             string category = Request.Params.Get("cat");
             if (category == null) category = "";
+
+            string days = Request.Params.Get("days");
+            if (days == null) days = config.daysback.ToString();
 
             string jobid = Request.Params.Get("job");
 
@@ -1301,7 +1305,7 @@ namespace Nightly
                 }
             }
 
-            phMain.Controls.Add(buildFooter(category));
+            phMain.Controls.Add(buildFooter(category, days, jobid));
         }
     }
 }

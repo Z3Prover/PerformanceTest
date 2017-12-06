@@ -317,6 +317,7 @@
     <Compile Include="compare.aspx.designer.cs">
       <DependentUpon>compare.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\ComparableExperimentViewModel.cs" />
     <Compile Include="ViewModel\Comparison.cs" />
     <Compile Include="Default.aspx.cs">
@@ -381,6 +382,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
     <None Include="Properties\PublishProfiles\z3-nightly - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\z3nightly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\z3nightly - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Z3NightlyWebApp - Web Deploy.pubxml" />
   </ItemGroup>
