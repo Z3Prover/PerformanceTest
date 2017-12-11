@@ -53,9 +53,9 @@ namespace AzurePerformanceTest
         }
 
 
-        public async Task<Tuple<ExperimentSummary[], RecordsTable>> GetTimelineAndRecords(string timelineName)
+        public async Task<Tuple<ExperimentSummary[], RecordsTable>> GetTimelineAndRecords(string timelineName, bool onlySummary = false)
         {
-            var results = await DownloadSummary(timelineName);
+            var results = await DownloadSummary(timelineName, onlySummary);
             var records = results.Item2;
             var summaries = ExperimentSummaryStorage.LoadFromTable(results.Item1);
 

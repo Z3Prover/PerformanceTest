@@ -13,11 +13,11 @@ namespace AzurePerformanceTest
 {
     public static class Helpers
     {
-        public static async Task<Timeline> GetTimeline(string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager)
+        public static async Task<Timeline> GetTimeline(string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager, bool onlySummary = false)
         {
             string connectionString = await Helpers.GetConnectionString();
             IDomainResolver domainResolver = GetDomainResolver();
-            var vm = await Timeline.Initialize(connectionString, summaryName, expManager, summaryManager);
+            var vm = await Timeline.Initialize(connectionString, summaryName, expManager, summaryManager, onlySummary);
             return vm;
         }
 

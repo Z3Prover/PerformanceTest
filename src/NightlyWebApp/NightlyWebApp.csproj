@@ -111,7 +111,8 @@
     <Content Include="Account\ChangePasswordSuccess.aspx" />
     <Content Include="Account\Login.aspx" />
     <Content Include="Account\Register.aspx" />
-    <Content Include="compare.aspx" />
+    <Content Include="BenchmarkHistory.aspx" />
+    <Content Include="Compare.aspx" />
     <Content Include="History.aspx" />
     <Content Include="img\AJAX.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -310,12 +311,19 @@
     <Compile Include="Account\Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
-    <Compile Include="compare.aspx.cs">
-      <DependentUpon>compare.aspx</DependentUpon>
+    <Compile Include="BenchmarkHistory.aspx.cs">
+      <DependentUpon>BenchmarkHistory.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="compare.aspx.designer.cs">
-      <DependentUpon>compare.aspx</DependentUpon>
+    <Compile Include="BenchmarkHistory.aspx.designer.cs">
+      <DependentUpon>BenchmarkHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Compare.aspx.cs">
+      <DependentUpon>Compare.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Compare.aspx.designer.cs">
+      <DependentUpon>Compare.aspx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\ComparableExperimentViewModel.cs" />

@@ -19,9 +19,9 @@ namespace Nightly
 
         private string[] categories;
 
-        public static async Task<Timeline> Initialize(string connectionString, string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager)
+        public static async Task<Timeline> Initialize(string connectionString, string summaryName, AzureExperimentManager expManager, AzureSummaryManager summaryManager, bool onlySummary = false)
         {
-            var summRec = await summaryManager.GetTimelineAndRecords(summaryName);
+            var summRec = await summaryManager.GetTimelineAndRecords(summaryName, onlySummary);
             var summ = summRec.Item1;
             var records = summRec.Item2;
             var now = DateTime.Now;
