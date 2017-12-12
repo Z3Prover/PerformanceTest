@@ -23,6 +23,7 @@
                         <asp:MenuItem NavigateUrl="~/Default.aspx" Text="Home"/>
                         <asp:MenuItem NavigateUrl="~/Compare.aspx" Text="Compare" Value="Compare" />
                         <asp:MenuItem NavigateUrl="~/History.aspx" Text="History" Value="History" />
+                        <asp:MenuItem NavigateUrl="~/BenchmarkHistory.aspx" Text="Benchmark History" Value="BenchmarkHistory" />
                         <asp:MenuItem NavigateUrl="~/About.aspx" Text="About"/>
                     </Items>
                 </asp:Menu>
@@ -35,7 +36,7 @@
         </div>
     </div>
     <div class="footer">
-        
+
     </div>
     </form>
 </body>

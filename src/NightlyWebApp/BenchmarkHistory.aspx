@@ -16,20 +16,42 @@
 
     <br />
 
-    File: <asp:TextBox ID="txtFilename" Text="filename" runat="server" Enabled="true" Width="80%" />
-    <asp:Button ID="btnGo" runat="server" Text="Go!" />
+    <asp:PlaceHolder runat="server" ID="phHead">
+    Benchmark filename: <asp:TextBox ID="txtFilename" runat="server" Enabled="true" Width="50%" />
+    &nbsp; Days back: <asp:TextBox ID="txtDaysBack" runat="server" Enabled="true" Width="100" />
+    &nbsp; <asp:Button ID="btnGo" runat="server" Text="Go!" />
+    </asp:PlaceHolder>
 
+    <br />
     <br />
 
     <asp:PlaceHolder runat="server" ID="phMain">
-        <asp:Table ID="tblEntries" runat="server" BorderStyle="Solid" BorderWidth="1" Width="30%">
+        <asp:Table ID="tblEntries" runat="server" BorderStyle="Solid" BorderWidth="1" HorizontalAlign="Center" Width="80%">
             <asp:TableHeaderRow BorderStyle="Solid" BackColor="Gray" ForeColor="Black">
-                <asp:TableHeaderCell Width="3%" HorizontalAlign="Left">ID</asp:TableHeaderCell>
-                <asp:TableHeaderCell Width="12%" HorizontalAlign="Center">Submission Time</asp:TableHeaderCell>
-                <asp:TableHeaderCell Width="7%" HorizontalAlign="Center" ColumnSpan="2">Result</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" HorizontalAlign="Center" RowSpan="3">Job</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="7%" HorizontalAlign="Center" RowSpan="3">Submission Time</asp:TableHeaderCell>
+                <asp:TableHeaderCell HorizontalAlign="Center" ColumnSpan="6">Result</asp:TableHeaderCell>
+            </asp:TableHeaderRow>
+            <asp:TableHeaderRow BorderStyle="Solid" BackColor="Gray" ForeColor="Black">
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">Status</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">Exit code</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">CPU time</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">Norm. CPU time</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">Wall clock time</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="5%" Font-Size="Smaller">Memory</asp:TableHeaderCell>
+            </asp:TableHeaderRow>
+            <asp:TableHeaderRow BorderStyle="Solid" BackColor="Gray" ForeColor="Black">
+                <asp:TableHeaderCell Font-Size="Smaller"></asp:TableHeaderCell>
+                <asp:TableHeaderCell Font-Size="Smaller"></asp:TableHeaderCell>
+                <asp:TableHeaderCell Font-Size="Smaller">[sec]</asp:TableHeaderCell>
+                <asp:TableHeaderCell Font-Size="Smaller">[sec]</asp:TableHeaderCell>
+                <asp:TableHeaderCell Font-Size="Smaller">[sec]</asp:TableHeaderCell>
+                <asp:TableHeaderCell Font-Size="Smaller">[MB]</asp:TableHeaderCell>
             </asp:TableHeaderRow>
         </asp:Table>
     </asp:PlaceHolder>
+
+    <br />
 
     <div style="float: right; font-size: smaller; font-family: monospace; font-variant: small-caps;">
         Load time: <%= RenderTime.TotalSeconds %> sec.

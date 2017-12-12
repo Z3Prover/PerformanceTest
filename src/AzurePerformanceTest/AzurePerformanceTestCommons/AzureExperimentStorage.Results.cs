@@ -26,9 +26,9 @@ namespace AzurePerformanceTest
         const int MaxStdErrLength = 4096;
 
 
-        public async Task<AzureExperimentResults> GetResults(ExperimentID experimentId)
+        public async Task<AzureExperimentResults> GetResults(ExperimentID experimentId, ExperimentManager.BenchmarkFilter f = null)
         {
-            var result = await GetAzureExperimentResults(experimentId);
+            var result = await GetAzureExperimentResults(experimentId, f);
             AzureBenchmarkResult[] azureResults = result.Item1;
             string etag = result.Item2;
             return new AzureExperimentResults(this, experimentId, azureResults, etag);
@@ -333,7 +333,7 @@ namespace AzurePerformanceTest
             }
         }
 
-        public async Task<Tuple<AzureBenchmarkResult[], string>> GetAzureExperimentResults(ExperimentID experimentId)
+        public async Task<Tuple<AzureBenchmarkResult[], string>> GetAzureExperimentResults(ExperimentID experimentId, ExperimentManager.BenchmarkFilter f = null)
         {
             AzureBenchmarkResult[] results;
 
@@ -341,7 +341,7 @@ namespace AzurePerformanceTest
             var blob = resultsContainer.GetBlobReference(blobName);
             try
             {
-                using (MemoryStream zipStream = new MemoryStream(4 << 20))
+                using (MemoryStream zipStream = new MemoryStream(1 << 16))
                 {
                     await blob.DownloadToStreamAsync(zipStream,
                         AccessCondition.GenerateEmptyCondition(),
@@ -356,7 +356,7 @@ namespace AzurePerformanceTest
                         var entry = zip.GetEntry(GetResultsFileName(experimentId));
                         using (var tableStream = entry.Open())
                         {
-                            results = AzureBenchmarkResult.LoadBenchmarks(experimentId, tableStream);
+                            results = AzureBenchmarkResult.LoadBenchmarks(experimentId, tableStream, f);
                             return Tuple.Create(results, blob.Properties.ETag);
                         }
                     }

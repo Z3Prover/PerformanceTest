@@ -50,7 +50,6 @@ namespace Nightly
                     summaryName = summaryName == null ? config.SummaryName : summaryName;
                     _defaultParams.Add("summary", summaryName);
 
-
                     var connectionString = await Helpers.GetConnectionString();
                     var expManager = AzureExperimentManager.Open(connectionString);
                     var summaryManager = new AzureSummaryManager(connectionString, Helpers.GetDomainResolver());

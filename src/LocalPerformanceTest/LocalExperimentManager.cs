@@ -51,7 +51,7 @@ namespace PerformanceTest
         private readonly AsyncLazy<double> asyncNormal;
         private int lastId = 0;
 
-        private LocalExperimentManager(FileStorage storage, IDomainResolver domainResolver) 
+        private LocalExperimentManager(FileStorage storage, IDomainResolver domainResolver)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             this.storage = storage;
@@ -97,7 +97,7 @@ namespace PerformanceTest
                                 storage.AddResults(id, benchmarks);
                                 ExperimentInstance val;
                                 runningExperiments.TryRemove(id, out val);
-                            }                            
+                            }
                             return benchmark.Result;
                         }
                         else throw benchmark.Exception;
@@ -128,7 +128,7 @@ namespace PerformanceTest
             }
             return Task.FromResult((IEnumerable<ExperimentStatus>)status);
         }
-        
+
         public override Task DeleteExperiment (int id)
         {
             var deleteRow = storage.GetExperiments()[id];
@@ -150,7 +150,7 @@ namespace PerformanceTest
             storage.ReplaceExperimentRow(newRow);
             return Task.FromResult(0);
         }
-        public override async Task<ExperimentResults> GetResults(int id)
+        public override async Task<ExperimentResults> GetResults(int id, BenchmarkFilter f)
         {
             ExperimentInstance experiment;
             if (runningExperiments.TryGetValue(id, out experiment))
@@ -263,7 +263,7 @@ namespace PerformanceTest
             return "";
         }
     }
-    
+
 
     public class ExperimentInstance
     {

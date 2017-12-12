@@ -258,9 +258,9 @@ namespace AzurePerformanceTest
                 experimentEntity.AdaptiveRunMaxTimeInSeconds);
         }
 
-        public override async Task<ExperimentResults> GetResults(ExperimentID id)
+        public override async Task<ExperimentResults> GetResults(ExperimentID id, BenchmarkFilter f = null)
         {
-            return await storage.GetResults(id);
+            return await storage.GetResults(id, f);
         }
 
         public override async Task<IEnumerable<ExperimentStatus>> GetStatus(IEnumerable<ExperimentID> ids)

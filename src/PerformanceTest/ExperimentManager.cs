@@ -37,7 +37,8 @@ namespace PerformanceTest
         /// </summary>
         /// <param name="id"></param>
         /// <returns>List of results of currently completed benchmarks</returns>
-        public abstract Task<ExperimentResults> GetResults(ExperimentID id);
+        public delegate bool BenchmarkFilter(string filename);
+        public abstract Task<ExperimentResults> GetResults(ExperimentID id, BenchmarkFilter f = null);
         public abstract Task DeleteExperiment(ExperimentID id);
         public abstract Task DeleteExecutable(string executableName);
 

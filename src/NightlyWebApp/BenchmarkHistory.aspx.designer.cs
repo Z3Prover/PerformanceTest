@@ -31,6 +31,15 @@ namespace Nightly {
         protected global::System.Web.UI.WebControls.PlaceHolder phTop;
         
         /// <summary>
+        /// phHead control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phHead;
+        
+        /// <summary>
         /// txtFilename control.
         /// </summary>
         /// <remarks>
@@ -38,6 +47,15 @@ namespace Nightly {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtFilename;
+        
+        /// <summary>
+        /// txtDaysBack control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtDaysBack;
         
         /// <summary>
         /// btnGo control.

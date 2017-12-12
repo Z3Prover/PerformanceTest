@@ -159,11 +159,14 @@ namespace AzurePerformanceTest
             table.SaveUTF8Bom(stream, new WriteSettings(Delimiter.Comma, true, true));
         }
 
-        public static AzureBenchmarkResult[] LoadBenchmarks(int expId, Stream stream)
+        public static AzureBenchmarkResult[] LoadBenchmarks(int expId, Stream stream, ExperimentManager.BenchmarkFilter f)
         {
+            DateTime before = DateTime.Now;
             var table = Table.Load(new StreamReader(stream), new ReadSettings(Delimiter.Comma, true, true, FSharpOption<int>.None,
                 FSharpOption<FSharpFunc<Tuple<int, string>, FSharpOption<Type>>>.Some(FSharpFunc<Tuple<int, string>, FSharpOption<Type>>.FromConverter(tuple => FSharpOption<Type>.Some(typeof(string))))));
+            var load_time = (DateTime.Now - before).TotalSeconds;
 
+            before = DateTime.Now;
             var fileName = table["BenchmarkFileName"].Rows.AsString;
             var acq = table["AcquireTime"].Rows.AsString;
             var norm = table["NormalizedRuntime"].Rows.AsString;
@@ -195,9 +198,13 @@ namespace AzurePerformanceTest
                  select Tuple.Create(c.Name, c.Rows.AsString))
                 .ToArray();
 
-            AzureBenchmarkResult[] results = new AzureBenchmarkResult[table.RowsCount];
-            for (int i = 0; i < results.Length; i++)
+            List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();
+            int num_rows = table.RowsCount;
+            for (int i = 0; i < num_rows; i++)
             {
+                if (f != null && !f(fileName[i]))
+                    continue;
+
                 Dictionary<string, string> props = new Dictionary<string, string>(propColumns.Length);
                 foreach (var pc in propColumns)
                 {
@@ -207,23 +214,29 @@ namespace AzurePerformanceTest
                     }
                 }
 
-                results[i] = new AzureBenchmarkResult();
-                results[i].AcquireTime = DateTime.Parse(acq[i], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-                results[i].BenchmarkFileName = fileName[i];
-                results[i].ExitCode = string.IsNullOrEmpty(exitcode[i]) ? null : (int?)int.Parse(exitcode[i], CultureInfo.InvariantCulture);
-                results[i].ExperimentID = expId;
-                results[i].NormalizedCPUTime = double.Parse(norm[i], CultureInfo.InvariantCulture);
-                results[i].PeakMemorySizeMB = double.Parse(mem[i], CultureInfo.InvariantCulture);
-                results[i].Properties = props;
-                results[i].Status = StatusFromString(stat[i]);
-                results[i].StdErr = stderr[i];
-                results[i].StdErrExtStorageIdx = stderrext[i];
-                results[i].StdOut = stdout[i];
-                results[i].StdOutExtStorageIdx = stdoutext[i];
-                results[i].CPUTime = TimeSpan.FromSeconds(double.Parse(runtime[i], CultureInfo.InvariantCulture));
-                results[i].WallClockTime = TimeSpan.FromSeconds(double.Parse(wctime[i], CultureInfo.InvariantCulture));
+                AzureBenchmarkResult r = new AzureBenchmarkResult();
+                r.AcquireTime = DateTime.Parse(acq[i], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                r.BenchmarkFileName = fileName[i];
+                r.ExitCode = string.IsNullOrEmpty(exitcode[i]) ? null : (int?)int.Parse(exitcode[i], CultureInfo.InvariantCulture);
+                r.ExperimentID = expId;
+                r.NormalizedCPUTime = double.Parse(norm[i], CultureInfo.InvariantCulture);
+                r.PeakMemorySizeMB = double.Parse(mem[i], CultureInfo.InvariantCulture);
+                r.Properties = props;
+                r.Status = StatusFromString(stat[i]);
+                r.StdErr = stderr[i];
+                r.StdErrExtStorageIdx = stderrext[i];
+                r.StdOut = stdout[i];
+                r.StdOutExtStorageIdx = stdoutext[i];
+                r.CPUTime = TimeSpan.FromSeconds(double.Parse(runtime[i], CultureInfo.InvariantCulture));
+                r.WallClockTime = TimeSpan.FromSeconds(double.Parse(wctime[i], CultureInfo.InvariantCulture));
+                results.Add(r);
             }
-            return results;
+
+            AzureBenchmarkResult[] ra = results.ToArray();
+            var conv_time = (DateTime.Now - before).TotalSeconds;
+            System.Diagnostics.Debug.Print("Job #{0}: table load time {1:n2} sec, conversion time {2:n2} sec", expId, load_time, conv_time);
+
+            return ra;
         }
 
         public static string StatusToString(ResultStatus status)
