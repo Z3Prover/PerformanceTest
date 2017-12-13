@@ -394,11 +394,14 @@
             // splitContainer1
             //
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.None;
             this.splitContainer1.IsSplitterFixed = true;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.splitContainer1.Size = new System.Drawing.Size(681, 649);
+            this.splitContainer1.SplitterDistance = 550;
+            this.splitContainer1.TabIndex = 7;
             //
             // splitContainer1.Panel1
             //
@@ -407,9 +410,6 @@
             // splitContainer1.Panel2
             //
             this.splitContainer1.Panel2.Controls.Add(this.gpOptions);
-            this.splitContainer1.Size = new System.Drawing.Size(681, 649);
-            this.splitContainer1.SplitterDistance = 529;
-            this.splitContainer1.TabIndex = 7;
             //
             // gbStatistics
             //
@@ -424,7 +424,7 @@
             this.gbStatistics.Controls.Add(this.lblTotal);
             this.gbStatistics.Location = new System.Drawing.Point(281, 0);
             this.gbStatistics.Name = "gbStatistics";
-            this.gbStatistics.Size = new System.Drawing.Size(222, 116);
+            this.gbStatistics.Size = new System.Drawing.Size(222, 125);
             this.gbStatistics.TabIndex = 30;
             this.gbStatistics.TabStop = false;
             //

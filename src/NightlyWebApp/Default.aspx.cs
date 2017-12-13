@@ -50,11 +50,11 @@ namespace Nightly
                     summaryName = summaryName == null ? config.SummaryName : summaryName;
                     _defaultParams.Add("summary", summaryName);
 
-                    var connectionString = await Helpers.GetConnectionString();
+                    var connectionString = await SiteMaster.GetConnectionString();
                     var expManager = AzureExperimentManager.Open(connectionString);
                     var summaryManager = new AzureSummaryManager(connectionString, Helpers.GetDomainResolver());
 
-                    vm = await Helpers.GetTimeline(summaryName, expManager, summaryManager);
+                    vm = await Helpers.GetTimeline(summaryName, expManager, summaryManager, connectionString);
 
                     buildCategoryPanels();
                 }

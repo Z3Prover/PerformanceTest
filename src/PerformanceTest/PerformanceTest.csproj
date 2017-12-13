@@ -52,8 +52,15 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.DataVisualization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Charts.cs" />
+    <Compile Include="ComparableResult.cs" />
+    <Compile Include="ComparableExperiment.cs" />
+    <Compile Include="Comparison.cs" />
     <Compile Include="DuplicateResolver.cs" />
     <Compile Include="ExperimentResults.cs" />
     <Compile Include="DomainResolver.cs" />
@@ -70,6 +77,10 @@
     <ProjectReference Include="..\Measurement\Measurement.csproj">
       <Project>{e315bfab-d44b-4a75-82a3-1eeaf33b5717}</Project>
       <Name>Measurement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Z3Domain\Z3Domain.csproj">
+      <Project>{cfa940ba-7127-4118-a9a5-97452c3897e1}</Project>
+      <Name>Z3Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
