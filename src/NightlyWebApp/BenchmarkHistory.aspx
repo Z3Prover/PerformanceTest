@@ -28,8 +28,8 @@
     <asp:PlaceHolder runat="server" ID="phMain">
         <asp:Table ID="tblEntries" runat="server" BorderStyle="Solid" BorderWidth="1" HorizontalAlign="Center" Width="80%">
             <asp:TableHeaderRow BorderStyle="Solid" BackColor="Gray" ForeColor="Black">
-                <asp:TableHeaderCell Width="5%" HorizontalAlign="Center" RowSpan="3">Job</asp:TableHeaderCell>
-                <asp:TableHeaderCell Width="7%" HorizontalAlign="Center" RowSpan="3">Submission Time</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="3%" HorizontalAlign="Center" RowSpan="3">Job</asp:TableHeaderCell>
+                <asp:TableHeaderCell Width="8%" HorizontalAlign="Center" RowSpan="3">Submission Time</asp:TableHeaderCell>
                 <asp:TableHeaderCell HorizontalAlign="Center" ColumnSpan="6">Result</asp:TableHeaderCell>
             </asp:TableHeaderRow>
             <asp:TableHeaderRow BorderStyle="Solid" BackColor="Gray" ForeColor="Black">
@@ -53,7 +53,15 @@
 
     <br />
 
+<%--    <div style="float: right; font-size: smaller; font-family: monospace; font-variant: small-caps;">
+        Disk space: <%= DiskSpace() %>
+    </div>
+    <br />--%>
     <div style="float: right; font-size: smaller; font-family: monospace; font-variant: small-caps;">
-        Load time: <%= RenderTime.TotalSeconds %> sec.
+        Temp space: <%= TempSpace() %>
+    </div>
+    <br />
+    <div style="float: right; font-size: smaller; font-family: monospace; font-variant: small-caps;">
+        Load time: <%= RenderTime.TotalSeconds %> sec. <br />
     </div>
 </asp:Content>

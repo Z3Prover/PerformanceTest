@@ -3,6 +3,7 @@ using PerformanceTest;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,6 +24,40 @@ namespace Nightly
         public TimeSpan RenderTime
         {
             get { return DateTime.Now - _startTime; }
+        }
+
+        public string DiskSpace ()
+        {
+            string res = "";
+            string notready = "";
+
+            foreach (var d in System.IO.DriveInfo.GetDrives())
+            {
+                if (d.IsReady)
+                {
+                    res += d.Name.TrimEnd('\\') + " ";
+                    res += (d.AvailableFreeSpace / 1073741824).ToString("F2") + " GB, ";
+                }
+                else
+                    notready += d.Name.TrimEnd('\\') + ", ";
+            }
+            res += "temp @ " + Path.GetTempPath() + " ";
+            res += "(N/R: " + notready.TrimEnd(' ', ',') + ")";
+            return res;
+        }
+
+        public string TempSpace()
+        {
+            string res = "?";
+            string root = Path.GetPathRoot(Path.GetFullPath(Path.GetTempPath()));
+
+            foreach (var d in System.IO.DriveInfo.GetDrives())
+                if (d.IsReady && d.Name == root)
+                {
+                    res = Path.GetTempPath() + " " + (d.AvailableFreeSpace / 1073741824).ToString("F2") + " GB";
+                    break;
+                }
+            return res;
         }
 
         protected async void Page_Load(object sender, EventArgs e)
@@ -94,13 +129,18 @@ namespace Nightly
 
             int daysback = Convert.ToInt32(txtDaysBack.Text);
 
+            List<Task<TableRow>> tasks = new List<Task<TableRow>>();
             List<TableRow> rows = new List<TableRow>();
 
             for (i = 0; i < daysback && i < ecnt; i++)
             {
                 ExperimentViewModel e = timeline.Experiments[ecnt - i - 1];
-                rows.Add(await GetRow(e.Id));
+                tasks.Add(GetRow(e.Id));
             }
+
+            await Task.WhenAll(tasks);
+            foreach (var t in tasks)
+                rows.Add(t.Result);
 
             System.Diagnostics.Debug.Print("Data load time {0:n2} sec", (DateTime.Now - before).TotalSeconds);
 
@@ -109,7 +149,7 @@ namespace Nightly
             {
                 tr = new System.Web.UI.WebControls.TableRow();
 
-                if (i++ % 2 == 0) tr.BackColor = Color.LightGreen;
+                if (i++ % 2 == 0) tr.BackColor = Color.PaleGreen;
                 else tr.BackColor = Color.LightGray;
 
                 tc = new TableCell();

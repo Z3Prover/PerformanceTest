@@ -333,34 +333,87 @@ namespace AzurePerformanceTest
             }
         }
 
-        public async Task<Tuple<AzureBenchmarkResult[], string>> GetAzureExperimentResults(ExperimentID experimentId, ExperimentManager.BenchmarkFilter f = null)
+        protected AzureBenchmarkResult[] GetFromCache(ExperimentID id, CloudBlob blob, ExperimentManager.BenchmarkFilter f = null)
         {
-            AzureBenchmarkResult[] results;
+            DateTime before = DateTime.Now;
+            AzureBenchmarkResult[] res = null;
 
-            string blobName = GetResultBlobName(experimentId);
-            var blob = resultsContainer.GetBlobReference(blobName);
             try
             {
-                using (MemoryStream zipStream = new MemoryStream(1 << 16))
-                {
-                    await blob.DownloadToStreamAsync(zipStream,
-                        AccessCondition.GenerateEmptyCondition(),
-                        new Microsoft.WindowsAzure.Storage.Blob.BlobRequestOptions
-                        {
-                            RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(100), 10)
-                        }, null);
-
-                    zipStream.Position = 0;
-                    using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                blob.FetchAttributes();
+                string dir = Path.Combine(Path.GetTempPath(), "z3nightly-results");
+                Directory.CreateDirectory(dir);
+                string file = Path.Combine(dir, GetResultsFileName(id));
+                if (File.Exists(file) &&
+                    blob.Properties.LastModified.HasValue &&
+                    File.GetLastWriteTimeUtc(file) > blob.Properties.LastModified.Value)
+                    using (var stream = new FileStream(file, FileMode.Open))
                     {
-                        var entry = zip.GetEntry(GetResultsFileName(experimentId));
-                        using (var tableStream = entry.Open())
-                        {
-                            results = AzureBenchmarkResult.LoadBenchmarks(experimentId, tableStream, f);
-                            return Tuple.Create(results, blob.Properties.ETag);
-                        }
+                        res = AzureBenchmarkResult.LoadBenchmarks(id, stream, f);
+                        Debug.Print("Job #{0}: cache hit, load time: {1:n2} sec", id, (DateTime.Now - before).TotalSeconds);
                     }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print("Exception caught while reading from cache: " + ex.Message);
+                Debug.Print("Stack Trace: " + ex.StackTrace);
+            }
+
+            return res;
+        }
+
+        protected async Task<AzureBenchmarkResult[]> GetFromStorage(ExperimentID id, CloudBlob blob, ExperimentManager.BenchmarkFilter f = null)
+        {
+            using (MemoryStream zipStream = new MemoryStream(1 << 16))
+            {
+                await blob.DownloadToStreamAsync(zipStream,
+                    AccessCondition.GenerateEmptyCondition(),
+                    new Microsoft.WindowsAzure.Storage.Blob.BlobRequestOptions
+                    {
+                        RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(100), 10)
+                    }, null);
+
+                AzureBenchmarkResult[] res = null;
+                zipStream.Position = 0;
+                using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                {
+                    string rfn = GetResultsFileName(id);
+                    var entry = zip.GetEntry(rfn);
+                    res = AzureBenchmarkResult.LoadBenchmarks(id, entry.Open(), f);
+
+                    DateTime before = DateTime.Now;
+                    try
+                    {
+                        // If possible, save to cache.
+                        string dir = Path.Combine(Path.GetTempPath(), "z3nightly-results");
+                        Directory.CreateDirectory(dir);
+                        string filename = Path.Combine(dir, rfn);
+
+                        using (FileStream file = File.Open(filename, FileMode.OpenOrCreate, FileAccess.Write))
+                        using (var e = entry.Open())
+                            await e.CopyToAsync(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print("Exception caught while saving to cache: {0}", ex.Message);
+                        Debug.Print("Stack Trace: " + ex.StackTrace);
+                    }
+                    Debug.Print("Job #{0}: cache save time: {1:n2} sec", id, (DateTime.Now - before).TotalSeconds);
                 }
+
+                return res;
+            }
+        }
+
+        public async Task<Tuple<AzureBenchmarkResult[], string>> GetAzureExperimentResults(ExperimentID experimentId, ExperimentManager.BenchmarkFilter f = null)
+        {
+            string blobName = GetResultBlobName(experimentId);
+            CloudBlob blob = resultsContainer.GetBlobReference(blobName);
+            try
+            {
+                AzureBenchmarkResult[] r = GetFromCache(experimentId, blob, f);
+                r = r ?? await GetFromStorage(experimentId, blob, f);
+                return Tuple.Create(r, blob.Properties.ETag);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404) // Not found == no results
             {
