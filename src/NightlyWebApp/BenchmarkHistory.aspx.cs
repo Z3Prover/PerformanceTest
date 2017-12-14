@@ -70,11 +70,11 @@ namespace Nightly
                 summaryName = summaryName == null ? Properties.Settings.Default.SummaryName : summaryName;
                 _defaultParams.Add("summary", summaryName);
 
-                var connectionString = await Helpers.GetConnectionString();
+                var connectionString = await SiteMaster.GetConnectionString();
                 expManager = AzureExperimentManager.Open(connectionString);
                 summaryManager = new AzureSummaryManager(connectionString, Helpers.GetDomainResolver());
 
-                timeline = await Helpers.GetTimeline(summaryName, expManager, summaryManager, true);
+                timeline = await Helpers.GetTimeline(summaryName, expManager, summaryManager, connectionString);
 
                 string fn = Request.Params.Get("filename");
                 if (fn != null) txtFilename.Text = fn;

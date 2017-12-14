@@ -370,7 +370,7 @@ namespace AzurePerformanceTest
                     AccessCondition.GenerateEmptyCondition(),
                     new Microsoft.WindowsAzure.Storage.Blob.BlobRequestOptions
                     {
-                        RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(100), 10)
+                        RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(100), 25)
                     }, null);
 
                 AzureBenchmarkResult[] res = null;
