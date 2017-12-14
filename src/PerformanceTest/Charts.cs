@@ -191,13 +191,18 @@ namespace PerformanceTest
                 chart.Series.Add(serBetter);
                 chart.Series.Add(serWorse);
 
-                //double avg_speedup = avg_speedup_x_time / avg_speedup_y_time;                
-                //TextAnnotation ann = new TextAnnotation();
-                //ann.Text = String.Format("avg s/u {0:n2}", avg_speedup);
-                //ann.X = comparison.TimeOutX;
-                //ann.Y = 20;
-                //ann.ForeColor = (avg_speedup >= 1.0) ? Color.Green : Color.Red;
-                //chart.Annotations.Add(ann);
+                double avg_speedup = avg_speedup_x_time / avg_speedup_y_time;
+                TextAnnotation ann = new TextAnnotation();
+                ann.Text = String.Format("avg speedup {0:n2}", avg_speedup);
+                ann.ForeColor = (avg_speedup >= 1.0) ? Color.Green : Color.Red;
+                ann.Font = new Font(ttle.Font, FontStyle.Bold);
+                ann.IsSizeAlwaysRelative = false;
+                ann.AxisX = ca.AxisX;
+                ann.AxisY = ca.AxisY;
+                ann.AnchorX = comparison.TimeOutX / 3.8;
+                ann.AnchorY = 0.15;
+                ann.AnchorAlignment = ContentAlignment.MiddleCenter;
+                chart.Annotations.Add(ann);
             }
 
             return chart;
