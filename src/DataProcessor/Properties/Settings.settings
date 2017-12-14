@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DataProcessor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="daysback" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="ConnectionStringSecretId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">connectionString</Value>
+    </Setting>
+    <Setting Name="AADApplicationId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">895a5b60-9798-4f21-9b8c-88f2278ebf68</Value>
+    </Setting>
+    <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8</Value>
+    </Setting>
+    <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://cz3.vault.azure.net/</Value>
+    </Setting>
+    <Setting Name="SummaryName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Z3Nightly</Value>
+    </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
