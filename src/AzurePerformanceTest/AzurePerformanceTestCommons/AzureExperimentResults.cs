@@ -75,6 +75,7 @@ namespace AzurePerformanceTest
 
             // Update benchmarks array
             Replace(newResults.ToArray());
+            (await storage.GetExperiment(ExperimentId)).CompletedBenchmarks = Benchmarks.Count();
 
             // Deleting blobs with output
             foreach (var ar in deleteOuts)
