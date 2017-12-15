@@ -499,7 +499,7 @@ namespace AzureWorker
                 benchmarksProcessed = tuple.Item1;
                 results = tuple.Item2;
                 await storage.PutAzureExperimentResults(experimentId, results.ToArray(), AzureExperimentStorage.UploadBlobMode.CreateOrReplace);
-                int benchmarksDone = benchmarksTotal == -1 ? benchmarksProcessed : benchmarksTotal - benchmarksToProcess + completedTasksCount;
+                int benchmarksDone = benchmarksTotal == -1 ? benchmarksProcessed : goodResults.Count();
                 await storage.SetBenchmarksDone(experimentId, benchmarksDone);
                 Console.WriteLine("Setting completed benchmarks to {0}.\nTotal benchmarks: {1}\nProcessed benchmarks: {2}\nTotal to process: {3}\nMessage count: {4}", benchmarksDone, benchmarksTotal, benchmarksProcessed, benchmarksToProcess, messageCount);
                 foreach (CloudQueueMessage message in messages)
