@@ -182,7 +182,8 @@ namespace Measurement
                         Thread.Sleep(500);
                         retry = true;
                     }
-                    else throw ex;
+                    else
+                        throw ex;
                 }
             } while (retry);
 

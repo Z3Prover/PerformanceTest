@@ -12,7 +12,7 @@ namespace AzureWorker.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,7 +25,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://z3perftest.vault.azure.net")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://cz3.vault.azure.net/")]
         public string KeyVaultUrl {
             get {
                 return ((string)(this["KeyVaultUrl"]));
@@ -34,7 +34,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("04fc29f8-a2c2-4242-bc17-18c35730a50d")]
+        [global::System.Configuration.DefaultSettingValueAttribute("895a5b60-9798-4f21-9b8c-88f2278ebf68")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -43,7 +43,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("510E3EB7B2172ACEEF3D297A2305D278F546F443")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));
@@ -52,7 +52,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("z3PerfConnectionString")]
+        [global::System.Configuration.DefaultSettingValueAttribute("connectionString")]
         public string ConnectionStringSecretId {
             get {
                 return ((string)(this["ConnectionStringSecretId"]));
@@ -61,7 +61,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://z3nightlywebapp.azurewebsites.net/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://z3nightly.azurewebsites.net/")]
         public string LinkPage {
             get {
                 return ((string)(this["LinkPage"]));

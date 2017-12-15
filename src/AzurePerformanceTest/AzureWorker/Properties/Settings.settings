@@ -3,19 +3,19 @@
   <Profiles />
   <Settings>
     <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://z3perftest.vault.azure.net</Value>
+      <Value Profile="(Default)">https://cz3.vault.azure.net/</Value>
     </Setting>
     <Setting Name="AADApplicationId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">04fc29f8-a2c2-4242-bc17-18c35730a50d</Value>
+      <Value Profile="(Default)">895a5b60-9798-4f21-9b8c-88f2278ebf68</Value>
     </Setting>
     <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">510E3EB7B2172ACEEF3D297A2305D278F546F443</Value>
+      <Value Profile="(Default)">2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8</Value>
     </Setting>
     <Setting Name="ConnectionStringSecretId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">z3PerfConnectionString</Value>
+      <Value Profile="(Default)">connectionString</Value>
     </Setting>
     <Setting Name="LinkPage" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://z3nightlywebapp.azurewebsites.net/</Value>
+      <Value Profile="(Default)">http://z3nightly.azurewebsites.net/</Value>
     </Setting>
     <Setting Name="ReportRecipients" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />

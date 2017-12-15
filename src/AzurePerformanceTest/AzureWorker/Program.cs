@@ -134,9 +134,9 @@ namespace AzureWorker
                     else
                         return new string[] { benchmarksPath + s };
                 }).ToArray();
-            totalBenchmarksToProcess = benchmarkList.Length;
-            totalBenchmarks = expInfo.TotalBenchmarks;
-            Console.WriteLine("Retrieved list of benchmarks to re-process. Total: {0}.", totalBenchmarksToProcess);
+            benchmarksToProcess = benchmarkList.Length;
+            benchmarksTotal = expInfo.TotalBenchmarks;
+            Console.WriteLine("Retrieved list of benchmarks to re-process. Total: {0}.", benchmarksToProcess);
             var collectionTask = CollectResults(experimentId, storage);
             Console.WriteLine("Started collection thread.");
 
@@ -185,7 +185,7 @@ namespace AzureWorker
                 summaryName = args[1];
             //Console.WriteLine(String.Format("Params are:\n id: {0}\ncontainer: {8}\ndirectory:{9}\ncategory: {1}\nextensions: {10}\ndomain: {11}\nexec: {2}\nargs: {3}\ntimeout: {4}\nmemlimit: {5}\noutlimit: {6}\nerrlimit: {7}", experimentId, benchmarkCategory, executable, arguments, timeout, memoryLimit, outputLimit, errorLimit, benchmarkContainerUri, benchmarkDirectory, extensionsString, domainString));
 #if DEBUG
-            string jobId = "cz3_exp8141";
+            string jobId = "cz3_exp8371";
 #else
             string jobId = Environment.GetEnvironmentVariable(JobIdEnvVariableName);
 #endif
@@ -303,7 +303,7 @@ namespace AzureWorker
                 before = DateTime.Now;
                 Console.Write("Adding tasks...");
                 List<Task> starterTasks = new List<Task>();
-                int totalBenchmarks = processedBlobs.Count();
+                int benchmarksTotal = processedBlobs.Count();
                 string benchmarksPath = CombineBlobPath(benchmarkDirectory, benchmarkCategory);
                 string outputQueueUri = storage.GetOutputQueueSASUri(experimentId, TimeSpan.FromHours(48));
                 string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(48));
@@ -326,16 +326,16 @@ namespace AzureWorker
 
                         return new string[] { blob.Name };
                     }).ToArray();
-                    starterTasks.Add(StartTasksForSegment(timeout.ToString(), experimentId, executable, arguments, memoryLimit, domainString, outputQueueUri, outputContainerUri, outputLimit, errorLimit, jobId, batchClient, blobNamesToProcess, benchmarksPath, totalBenchmarks, benchmarkStorage, maxRepetitions, maxTime));
+                    starterTasks.Add(StartTasksForSegment(timeout.ToString(), experimentId, executable, arguments, memoryLimit, domainString, outputQueueUri, outputContainerUri, outputLimit, errorLimit, jobId, batchClient, blobNamesToProcess, benchmarksPath, benchmarksTotal, benchmarkStorage, maxRepetitions, maxTime));
 
                     continuationToken = resultSegment.ContinuationToken;
-                    totalBenchmarks += blobNamesToProcess.Length;
+                    benchmarksTotal += blobNamesToProcess.Length;
                 }
                 while (continuationToken != null);
 
-                await storage.SetTotalBenchmarks(experimentId, totalBenchmarks);
-                Program.totalBenchmarks = totalBenchmarks;
-                totalBenchmarksToProcess = totalBenchmarks - goodResults.Count;
+                await storage.SetBenchmarksTotal(experimentId, benchmarksTotal);
+                Program.benchmarksTotal = benchmarksTotal;
+                benchmarksToProcess = benchmarksTotal - goodResults.Count;
                 Console.WriteLine(" took {0}.", (DateTime.Now - before));
 
                 before = DateTime.Now;
@@ -455,8 +455,8 @@ namespace AzureWorker
         static List<AzureBenchmarkResult> goodResults = new List<AzureBenchmarkResult>();
         static List<AzureBenchmarkResult> badResults = new List<AzureBenchmarkResult>();
         static int completedTasksCount = 0;
-        static int totalBenchmarks = -1;
-        static int totalBenchmarksToProcess = -1;
+        static int benchmarksTotal = -1;
+        static int benchmarksToProcess = -1;
 
         static async Task FetchSavedResults(int experimentId, AzureExperimentStorage storage)
         {
@@ -479,36 +479,31 @@ namespace AzureWorker
             Console.WriteLine("Started collection.");
             var queue = storage.GetResultsQueueReference(experimentId);
             List<AzureBenchmarkResult> results = new List<AzureBenchmarkResult>();
-            int processedBenchmarks = 0;
+            int benchmarksProcessed = 0;
 
             var formatter = new BinaryFormatter();
             bool completed = false;
             do
             {
-                completed = totalBenchmarksToProcess != -1 && completedTasksCount >= totalBenchmarksToProcess;
                 var messages = queue.GetMessages(32, TimeSpan.FromMinutes(5));
                 int messageCount = messages.Count();
-                completed = completed && messageCount == 0;
+                completed = benchmarksToProcess != -1 &&
+                            completedTasksCount >= benchmarksToProcess &&
+                            messageCount == 0;
                 foreach (CloudQueueMessage message in messages)
-                {
                     using (var ms = new MemoryStream(message.AsBytes))
-                    {
                         goodResults.Add((AzureBenchmarkResult)formatter.Deserialize(ms));
-                    }
-                }
                 int oldCount = results.Count;
                 results = goodResults.Concat(badResults).ToList();
                 var tuple = SortCountUniqueNamesAndRemoveExactDuplicates(results);
-                processedBenchmarks = tuple.Item1;
+                benchmarksProcessed = tuple.Item1;
                 results = tuple.Item2;
                 await storage.PutAzureExperimentResults(experimentId, results.ToArray(), AzureExperimentStorage.UploadBlobMode.CreateOrReplace);
-                int completedBenchmarks = totalBenchmarks == -1 ? processedBenchmarks : totalBenchmarks - totalBenchmarksToProcess + completedTasksCount;
-                await storage.SetCompletedBenchmarks(experimentId, completedBenchmarks);
-                Console.WriteLine("Setting completed benchmarks to {0}.\nTotal benchmarks: {1}\nProcessed benchmarks: {2}\nTotal to process: {3}\nCompleted tasks: {4}\nMessage count: {5}", completedBenchmarks, totalBenchmarks, processedBenchmarks, totalBenchmarksToProcess, completedTasksCount, messageCount);
+                int benchmarksDone = benchmarksTotal == -1 ? benchmarksProcessed : benchmarksTotal - benchmarksToProcess + completedTasksCount;
+                await storage.SetBenchmarksDone(experimentId, benchmarksDone);
+                Console.WriteLine("Setting completed benchmarks to {0}.\nTotal benchmarks: {1}\nProcessed benchmarks: {2}\nTotal to process: {3}\nMessage count: {4}", benchmarksDone, benchmarksTotal, benchmarksProcessed, benchmarksToProcess, messageCount);
                 foreach (CloudQueueMessage message in messages)
-                {
                     queue.DeleteMessage(message);
-                }
                 if (oldCount == results.Count)
                     Thread.Sleep(2500);
             }
@@ -677,7 +672,11 @@ namespace AzureWorker
             //}
             double normal = 1.0;
 
+#if DEBUG
+            string workerDir = @"C:\temp\azworker-tmp";
+#else
             string workerDir = Path.Combine(Environment.GetEnvironmentVariable(SharedDirEnvVariableName), Environment.GetEnvironmentVariable(JobIdEnvVariableName));
+#endif
             executable = Path.Combine(workerDir, "exec", executable);
             string normalFilePath = Path.Combine(workerDir, PerformanceCoefficientFileName);
             if (File.Exists(normalFilePath))
@@ -715,7 +714,11 @@ namespace AzureWorker
 
         static Task<double> RunReference(string[] args)
         {
+#if DEBUG
+            string workerDir = @"C:\temp\azworker-tmp";
+#else
             string workerDir = Path.Combine(Environment.GetEnvironmentVariable(SharedDirEnvVariableName), Environment.GetEnvironmentVariable(JobIdEnvVariableName));
+#endif
             string normalFilePath = Path.Combine(workerDir, PerformanceCoefficientFileName);
             string refJsonPath = Path.Combine(workerDir, "reference.json");
             if (!File.Exists(refJsonPath))

@@ -486,7 +486,7 @@ namespace AzurePerformanceTest
             } while (changed);
         }
 
-        public async Task SetTotalBenchmarks(int id, int totalBenchmarks)
+        public async Task SetBenchmarksTotal(int id, int total)
         {
             TableQuery<ExperimentEntity> query = ExperimentPointQuery(id);
 
@@ -494,13 +494,13 @@ namespace AzurePerformanceTest
             do
             {
                 ExperimentEntity experiment = await FirstExperimentInQuery(query);
-                experiment.TotalBenchmarks = totalBenchmarks;
+                experiment.TotalBenchmarks = total;
 
                 changed = !(await TryUpdateTableEntity(experimentsTable, experiment));
             } while (changed);
         }
 
-        public async Task SetCompletedBenchmarks(int id, int completedBenchmarks)
+        public async Task SetBenchmarksDone(int id, int done)
         {
             TableQuery<ExperimentEntity> query = ExperimentPointQuery(id);
 
@@ -508,7 +508,7 @@ namespace AzurePerformanceTest
             do
             {
                 ExperimentEntity experiment = await FirstExperimentInQuery(query);
-                experiment.CompletedBenchmarks = completedBenchmarks;
+                experiment.CompletedBenchmarks = done;
 
                 changed = !(await TryUpdateTableEntity(experimentsTable, experiment));
             } while (changed);
