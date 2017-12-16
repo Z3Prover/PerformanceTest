@@ -56,6 +56,7 @@ namespace PerformanceTest.Management
                     int eid = ids[i];
 
                     bool resolved = false;
+                    int after_resolution_count = 0;
                     do
                     {
                         var results = await manager.GetResults(eid);
@@ -84,7 +85,11 @@ namespace PerformanceTest.Management
                             resolved = true;
                             uiService.ShowInfo("There are no duplicates in the experiment " + eid, "No duplicates");
                         }
+
+                        after_resolution_count = results.Benchmarks.Count();
                     } while (!resolved);
+
+                    await manager.Storage.SetBenchmarksDone(eid, after_resolution_count);
                 }
             }
             catch (Exception ex)
