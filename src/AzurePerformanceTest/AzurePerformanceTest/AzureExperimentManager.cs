@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.Batch.Auth;
 using Microsoft.Azure.Batch;
-using ExperimentID = System.Int32;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.Azure.Batch.Common;
 using System.IO;
 using System.Diagnostics;
 using PerformanceTest;
 using Measurement;
+
+using ExperimentID = System.Int32;
 
 namespace AzurePerformanceTest
 {
@@ -425,6 +427,11 @@ namespace AzurePerformanceTest
             var refExp = await storage.GetReferenceExperiment();
             ExperimentEntity ee = await storage.GetExperiment(id);
             string poolId = "z3-nightly";
+
+            Regex re = new Regex(@"^.*\(pool: ([^ ]*)\)$");
+            Match m = re.Match(ee.WorkerInformation);
+            if (m.Success)
+                poolId = m.Groups[1].Value;
 
             using (var bc = BatchClient.Open(batchCreds))
             {
