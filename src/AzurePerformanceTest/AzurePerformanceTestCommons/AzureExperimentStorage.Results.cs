@@ -366,6 +366,8 @@ namespace AzurePerformanceTest
         {
             using (MemoryStream zipStream = new MemoryStream(1 << 16))
             {
+                DateTime before = DateTime.Now;
+
                 await blob.DownloadToStreamAsync(zipStream,
                     AccessCondition.GenerateEmptyCondition(),
                     new Microsoft.WindowsAzure.Storage.Blob.BlobRequestOptions
@@ -381,7 +383,7 @@ namespace AzurePerformanceTest
                     var entry = zip.GetEntry(rfn);
                     res = AzureBenchmarkResult.LoadBenchmarks(id, entry.Open(), f);
 
-                    DateTime before = DateTime.Now;
+                    DateTime before_cache = DateTime.Now;
                     try
                     {
                         // If possible, save to cache.
@@ -392,13 +394,15 @@ namespace AzurePerformanceTest
                         using (FileStream file = File.Open(filename, FileMode.OpenOrCreate, FileAccess.Write))
                         using (var e = entry.Open())
                             await e.CopyToAsync(file);
+
+                        File.SetLastWriteTimeUtc(filename, before);
                     }
                     catch (Exception ex)
                     {
                         Debug.Print("Exception caught while saving to cache: {0}", ex.Message);
                         Debug.Print("Stack Trace: " + ex.StackTrace);
                     }
-                    Debug.Print("Job #{0}: cache save time: {1:n2} sec", id, (DateTime.Now - before).TotalSeconds);
+                    Debug.Print("Job #{0}: cache save time: {1:n2} sec", id, (DateTime.Now - before_cache).TotalSeconds);
                 }
 
                 return res;
