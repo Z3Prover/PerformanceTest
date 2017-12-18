@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -32,9 +32,10 @@ namespace PerformanceTest.Management
         private uint memoutX = 1800;
         private uint memoutY = 1800;
         private Dictionary<string, int> classes = new Dictionary<string, int>();
+        private Regex filterRegex = new Regex(".*");
 
 
-        public Scatterplot(CompareExperimentsViewModel vm, ExperimentStatusViewModel exp1, ExperimentStatusViewModel exp2, double timeout1, double timeout2, double memout1, double memout2,  IUIService uiService)
+        public Scatterplot(CompareExperimentsViewModel vm, ExperimentStatusViewModel exp1, ExperimentStatusViewModel exp2, double timeout1, double timeout2, double memout1, double memout2, IUIService uiService)
         {
             if (vm == null) throw new ArgumentNullException("vm");
             if (exp1 == null) throw new ArgumentNullException("exp1");
@@ -338,20 +339,26 @@ namespace PerformanceTest.Management
                 {
                     foreach (var item in vm.CompareItems)
                     {
+                        if (!filterRegex.Match(item.Filename).Success)
+                            continue;
+
                         double x = 0.0, y = 0.0;
                         if (rbNonNormalized.Checked)
                         {
                             x = item.Results1.CPUTime;
                             y = item.Results2.CPUTime;
-                        } else if (rbWallClock.Checked)
+                        }
+                        else if (rbWallClock.Checked)
                         {
                             x = item.Results1.WallClockTime;
                             y = item.Results2.WallClockTime;
-                        } else if (rbMemoryUsed.Checked)
+                        }
+                        else if (rbMemoryUsed.Checked)
                         {
                             x = item.Results1.MemorySizeMB;
                             y = item.Results2.MemorySizeMB;
-                        } else
+                        }
+                        else
                         {
                             x = item.Results1.NormalizedCPUTime;
                             y = item.Results2.NormalizedCPUTime;
@@ -448,9 +455,8 @@ namespace PerformanceTest.Management
             }
             finally
             {
-
                 chart.Update();
-                if(vm.CompareItems != null) UpdateStatus(false);
+                if (vm.CompareItems != null) UpdateStatus(false);
                 uiService.StopIndicateLongOperation(handle);
             }
 
@@ -465,11 +471,13 @@ namespace PerformanceTest.Management
             lblFaster.Text = y_faster.ToString();
             lblSlower.Text = y_slower.ToString();
         }
+
         private void scatterTest_Load(object sender, EventArgs e)
         {
             SetupChart();
             RefreshChart();
         }
+
         private void ckCheckedChanged(object sender, EventArgs e)
         {
             fancy = cbFancy.Checked;
@@ -497,6 +505,16 @@ namespace PerformanceTest.Management
             s.Points.AddXY(axisMinimum, axisMinimum * f);
             s.Points.AddXY(axisMaximum / f, axisMaximum);
             s.Points.AddXY(axisMaximum, axisMaximum);
+        }
+
+        private void txtFilterOnKeyUP(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                SetupChart();
+                filterRegex = txtFilter.Text == "" ? new Regex(".*") : new Regex(txtFilter.Text);
+                RefreshChart();
+            }
         }
     }
 }

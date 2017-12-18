@@ -53,6 +53,8 @@
             this.lblTotal = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lblDatapoints = new System.Windows.Forms.Label();
+            this.lblFilter = new System.Windows.Forms.Label();
+            this.txtFilter = new System.Windows.Forms.TextBox();
             this.ckTIME = new System.Windows.Forms.CheckBox();
             this.ckUNKNOWN = new System.Windows.Forms.CheckBox();
             this.rbNormalized = new System.Windows.Forms.RadioButton();
@@ -320,6 +322,25 @@
             this.lblDatapoints.TabIndex = 19;
             this.lblDatapoints.Text = "Datapoints:";
             //
+            // lblFilter
+            //
+            this.lblFilter.AutoSize = true;
+            this.lblFilter.Location = new System.Drawing.Point(6, 92);
+            this.lblFilter.Name = "lblFilter";
+            this.lblFilter.Size = new System.Drawing.Size(61, 13);
+            this.lblFilter.TabIndex = 19;
+            this.lblFilter.Text = "Filter (RE):";
+            //
+            // txtFilter
+            //
+            this.txtFilter.AutoSize = false;
+            this.txtFilter.Location = new System.Drawing.Point(73, 92);
+            this.txtFilter.Name = "txtFilter";
+            this.txtFilter.Size = new System.Drawing.Size(140, 17);
+            this.txtFilter.TabIndex = 19;
+            this.txtFilter.Text = "";
+            this.txtFilter.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtFilterOnKeyUP);
+            //
             // ckTIME
             //
             this.ckTIME.AutoSize = true;
@@ -422,6 +443,8 @@
             this.gbStatistics.Controls.Add(this.lblAvgSpeedup);
             this.gbStatistics.Controls.Add(this.lblFaster);
             this.gbStatistics.Controls.Add(this.lblTotal);
+            this.gbStatistics.Controls.Add(this.lblFilter);
+            this.gbStatistics.Controls.Add(this.txtFilter);
             this.gbStatistics.Location = new System.Drawing.Point(281, 0);
             this.gbStatistics.Name = "gbStatistics";
             this.gbStatistics.Size = new System.Drawing.Size(222, 125);
@@ -483,6 +506,8 @@
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblDatapoints;
+        private System.Windows.Forms.Label lblFilter;
+        private System.Windows.Forms.TextBox txtFilter;
         private System.Windows.Forms.CheckBox ckERROR;
         private System.Windows.Forms.CheckBox ckMEMORY;
         private System.Windows.Forms.CheckBox ckBUG;
