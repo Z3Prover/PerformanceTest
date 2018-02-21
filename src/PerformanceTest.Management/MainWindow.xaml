@@ -81,7 +81,7 @@
         </Grid>
 
         <TabControl Grid.Row="2" Grid.Column="0" TabStripPlacement="Bottom" Grid.ColumnSpan="2">
-            <TabItem Header="Experiments" >
+            <TabItem Header="Experiments">
                 <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Name="dataGrid" IsReadOnly="False"
                           GridLinesVisibility="None" SelectionUnit="FullRow" SelectionMode="Extended" AlternatingRowBackground="AliceBlue"
                           ItemsSource="{Binding Items}" MouseDoubleClick="dataGrid_MouseDoubleClick"

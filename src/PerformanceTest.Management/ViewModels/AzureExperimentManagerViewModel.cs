@@ -67,6 +67,7 @@ namespace PerformanceTest.Management
                             uiService.ShowInfo("Duplicates resolution cancelled.", "Resolution cancelled");
                             return; // cancelling operation
                         }
+
                         if (duplicates.Length > 0)
                         {
                             resolved = await results.TryDelete(duplicates);
@@ -90,6 +91,7 @@ namespace PerformanceTest.Management
                     } while (!resolved);
 
                     await manager.Storage.SetBenchmarksDone(eid, after_resolution_count);
+                    await manager.Storage.SetBenchmarksTotal(eid, after_resolution_count);
                 }
             }
             catch (Exception ex)
