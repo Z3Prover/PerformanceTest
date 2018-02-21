@@ -92,6 +92,7 @@ namespace PerformanceTest.Management
             bool all_times_same = true;
             bool all_memouts = true;
             bool all_inerrors = true;
+            bool at_least_one_timeout = false;
             double runtime = 0.0;
             double min_time = double.MaxValue;
             BenchmarkResult min_item = null;
@@ -102,10 +103,12 @@ namespace PerformanceTest.Management
             {
                 ResultStatus status = r.Status;
                 double time = r.CPUTime.TotalSeconds;
-                if (status != ResultStatus.Timeout && status != ResultStatus.InfrastructureError) { all_timeouts = false; }
+
+                if (status != ResultStatus.Timeout && status != ResultStatus.InfrastructureError) { all_timeouts = false; at_least_one_timeout = true; }
                 if (status != ResultStatus.Success && status != ResultStatus.InfrastructureError) { all_ok = false; }
                 if (status != ResultStatus.OutOfMemory && status != ResultStatus.InfrastructureError) { all_memouts = false; }
                 if (status != ResultStatus.InfrastructureError) { all_inerrors = false; }
+
                 if (time < min_time)
                 {
                     min_time = time;
@@ -146,7 +149,7 @@ namespace PerformanceTest.Management
             {
                 return benchmarks[0];
             }
-            else if (resolveSlowest && (all_ok || all_memouts))
+            else if (resolveSlowest && (all_ok || all_memouts || at_least_one_timeout))
             {
                 return max_item;
             }
