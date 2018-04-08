@@ -185,7 +185,7 @@ namespace AzureWorker
                 summaryName = args[1];
             //Console.WriteLine(String.Format("Params are:\n id: {0}\ncontainer: {8}\ndirectory:{9}\ncategory: {1}\nextensions: {10}\ndomain: {11}\nexec: {2}\nargs: {3}\ntimeout: {4}\nmemlimit: {5}\noutlimit: {6}\nerrlimit: {7}", experimentId, benchmarkCategory, executable, arguments, timeout, memoryLimit, outputLimit, errorLimit, benchmarkContainerUri, benchmarkDirectory, extensionsString, domainString));
 #if DEBUG
-            string jobId = "cz3_exp8543";
+            string jobId = "cz3_exp8535";
 #else
             string jobId = Environment.GetEnvironmentVariable(JobIdEnvVariableName);
 #endif
@@ -470,8 +470,9 @@ namespace AzureWorker
             badResults = new List<AzureBenchmarkResult>();
             foreach (var r in results)
             {
-                if (r.StdErr.StartsWith(InfrastructureErrorPrefix) ||
-                    (!string.IsNullOrEmpty(r.StdErrExtStorageIdx) &&
+                if (r.StdErr != null &&
+                    (r.StdErr.StartsWith(InfrastructureErrorPrefix) ||
+                     (!string.IsNullOrEmpty(r.StdErrExtStorageIdx)) &&
                      Utils.StreamToString(storage.ParseAzureBenchmarkResult(r).StdErr, false).StartsWith(InfrastructureErrorPrefix)))
                     badResults.Add(r);
                 else
