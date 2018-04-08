@@ -225,7 +225,7 @@ namespace AzurePerformanceTest
                 );
         }
 
-        private static string BlobNamePrefix(int experimentID)
+        public static string BlobNamePrefix(int experimentID)
         {
             return String.Concat("E", experimentID.ToString(), "F");
         }
