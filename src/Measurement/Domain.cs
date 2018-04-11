@@ -188,12 +188,17 @@ namespace Measurement
     public class ProcessRunAnalysis
     {
         private readonly ResultStatus status;
-        private readonly IReadOnlyDictionary<string, string> outputProperties;
+        private Dictionary<string, string> outputProperties = new Dictionary<string, string>();
 
         public ProcessRunAnalysis(ResultStatus status, IReadOnlyDictionary<string, string> outputProperties)
         {
             this.status = status;
-            this.outputProperties = outputProperties;
+
+            foreach (KeyValuePair<string, string> kvp in outputProperties)
+            {
+                // null only when status == ResultStatus.InfrastructureError?
+                this.outputProperties[kvp.Key] = (kvp.Value ?? "0");
+            }
         }
 
         public ResultStatus Status { get { return status; } }

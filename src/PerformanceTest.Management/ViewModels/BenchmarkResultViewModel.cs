@@ -113,7 +113,7 @@ namespace PerformanceTest.Management
 
         private int GetProperty(string prop)
         {
-            int res = result.Properties.ContainsKey(prop) ? Int32.Parse(result.Properties[prop], System.Globalization.CultureInfo.InvariantCulture) : 0;
+            int res = result.Properties.ContainsKey(prop) ? Int32.Parse(result.Properties[prop] ?? "0", System.Globalization.CultureInfo.InvariantCulture) : 0;
             return res;
         }
 
