@@ -83,8 +83,10 @@ namespace Measurement
                         else if (out_lim <= 0 || err_lim <= 0)
                         {
                             Trace.WriteLine("Process produced too much output; killing.");
+                            exhausted_memory = true;
+                            out_writer.WriteLine("\n---OUTPUT TRUNCATED---");
+                            err_writer.WriteLine("\n---OUTPUT TRUNCATED---");
                             Kill(p);
-                            throw new Exception("Process produced too much output.");
                         }
                     }
                 }

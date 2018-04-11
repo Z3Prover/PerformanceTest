@@ -185,7 +185,7 @@ namespace AzureWorker
                 summaryName = args[1];
             //Console.WriteLine(String.Format("Params are:\n id: {0}\ncontainer: {8}\ndirectory:{9}\ncategory: {1}\nextensions: {10}\ndomain: {11}\nexec: {2}\nargs: {3}\ntimeout: {4}\nmemlimit: {5}\noutlimit: {6}\nerrlimit: {7}", experimentId, benchmarkCategory, executable, arguments, timeout, memoryLimit, outputLimit, errorLimit, benchmarkContainerUri, benchmarkDirectory, extensionsString, domainString));
 #if DEBUG
-            string jobId = "cz3_exp8371";
+            string jobId = "cz3_exp8535";
 #else
             string jobId = Environment.GetEnvironmentVariable(JobIdEnvVariableName);
 #endif
@@ -230,9 +230,9 @@ namespace AzureWorker
             {
                 // Exclude benchmarks that finished correctly
                 var processedBlobs = new HashSet<string>();
-                string prefix = (benchmarkCategory.Trim('/') + "/" + benchmarkDirectory.Trim('/')).Trim('/');
+                string prefix = (benchmarkDirectory.Trim('/') + "/" + benchmarkCategory.Trim('/')).Trim('/');
                 foreach (var r in goodResults.Select(g => prefix + "/" + g.BenchmarkFileName))
-                    processedBlobs.Add(r);
+                    processedBlobs.Add(r.Trim());
                 Console.WriteLine(" took {0}.", (DateTime.Now - before));
 
                 // Exclude those that are still in progress
@@ -252,7 +252,11 @@ namespace AzureWorker
                     {
                         int id;
                         if (int.TryParse(t.Id, out id))
-                            processedBlobs.Add(t.DisplayName);
+                        {
+                            string n = t.DisplayName.Trim();
+                            if (!processedBlobs.Contains(n))
+                                processedBlobs.Add(n);
+                        }
                     };
                     Console.WriteLine(" took {0}.", (DateTime.Now - before));
 
@@ -411,10 +415,16 @@ namespace AzureWorker
             }
         }
 
+        static List<AzureBenchmarkResult> goodResults = new List<AzureBenchmarkResult>();
+        static List<AzureBenchmarkResult> badResults = new List<AzureBenchmarkResult>();
+        static int completedTasksCount = 0;
+        static int benchmarksTotal = -1;
+        static int benchmarksToProcess = -1;
+
         private static void MonitorTasksUntilCompletion(int experimentId, string jobId, Task collectionTask, BatchClient batchClient, Domain domain)
         {
             // Monitoring tasks
-            ODATADetailLevel fLvl = new ODATADetailLevel(domain.FailureFilter(), "id,displayName");
+            ODATADetailLevel fLvl = new ODATADetailLevel(domain.FailureFilter(), "id,displayName,executionInfo");
 
             do
             {
@@ -423,25 +433,26 @@ namespace AzureWorker
                 foreach (CloudTask t in ts) {
                     if (t == null)
                         Console.Error.WriteLine("improbable task == null condition.");
+                    if (t == null)
+                        Console.Error.WriteLine("improbable badRresults == null condition.");
                     else
                     {
-                        badResults.Add(new AzureBenchmarkResult()
-                        {
-                            AcquireTime = t.ExecutionInformation.StartTime ?? DateTime.MinValue,
-                            BenchmarkFileName = t.DisplayName,
-                            ExitCode = t.ExecutionInformation.ExitCode,
-                            ExperimentID = experimentId,
-                            StdErr = InfrastructureErrorPrefix + t.ExecutionInformation.FailureInformation.Message,
-                            StdErrExtStorageIdx = "",
-                            StdOut = "",
-                            StdOutExtStorageIdx = "",
-                            NormalizedCPUTime = 0,
-                            PeakMemorySizeMB = 0,
-                            Properties = new Dictionary<string, string>(),
-                            Status = ResultStatus.InfrastructureError,
-                            CPUTime = TimeSpan.Zero,
-                            WallClockTime = TimeSpan.Zero
-                        });
+                        AzureBenchmarkResult r = new AzureBenchmarkResult();
+                        r.AcquireTime = t.ExecutionInformation.StartTime ?? DateTime.MinValue;
+                        r.BenchmarkFileName = t.DisplayName;
+                        r.ExitCode = t.ExecutionInformation.ExitCode;
+                        r.ExperimentID = experimentId;
+                        r.StdErr = InfrastructureErrorPrefix + t.ExecutionInformation.FailureInformation.Message;
+                        r.StdErrExtStorageIdx = "";
+                        r.StdOut = "";
+                        r.StdOutExtStorageIdx = "";
+                        r.NormalizedCPUTime = 0;
+                        r.PeakMemorySizeMB = 0;
+                        r.Properties = new Dictionary<string, string>();
+                        r.Status = ResultStatus.InfrastructureError;
+                        r.CPUTime = TimeSpan.Zero;
+                        r.WallClockTime = TimeSpan.Zero;
+                        badResults.Add(r); ;
                     }
                 }
                 Console.WriteLine("Done fetching failed tasks. Got {0}.", badResults.Count);
@@ -450,13 +461,7 @@ namespace AzureWorker
                 Console.WriteLine("Done fetching completed tasks. Got {0}.", completedTasksCount);
             }
             while (!collectionTask.Wait(30000));
-        }
-
-        static List<AzureBenchmarkResult> goodResults = new List<AzureBenchmarkResult>();
-        static List<AzureBenchmarkResult> badResults = new List<AzureBenchmarkResult>();
-        static int completedTasksCount = 0;
-        static int benchmarksTotal = -1;
-        static int benchmarksToProcess = -1;
+        }        
 
         static async Task FetchSavedResults(int experimentId, AzureExperimentStorage storage)
         {
@@ -465,8 +470,9 @@ namespace AzureWorker
             badResults = new List<AzureBenchmarkResult>();
             foreach (var r in results)
             {
-                if (r.StdErr.StartsWith(InfrastructureErrorPrefix) ||
-                    (!string.IsNullOrEmpty(r.StdErrExtStorageIdx) &&
+                if (r.StdErr != null &&
+                    (r.StdErr.StartsWith(InfrastructureErrorPrefix) ||
+                     (!string.IsNullOrEmpty(r.StdErrExtStorageIdx)) &&
                      Utils.StreamToString(storage.ParseAzureBenchmarkResult(r).StdErr, false).StartsWith(InfrastructureErrorPrefix)))
                     badResults.Add(r);
                 else

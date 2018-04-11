@@ -324,6 +324,29 @@ namespace AzurePerformanceTest
             return result;
         }
 
+        private async void AddStarterTask(int id, string summaryName, CloudJob job, bool isRetry = false, string newBenchmarkContainerUri = "")
+        {
+            string taskId = "taskStarter";
+            string taskCommandLine = isRetry ?
+                string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-tasks {0} \"{1}\"", id, summaryName ?? "") :
+                string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-retry {0} \"{1}\" \"{2}\"", id, summaryName, newBenchmarkContainerUri);
+            job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
+            job.JobManagerTask.AllowLowPriorityNode = true;
+
+            foreach (string fn in new string[] { "stdout.txt", "stderr.txt" })
+            {
+                string pre = AzureExperimentStorage.BlobNamePrefix(id);                
+                string bn = pre + "/" + fn;
+                OutputFileUploadOptions uopt = new OutputFileUploadOptions(OutputFileUploadCondition.TaskCompletion);
+                string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(72));
+                OutputFileBlobContainerDestination oc = new OutputFileBlobContainerDestination(outputContainerUri, bn);
+                OutputFileDestination od = new OutputFileDestination(oc);
+                job.JobManagerTask.OutputFiles.Add(new OutputFile("$AZ_BATCH_TASK_DIR/" + fn, od, uopt));
+            }
+
+            await job.CommitAsync();
+        }
+
         public override async Task<ExperimentID> StartExperiment(ExperimentDefinition definition, string creator = null, string note = null, string summaryName = null)
         {
             if (!CanStart) throw new InvalidOperationException("Cannot start experiment since the manager is in read mode");
@@ -408,13 +431,8 @@ namespace AzurePerformanceTest
                     job.Constraints.MaxWallClockTime = definition.ExperimentTimeout;
 
                 job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
-                string taskId = "taskStarter";
 
-                string taskCommandLine = string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-tasks {0} \"{1}\"", id, summaryName ?? "");
-
-                job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
-
-                await job.CommitAsync();
+                AddStarterTask(id, summaryName, job);
             }
 
             return id;
@@ -523,14 +541,8 @@ namespace AzurePerformanceTest
                     job.Constraints.MaxWallClockTime = def.ExperimentTimeout;
 
                 job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
-                string taskId = "taskStarter";
-
                 string summaryName = ee.Creator != "Nightly" ? "" : "Z3Nightly";
-                string taskCommandLine = string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-tasks {0} \"{1}\"", id, summaryName);
-
-                job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
-
-                await job.CommitAsync();
+                AddStarterTask(id, summaryName, job);
             }
 
             return true;
@@ -637,12 +649,8 @@ namespace AzurePerformanceTest
                 job.Constraints = new JobConstraints();
 
                 job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
-                string taskId = "taskStarter";
 
-                string taskCommandLine = string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-retry {0} \"{1}\" \"{2}\"",
-                    id, tempBlobName, newBenchmarkContainerUri);
-
-                job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
+                AddStarterTask(id, tempBlobName, job, true, newBenchmarkContainerUri);
 
                 bool failedToCommit = false;
                 int tryBackAwayMultiplier = 1;
