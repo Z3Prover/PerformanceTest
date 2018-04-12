@@ -332,10 +332,11 @@ namespace AzurePerformanceTest
                 string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-retry {0} \"{1}\" \"{2}\"", id, summaryName, newBenchmarkContainerUri);
             job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
             job.JobManagerTask.AllowLowPriorityNode = true;
+            job.JobManagerTask.OutputFiles = job.JobManagerTask.OutputFiles ?? new List<OutputFile>();
 
             foreach (string fn in new string[] { "stdout.txt", "stderr.txt" })
             {
-                string pre = AzureExperimentStorage.BlobNamePrefix(id);                
+                string pre = AzureExperimentStorage.BlobNamePrefix(id);
                 string bn = pre + "/" + fn;
                 OutputFileUploadOptions uopt = new OutputFileUploadOptions(OutputFileUploadCondition.TaskCompletion);
                 string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(72));
