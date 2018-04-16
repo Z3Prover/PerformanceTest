@@ -35,6 +35,8 @@ namespace AzurePerformanceTest
 
         public AzureBenchmarkStorage(string containerUri)
         {
+            System.Console.WriteLine("Questionable URI: {0}", containerUri);
+
             this.uri = containerUri;
             var parts = containerUri.Split('?');
             if (parts.Length != 2)
@@ -43,7 +45,7 @@ namespace AzurePerformanceTest
             this.signature = "?" + parts[1];
             inputsContainer = new CloudBlobContainer(new Uri(containerUri));
         }
-        
+
 
         public string GetContainerSASUri()
         {
@@ -78,7 +80,7 @@ namespace AzurePerformanceTest
         public IEnumerable<string> ListDirectories(string baseDirectory = "")
         {
             CloudBlobDirectory dir = inputsContainer.GetDirectoryReference(baseDirectory);
-            return dir.ListBlobs(false, BlobListingDetails.None, 
+            return dir.ListBlobs(false, BlobListingDetails.None,
                 options: new BlobRequestOptions
                 {
                      RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.ExponentialRetry(TimeSpan.FromMilliseconds(50), 5)

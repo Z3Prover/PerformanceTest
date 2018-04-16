@@ -125,7 +125,7 @@ namespace Measure
             double threshold = 0.15;
 
             if (lastResult == null)
-                info = String.Format("{1:0.0000}\t{2:0.00} MB\t{0.0}",
+                info = String.Format("{1:0.0000}\t{2:0.00} MB\t{3:0.00}",
                     result.BenchmarkFileName, result.NormalizedCPUTime, result.PeakMemorySizeMB);
             else
             {

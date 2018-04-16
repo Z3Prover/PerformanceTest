@@ -324,26 +324,26 @@ namespace AzurePerformanceTest
             return result;
         }
 
-        private async void AddStarterTask(int id, string summaryName, CloudJob job, bool isRetry = false, string newBenchmarkContainerUri = "")
+        private async void AddStarterTask(int id, string summaryName, CloudJob job, bool isRetry = false, string newBenchmarkContainerUri = ExperimentDefinition.DefaultContainerUri)
         {
             string taskId = "taskStarter";
-            string taskCommandLine = isRetry ?
+            string taskCommandLine = !isRetry ?
                 string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-tasks {0} \"{1}\"", id, summaryName ?? "") :
                 string.Format("cmd /c %AZ_BATCH_NODE_SHARED_DIR%\\%AZ_BATCH_JOB_ID%\\AzureWorker.exe --manage-retry {0} \"{1}\" \"{2}\"", id, summaryName, newBenchmarkContainerUri);
             job.JobManagerTask = new JobManagerTask(taskId, taskCommandLine);
             job.JobManagerTask.AllowLowPriorityNode = true;
-            job.JobManagerTask.OutputFiles = job.JobManagerTask.OutputFiles ?? new List<OutputFile>();
+            //job.JobManagerTask.OutputFiles = job.JobManagerTask.OutputFiles ?? new List<OutputFile>();
 
-            foreach (string fn in new string[] { "stdout.txt", "stderr.txt" })
-            {
-                string pre = AzureExperimentStorage.BlobNamePrefix(id);
-                string bn = pre + "/" + fn;
-                OutputFileUploadOptions uopt = new OutputFileUploadOptions(OutputFileUploadCondition.TaskCompletion);
-                string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(72));
-                OutputFileBlobContainerDestination oc = new OutputFileBlobContainerDestination(outputContainerUri, bn);
-                OutputFileDestination od = new OutputFileDestination(oc);
-                job.JobManagerTask.OutputFiles.Add(new OutputFile("$AZ_BATCH_TASK_DIR/" + fn, od, uopt));
-            }
+            //foreach (string fn in new string[] { "stdout.txt", "stderr.txt" })
+            //{
+            //    string pre = AzureExperimentStorage.BlobNamePrefix(id);
+            //    string bn = pre + "/" + fn;
+            //    OutputFileUploadOptions uopt = new OutputFileUploadOptions(OutputFileUploadCondition.TaskCompletion);
+            //    string outputContainerUri = storage.GetOutputContainerSASUri(TimeSpan.FromHours(72));
+            //    OutputFileBlobContainerDestination oc = new OutputFileBlobContainerDestination(outputContainerUri, bn);
+            //    OutputFileDestination od = new OutputFileDestination(oc);
+            //    job.JobManagerTask.OutputFiles.Add(new OutputFile("$AZ_BATCH_TASK_DIR/" + fn, od, uopt));
+            //}
 
             await job.CommitAsync();
         }
@@ -387,16 +387,14 @@ namespace AzurePerformanceTest
                 string executableFolder = "exec";
                 job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(storage.GetExecutableSasUri(definition.Executable), Path.Combine(executableFolder, definition.Executable)));
 
+                AzureBenchmarkStorage benchStorage = storage.DefaultBenchmarkStorage;
                 if (refExp != null)
                 {
                     string refContentFolder = "refdata";
                     string refBenchFolder = Path.Combine(refContentFolder, "data");
                     var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
                     job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
-                    AzureBenchmarkStorage benchStorage;
-                    if (refExp.Definition.BenchmarkContainerUri == ExperimentDefinition.DefaultContainerUri)
-                        benchStorage = storage.DefaultBenchmarkStorage;
-                    else
+                    if (refExp.Definition.BenchmarkContainerUri != ExperimentDefinition.DefaultContainerUri)
                         benchStorage = new AzureBenchmarkStorage(refExp.Definition.BenchmarkContainerUri);
 
                     Domain refdomain;
@@ -433,7 +431,7 @@ namespace AzurePerformanceTest
 
                 job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
 
-                AddStarterTask(id, summaryName, job);
+                AddStarterTask(id, summaryName, job, false, benchStorage.GetContainerSASUri());
             }
 
             return id;
@@ -497,16 +495,14 @@ namespace AzurePerformanceTest
                 string executableFolder = "exec";
                 job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(storage.GetExecutableSasUri(def.Executable), Path.Combine(executableFolder, def.Executable)));
 
+                AzureBenchmarkStorage benchStorage = benchStorage = storage.DefaultBenchmarkStorage;
                 if (refExp != null)
                 {
                     string refContentFolder = "refdata";
                     string refBenchFolder = Path.Combine(refContentFolder, "data");
                     var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
                     job.JobPreparationTask.ResourceFiles.Add(new ResourceFile(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
-                    AzureBenchmarkStorage benchStorage;
-                    if (refExp.Definition.BenchmarkContainerUri == ExperimentDefinition.DefaultContainerUri)
-                        benchStorage = storage.DefaultBenchmarkStorage;
-                    else
+                    if (refExp.Definition.BenchmarkContainerUri != ExperimentDefinition.DefaultContainerUri)
                         benchStorage = new AzureBenchmarkStorage(refExp.Definition.BenchmarkContainerUri);
 
                     Domain refdomain;
@@ -543,7 +539,7 @@ namespace AzurePerformanceTest
 
                 job.Constraints.MaxTaskRetryCount = MaxTaskRetryCount;
                 string summaryName = ee.Creator != "Nightly" ? "" : "Z3Nightly";
-                AddStarterTask(id, summaryName, job);
+                AddStarterTask(id, summaryName, job, false, benchStorage.GetContainerSASUri());
             }
 
             return true;
