@@ -124,6 +124,10 @@ namespace Measurement
                 {
                     /* OK */
                 }
+                catch (UnauthorizedAccessException)
+                {
+                    /* OK */
+                }
             }
 
             var status =
