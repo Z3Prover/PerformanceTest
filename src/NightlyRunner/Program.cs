@@ -38,29 +38,30 @@ namespace NightlyRunner
         {
             string connectionString = await GetConnectionString();
 
-            RepositoryContent binary = await GetRecentNightlyBuild();
-            if (binary == null)
+            Tuple<ReleaseAsset, string> asset_hash = await GetNightlyBuild();
+            if (asset_hash == null || asset_hash.Item1 == null)
             {
                 Trace.WriteLine("Repository has no new build.");
                 return;
             }
-            Trace.WriteLine("Last nightly build contains " + binary.Name);
+            ReleaseAsset asset = asset_hash.Item1;
+            string hash = asset_hash.Item2;
 
             AzureExperimentManager manager = AzureExperimentManager.Open(connectionString);
-            string lastNightlyExecutable = await GetLastNightlyExperiment(manager);
-            if(lastNightlyExecutable == binary.Name)
+            DateTime last_submission_time = await GetLastNightlyExperimentSubmissionTime(manager);
+            if (last_submission_time >= asset.UpdatedAt)
             {
                 Trace.WriteLine("No changes found since last nightly experiment.");
                 return;
             }
 
-            using (MemoryStream stream = new MemoryStream(binary.Size))
+            using (MemoryStream stream = new MemoryStream(asset.Size))
             {
-                await Download(binary, stream);
+                await Download(asset, stream);
                 stream.Position = 0;
 
                 Trace.WriteLine("Opening an experiment manager...");
-                await SubmitExperiment(manager, stream, binary.Name);
+                await SubmitExperiment(manager, stream, asset.Name, hash);
             }
         }
 
@@ -75,11 +76,11 @@ namespace NightlyRunner
             return await secretStorage.GetSecret(Settings.Default.ConnectionStringSecretId);
         }
 
-        private static async Task Download(RepositoryContent binary, Stream stream)
+        private static async Task Download(ReleaseAsset binary, Stream stream)
         {
-            Trace.WriteLine(string.Format("Downloading new nightly build from {0} ({1:F2} MB)...", binary.DownloadUrl, binary.Size / 1024.0 / 1024.0));
+            Trace.WriteLine(string.Format("Downloading new nightly build from {0} ({1:F2} MB)...", binary.BrowserDownloadUrl, binary.Size / 1024.0 / 1024.0));
 
-            HttpWebRequest request = WebRequest.CreateHttp(binary.DownloadUrl);
+            HttpWebRequest request = WebRequest.CreateHttp(binary.BrowserDownloadUrl);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
             using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
@@ -89,12 +90,11 @@ namespace NightlyRunner
             }
         }
 
-        static async Task SubmitExperiment(AzureExperimentManager manager, Stream source, string fileName)
+        static async Task SubmitExperiment(AzureExperimentManager manager, Stream source, string fileName, string commit_hash)
         {
             Trace.WriteLine("Uploading new executable...");
             string packageName = await manager.Storage.UploadNewExecutable(source, fileName, Settings.Creator);
             Trace.WriteLine("Successfully uploaded as " + packageName);
-
 
             ExperimentDefinition definition =
                 ExperimentDefinition.Create(
@@ -113,9 +113,8 @@ namespace NightlyRunner
             Trace.WriteLine(string.Format("Starting nightly experiment in Batch pool \"{0}\"...", Settings.AzureBatchPoolId));
             manager.BatchPoolID = Settings.AzureBatchPoolId;
 
-            string commitSha = GetCommitSha(fileName);
-            string note = commitSha != null ?
-                string.Format("{0} for https://github.com/{1}/{2}/commit/{3}", Settings.ExperimentNote, Settings.GitHubOwner, Settings.GitHubZ3Repository, commitSha) :
+            string note = commit_hash != null ?
+                string.Format("{0} for https://github.com/{1}/{2}/commit/{3}", Settings.ExperimentNote, Settings.GitHubOwner, Settings.GitHubZ3Repository, commit_hash) :
                 Settings.ExperimentNote;
 
             var summaryName = Settings.SummaryName == "" ? null : Settings.SummaryName;
@@ -123,60 +122,46 @@ namespace NightlyRunner
             Trace.WriteLine(string.Format("Done, experiment id {0}.", experimentId));
         }
 
-        static async Task<string> GetLastNightlyExperiment(AzureExperimentManager manager)
+        static async Task<DateTime> GetLastNightlyExperimentSubmissionTime(AzureExperimentManager manager)
         {
             Trace.WriteLine("Looking for most recent nightly experiment...");
 
             // Returns a list ordered by submission time
             var experiments = await manager.FindExperiments(new ExperimentManager.ExperimentFilter() { CreatorEquals = Settings.Creator });
             var mostRecent = experiments.FirstOrDefault();
-            if (mostRecent == null) return null;
+            if (mostRecent == null) return DateTime.MinValue;
 
-            var metadata = await manager.Storage.GetExecutableMetadata(mostRecent.Definition.Executable);
-            string fileName = null;
-            if(metadata.TryGetValue(AzureExperimentStorage.KeyFileName, out fileName))
-            {
-                Trace.WriteLine("Last nightly experiment was run for " + fileName);
-            }
-            return fileName;
+            Trace.WriteLine("Last nightly experiment was submitted at " + mostRecent.Status.SubmissionTime);
+            return mostRecent.Status.SubmissionTime;
         }
 
-        static async Task<RepositoryContent> GetRecentNightlyBuild()
+        static async Task<Tuple<ReleaseAsset, string>> GetNightlyBuild()
         {
             Trace.WriteLine("Looking for most recent nightly build...");
             var github = new GitHubClient(new ProductHeaderValue("Z3-Tests-Nightly-Runner"));
-            var nightly = await github.Repository.Content.GetAllContents(Settings.GitHubOwner, Settings.GitHubBinariesRepository, Settings.GitHubBinariesNightlyFolder);
+            var release = await github.Repository.Release.Get(Settings.GitHubOwner, Settings.GitHubZ3Repository, "Nightly");
+            if (release == null) return null; // no matching files found
 
-            var files = nightly.Select(f => Tuple.Create(f, regex.Match(f.Name))).Where(fm => fm.Item2.Success).ToArray();
-            if (files.Length == 0) return null; // no matching files found
-            if (files.Length == 1) return files[0].Item1; // single matching file
+            var assets = release.Assets.Select(f => Tuple.Create(f, regex.Match(f.Name))).Where(fm => fm.Item2.Success).ToArray();
+            if (assets == null || assets.Length == 0) return null;  // no matching files found
 
             // Multiple matching files, should take the most recent
             DateTimeOffset max = DateTimeOffset.MinValue;
-            RepositoryContent recent = null;
+            ReleaseAsset recent = null;
+            string hash = release.TargetCommitish;
 
-            foreach (var fm in files)
+            foreach (var a in assets)
             {
-                string sha = fm.Item2.Groups[Settings.RegexExecutableFileName_CommitGroup].Value;
-                var commit = await github.Repository.Commit.Get(Settings.GitHubOwner, Settings.GitHubZ3Repository, sha);
-                var date = commit.Commit.Committer.Date;
-                if(date > max)
+                var commit = await github.Repository.Commit.Get(Settings.GitHubOwner, Settings.GitHubZ3Repository, hash);
+                var date = a.Item1.UpdatedAt;
+                if (date > max)
                 {
                     max = date;
-                    recent = fm.Item1;
+                    recent = a.Item1;
                 }
             }
-            return recent;
-        }
 
-        static string GetCommitSha(string fileName)
-        {
-            if (fileName == null) return null;
-            var m = regex.Match(fileName);
-            if (!m.Success) return null;
-            var g = m.Groups[Settings.RegexExecutableFileName_CommitGroup];
-            if (!g.Success) return null;
-            return g.Value;
+            return Tuple.Create(recent, release.TargetCommitish);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace NightlyRunner.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -142,15 +142,6 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("^z3-(\\d+\\.\\d+\\.\\d+).([\\d\\w]+)-x86-win.zip$")]
-        public string RegexExecutableFileName {
-            get {
-                return ((string)(this["RegexExecutableFileName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public string RegexExecutableFileName_CommitGroup {
             get {
@@ -169,15 +160,6 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("testPool")]
-        public string AzureBatchPoolId {
-            get {
-                return ((string)(this["AzureBatchPoolId"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Nightly run")]
         public string ExperimentNote {
             get {
@@ -187,7 +169,34 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("z3PerfConnectionString")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Z3Nightly")]
+        public string SummaryName {
+            get {
+                return ((string)(this["SummaryName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("^z3-(\\d+\\.\\d+\\.\\d+)-x86-win.zip$")]
+        public string RegexExecutableFileName {
+            get {
+                return ((string)(this["RegexExecutableFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("z3-nightly")]
+        public string AzureBatchPoolId {
+            get {
+                return ((string)(this["AzureBatchPoolId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("connectionString")]
         public string ConnectionStringSecretId {
             get {
                 return ((string)(this["ConnectionStringSecretId"]));
@@ -196,7 +205,7 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("04fc29f8-a2c2-4242-bc17-18c35730a50d")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -205,7 +214,7 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("510E3EB7B2172ACEEF3D297A2305D278F546F443")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));
@@ -214,19 +223,10 @@ namespace NightlyRunner.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://z3perftest.vault.azure.net")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string KeyVaultUrl {
             get {
                 return ((string)(this["KeyVaultUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Z3Nightly")]
-        public string SummaryName {
-            get {
-                return ((string)(this["SummaryName"]));
             }
         }
     }

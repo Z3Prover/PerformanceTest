@@ -454,8 +454,7 @@ To resubmit some benchmarks of an existing experiment from code, use `AzurePerfo
 The .NET application `/src/NightlyRunner` allows to submit performance tests for the latest nightly build of Z3. 
 It does the following:
 
-1. Finds most recent x86 binary package at [https://github.com/Z3Prover/bin/tree/master/nightly](https://github.com/Z3Prover/bin/tree/master/nightly). 
-If there are multiple files found, takes commit sha from the file names and looks to the commit history of the Z3 repository to determine which is most recent.
+1. Finds most recent x86 binary package at [https://github.com/Z3Prover/z3/releases/tag/Nightly](https://github.com/Z3Prover/z3/releases/tag/Nightly). 
 2. Finds the last nightly performance experiment.
 3. If the most recent build differs from the last experiment executable, does the following:
   
