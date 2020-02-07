@@ -19,6 +19,7 @@ using Newtonsoft.Json.Serialization;
 using System.Threading;
 using AzurePerformanceTest;
 using System.Globalization;
+using System.Drawing.Printing;
 
 namespace AzureWorker
 {
@@ -461,7 +462,7 @@ namespace AzureWorker
                 Console.WriteLine("Done fetching completed tasks. Got {0}.", completedTasksCount);
             }
             while (!collectionTask.Wait(30000));
-        }        
+        }
 
         static async Task FetchSavedResults(int experimentId, AzureExperimentStorage storage)
         {
@@ -720,6 +721,9 @@ namespace AzureWorker
 
         static Task<double> RunReference(string[] args)
         {
+            //TextWriterTraceListener tr1 = new TextWriterTraceListener(System.Console.Out);
+            //Debug.Listeners.Add(tr1);
+
 #if DEBUG
             string workerDir = @"C:\temp\azworker-tmp";
 #else
@@ -745,7 +749,7 @@ namespace AzureWorker
             BenchmarkResult[] results = new BenchmarkResult[benchmarks.Length];
             for (int i = 0; i < benchmarks.Length; ++i)
             {
-                Trace.WriteLine(string.Format("Procssing reference file {0}", benchmarks[i]));
+                Trace.WriteLine(string.Format("Processing reference file {0}", benchmarks[i]));
                 results[i] = LocalExperimentRunner.RunBenchmark(
                     -1,
                     execPath,
@@ -762,8 +766,10 @@ namespace AzureWorker
             }
 
             var totalRuntime = results.Sum(r => r.NormalizedCPUTime);
+            if (totalRuntime <= 0.0) totalRuntime = 0.1;
             double normal = exp.ReferenceValue / totalRuntime;
 
+            Console.WriteLine("Reference data: " + normal.ToString());
             File.WriteAllText(normalFilePath, normal.ToString());
             return Task.FromResult(normal);
         }

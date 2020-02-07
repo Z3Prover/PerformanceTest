@@ -15,11 +15,14 @@ namespace AzurePerformanceTest
         string keyVaultUrl;
         Dictionary<string, string> cache = new Dictionary<string, string>();
 
-        public SecretStorage(string AADAppId, string cerificateThumbprint, string keyVaultUrl)
+        public SecretStorage(string AADAppId, string certificateThumprint, string keyVaultUrl)
         {
             this.keyVaultUrl = keyVaultUrl;
 
-            var certificate = FindCertificateByThumbprint(cerificateThumbprint);
+            System.Console.WriteLine("App ID: " + AADAppId);
+            System.Console.WriteLine("Thumbprint: " + certificateThumprint);
+            var certificate = FindCertificateByThumbprint(certificateThumprint);
+            System.Console.WriteLine("Certificate: " + certificate.ToString());
             var assertionCert = new ClientAssertionCertificate(AADAppId, certificate);
 
             keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(

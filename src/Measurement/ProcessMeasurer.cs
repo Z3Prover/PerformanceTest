@@ -76,7 +76,7 @@ namespace Measurement
                         }
                         else if (memLimitBytes > 0 && m > memLimitBytes)
                         {
-                            Trace.WriteLine("Process uses too much memory; killing.");
+                            Trace.WriteLine("Process uses too much memory (" + m + " bytes); killing.");
                             exhausted_memory = true;
                             Kill(p);
                         }
@@ -259,7 +259,10 @@ namespace Measurement
             try
             {
                 if (!p.HasExited)
-                    r = p.PeakVirtualMemorySize64;
+                {
+                    // p.PeakVirtualMemorySize64 seems to not work right or over-approximate on some systems?
+                    r = p.PeakWorkingSet64;
+                }
             }
             catch
             {
