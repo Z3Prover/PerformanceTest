@@ -375,7 +375,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libman.json" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\Azure Z3 Nightly.pubxml" />
     <None Include="Properties\PublishProfiles\DeploymentFolder.pubxml" />

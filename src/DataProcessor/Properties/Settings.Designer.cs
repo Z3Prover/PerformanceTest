@@ -43,7 +43,7 @@ namespace DataProcessor.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("895a5b60-9798-4f21-9b8c-88f2278ebf68")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6c67dea7-657e-45ca-ac9e-a8bacdfb826b")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -52,7 +52,7 @@ namespace DataProcessor.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0c26c97b9542a63be37a6ba219f85a67329e2d97")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));

@@ -52,7 +52,7 @@ namespace Nightly.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0C26C97B9542A63BE37A6BA219F85A67329E2D97")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0c26c97b9542a63be37a6ba219f85a67329e2d97")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));

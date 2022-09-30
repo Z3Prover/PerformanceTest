@@ -12,7 +12,7 @@
       <Value Profile="(Default)">6c67dea7-657e-45ca-ac9e-a8bacdfb826b</Value>
     </Setting>
     <Setting Name="AADApplicationCertThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">0C26C97B9542A63BE37A6BA219F85A67329E2D97</Value>
+      <Value Profile="(Default)">0c26c97b9542a63be37a6ba219f85a67329e2d97</Value>
     </Setting>
     <Setting Name="KeyVaultUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://cz3.vault.azure.net/</Value>
