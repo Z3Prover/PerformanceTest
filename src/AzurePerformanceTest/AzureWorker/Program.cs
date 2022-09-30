@@ -624,7 +624,7 @@ namespace AzureWorker
                     timeout, domainName, queueUri, containerUri,
                     maxRepetitions, maxTime, memoryLimit,
                     NullableLongToString(outputLimit), NullableLongToString(errorLimit));
-                var resourceFile = ResourceFile.FromStorageContainerUrl(benchmarkStorage.GetBlobSASUri(blobName), shortName);
+                var resourceFile = ResourceFile.FromUrl(benchmarkStorage.GetBlobSASUri(blobName), shortName);
                 CloudTask task = new CloudTask(taskId, taskCommandLine);
                 task.ResourceFiles = new List<ResourceFile> { resourceFile };
                 task.Constraints = new TaskConstraints();

@@ -382,11 +382,11 @@ namespace AzurePerformanceTest
                 {
                     string sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
                     string blobSasUri = String.Format("{0}{1}", blob.Uri, sasBlobToken);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(blobSasUri, blob.Name));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(blobSasUri, blob.Name));
                 }
 
                 string executableFolder = "exec";
-                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(storage.GetExecutableSasUri(definition.Executable), Path.Combine(executableFolder, definition.Executable)));
+                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(storage.GetExecutableSasUri(definition.Executable), Path.Combine(executableFolder, definition.Executable)));
 
                 AzureBenchmarkStorage benchStorage = storage.DefaultBenchmarkStorage;
                 if (refExp != null)
@@ -394,7 +394,7 @@ namespace AzurePerformanceTest
                     string refContentFolder = "refdata";
                     string refBenchFolder = Path.Combine(refContentFolder, "data");
                     var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
                     if (refExp.Definition.BenchmarkContainerUri != ExperimentDefinition.DefaultContainerUri)
                         benchStorage = new AzureBenchmarkStorage(refExp.Definition.BenchmarkContainerUri);
 
@@ -421,7 +421,7 @@ namespace AzurePerformanceTest
                         if (!extensions.Contains(ext))
                             continue;
 
-                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
+                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
                     }
                 }
 
@@ -490,11 +490,11 @@ namespace AzurePerformanceTest
                 {
                     string sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
                     string blobSasUri = String.Format("{0}{1}", blob.Uri, sasBlobToken);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(blobSasUri, blob.Name));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(blobSasUri, blob.Name));
                 }
 
                 string executableFolder = "exec";
-                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(storage.GetExecutableSasUri(def.Executable), Path.Combine(executableFolder, def.Executable)));
+                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(storage.GetExecutableSasUri(def.Executable), Path.Combine(executableFolder, def.Executable)));
 
                 AzureBenchmarkStorage benchStorage = benchStorage = storage.DefaultBenchmarkStorage;
                 if (refExp != null)
@@ -502,7 +502,7 @@ namespace AzurePerformanceTest
                     string refContentFolder = "refdata";
                     string refBenchFolder = Path.Combine(refContentFolder, "data");
                     var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
                     if (refExp.Definition.BenchmarkContainerUri != ExperimentDefinition.DefaultContainerUri)
                         benchStorage = new AzureBenchmarkStorage(refExp.Definition.BenchmarkContainerUri);
 
@@ -529,7 +529,7 @@ namespace AzurePerformanceTest
                         if (!extensions.Contains(ext))
                             continue;
 
-                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
+                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
                     }
                 }
 
@@ -599,18 +599,18 @@ namespace AzurePerformanceTest
                 {
                     string sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
                     string blobSasUri = String.Format("{0}{1}", blob.Uri, sasBlobToken);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(blobSasUri, blob.Name));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(blobSasUri, blob.Name));
                 }
 
                 string executableFolder = "exec";
-                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(storage.GetExecutableSasUri(exp.Executable), Path.Combine(executableFolder, exp.Executable)));
+                job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(storage.GetExecutableSasUri(exp.Executable), Path.Combine(executableFolder, exp.Executable)));
 
                 if (refExp != null)
                 {
                     string refContentFolder = "refdata";
                     string refBenchFolder = Path.Combine(refContentFolder, "data");
                     var refExpExecUri = storage.GetExecutableSasUri(refExp.Definition.Executable);
-                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
+                    job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(refExpExecUri, Path.Combine(refContentFolder, refExp.Definition.Executable)));
                     AzureBenchmarkStorage benchStorage;
                     if (refExp.Definition.BenchmarkContainerUri == ExperimentDefinition.DefaultContainerUri)
                         benchStorage = storage.DefaultBenchmarkStorage;
@@ -640,7 +640,7 @@ namespace AzurePerformanceTest
                         if (!extensions.Contains(ext))
                             continue;
 
-                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromStorageContainerUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
+                        job.JobPreparationTask.ResourceFiles.Add(ResourceFile.FromUrl(benchStorage.GetBlobSASUri(blob), Path.Combine(refBenchFolder, shortName)));
                     }
                 }
 
