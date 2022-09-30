@@ -458,7 +458,7 @@ namespace AzureWorker
                 }
                 Console.WriteLine("Done fetching failed tasks. Got {0}.", badResults.Count);
                 Console.WriteLine("Fetching completed tasks...");
-                completedTasksCount = batchClient.JobOperations.GetJobTaskCounts(jobId).Completed;
+                completedTasksCount = batchClient.JobOperations.GetJobTaskCounts(jobId).TaskCounts.Completed;
                 Console.WriteLine("Done fetching completed tasks. Got {0}.", completedTasksCount);
             }
             while (!collectionTask.Wait(30000));
@@ -624,7 +624,7 @@ namespace AzureWorker
                     timeout, domainName, queueUri, containerUri,
                     maxRepetitions, maxTime, memoryLimit,
                     NullableLongToString(outputLimit), NullableLongToString(errorLimit));
-                var resourceFile = new ResourceFile(benchmarkStorage.GetBlobSASUri(blobName), shortName);
+                var resourceFile = ResourceFile.FromUrl(benchmarkStorage.GetBlobSASUri(blobName), shortName);
                 CloudTask task = new CloudTask(taskId, taskCommandLine);
                 task.ResourceFiles = new List<ResourceFile> { resourceFile };
                 task.Constraints = new TaskConstraints();

@@ -12,7 +12,7 @@ namespace AzureWorker.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -34,7 +34,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("895a5b60-9798-4f21-9b8c-88f2278ebf68")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6c67dea7-657e-45ca-ac9e-a8bacdfb826b")]
         public string AADApplicationId {
             get {
                 return ((string)(this["AADApplicationId"]));
@@ -43,7 +43,7 @@ namespace AzureWorker.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2eafe8e09fd3b416c68f4a375ac88fe06f05d0f8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0C26C97B9542A63BE37A6BA219F85A67329E2D97")]
         public string AADApplicationCertThumbprint {
             get {
                 return ((string)(this["AADApplicationCertThumbprint"]));
