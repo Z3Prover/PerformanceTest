@@ -1,5 +1,5 @@
 ﻿using Microsoft.Azure.KeyVault;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,8 @@ namespace AzurePerformanceTest
             System.Console.WriteLine("Thumbprint: " + certificateThumprint);
             var certificate = FindCertificateByThumbprint(certificateThumprint);
             System.Console.WriteLine("Certificate: " + certificate.ToString());
-            var assertionCert = new ClientAssertionCertificate(AADAppId, certificate);
+            var builder =  ConfidentialClientApplicationBuilder.Create(AADAppId);
+            var assertionCert = builder.WithCertificate(certificate);
 
             keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(
                    (authority, resource, scope) => GetAccessToken(authority, resource, scope, assertionCert)));
@@ -57,12 +58,20 @@ namespace AzurePerformanceTest
             }
         }
 
-        static async Task<string> GetAccessToken(string authority, string resource, string scope, ClientAssertionCertificate assertionCert)
+        static async Task<string> GetAccessToken(string authority, string resource, string scope, ConfidentialClientApplicationBuilder assertionCert)
         {
-            var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
-            var result = await context.AcquireTokenAsync(resource, assertionCert).ConfigureAwait(false);
+            var pca = assertionCert.Build();
+            // 2. GetAccounts
+            var accounts = await pca.GetAccountsAsync(authority);
+            //var authResult = await pca.AcquireTokenSilent(resource).ExecuteAsync();
 
-            return result.AccessToken;
+            var builder = ConfidentialClientApplicationBuilder.Create(authority);
+            // var context = builder.WithCertificate(TokenCache);
+            //var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
+            // var result = await context.AcquireTokenAsync(resource, assertionCert).ConfigureAwait(false);
+
+            // return result.AccessToken;
+            throw null;
         }
     }
 }

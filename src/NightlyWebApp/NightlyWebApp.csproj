@@ -60,6 +60,12 @@
     <Reference Include="Microsoft.CSharp">
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Identity.Client, Version=4.52.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Identity.Client.4.52.0\lib\net461\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=6.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.IdentityModel.Abstractions.6.22.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -70,6 +76,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.DataVisualization">
       <Private>True</Private>
     </Reference>
@@ -80,6 +88,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Private>True</Private>
     </Reference>
@@ -386,7 +395,9 @@
     <None Include="Properties\PublishProfiles\z3-nightly - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\z3nightly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\z3nightly - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\z3nightly - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\Z3NightlyWebApp - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\z3test - Web Deploy.pubxml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzurePerformanceTest\AzurePerformanceTestCommons\AzurePerformanceTestCommons.csproj">
