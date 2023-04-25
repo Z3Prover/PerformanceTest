@@ -61,16 +61,23 @@ namespace AzurePerformanceTest
         static async Task<string> GetAccessToken(string authority, string resource, string scope, ConfidentialClientApplicationBuilder assertionCert)
         {
             var pca = assertionCert.Build();
-            // 2. GetAccounts
-            var accounts = await pca.GetAccountsAsync(authority);
-            //var authResult = await pca.AcquireTokenSilent(resource).ExecuteAsync();
 
-            var builder = ConfidentialClientApplicationBuilder.Create(authority);
-            // var context = builder.WithCertificate(TokenCache);
-            //var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
+            // authority/scope?
+            var r = await pca.AcquireTokenForClient(new[] { $"{resource}/.default" })
+                .ExecuteAsync()
+                .ConfigureAwait(false);
+
+            return r.AccessToken;
+
+            // Variants:
+            // var accounts = await pca.GetAccountsAsync(authority);
+            // var authResult = await pca.AcquireTokenSilent(resource).ExecuteAsync();
+
+            // old code:
+            // var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
             // var result = await context.AcquireTokenAsync(resource, assertionCert).ConfigureAwait(false);
-
             // return result.AccessToken;
+
             throw null;
         }
     }
