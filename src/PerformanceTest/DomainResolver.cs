@@ -35,9 +35,14 @@ namespace PerformanceTest
             }
         }
 
-        public Domain GetDomain(string domainName)
+        static public Domain GetDomain(string domainName, List<Domain> domains)
         {
-            if (domainName == null) throw new ArgumentNullException("domainName");
+            if (domainName == null)
+                throw new ArgumentNullException("domainName");
+            if (domains == null || domains.Count == 0)
+                throw new KeyNotFoundException(String.Format("There are no domains loaded"));
+            if (domainName == String.Empty)
+                domainName = domains[0].Name;
             foreach (var d in domains)
             {
                 if (d.Name == domainName)
@@ -46,6 +51,11 @@ namespace PerformanceTest
                 }
             }
             throw new KeyNotFoundException(String.Format("Domain '{0}' not found", domainName));
+        }
+
+        public Domain GetDomain(string domainName)
+        {
+            return GetDomain(domainName, domains);
         }
     }
 
@@ -98,16 +108,7 @@ namespace PerformanceTest
 
         public Domain GetDomain(string domainName)
         {
-            if (domainName == null) throw new ArgumentNullException("domainName");
-            if (domains != null)
-                foreach (var d in domains)
-                {
-                    if (d.Name == domainName)
-                    {
-                        return d;
-                    }
-                }
-            throw new KeyNotFoundException(String.Format("Domain '{0}' not found", domainName));
+            return DomainResolver.GetDomain(domainName, domains);
         }
     }
 }
