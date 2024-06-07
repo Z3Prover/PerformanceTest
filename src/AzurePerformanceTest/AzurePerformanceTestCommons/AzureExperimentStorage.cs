@@ -1,5 +1,6 @@
 ﻿using Measurement;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 
 using ExperimentID = System.Int32;
 
@@ -57,7 +59,12 @@ namespace AzurePerformanceTest
 
         public AzureExperimentStorage(string storageConnectionString)
         {
-            storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var cs = new StorageAccountConnectionString(storageConnectionString);
+            var tokenCredential = new TokenCredential("https://storage.azure.com");
+            var storageCredential = new StorageCredentials(tokenCredential);
+            storageAccount = new CloudStorageAccount(storageCredential, cs.AccountName, "core.windows.net", true);
+
+            /// storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             blobClient = storageAccount.CreateCloudBlobClient();
             binContainer = blobClient.GetContainerReference(binContainerName);
             outputContainer = blobClient.GetContainerReference(outputContainerName);

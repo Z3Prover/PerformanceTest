@@ -79,9 +79,9 @@ namespace AzurePerformanceTest
             {
                 storage = new AzureExperimentStorage(storageConnectionString);
             }
-            catch
+            catch (Exception e)
             {
-                throw new Exception("Storage connection failed");
+                throw new Exception($"Storage connection failed {e}");
             }
             if (batchAccountName != null)
                 return Open(storage, batchUrl, batchAccountName, batchAccessKey, batchIdentity);
