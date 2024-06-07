@@ -35,9 +35,10 @@ namespace AzurePerformanceTest
             this.BatchPoolID = DefaultPoolID;
         }
 
-        protected AzureExperimentManager(AzureExperimentStorage storage, string batchUrl, string managedClientId, string[] scopes)
+        protected AzureExperimentManager(AzureExperimentStorage storage, string batchUrl, string batchAccName, string managedClientId, bool dummy)
         {
             this.storage = storage;
+            var scopes = new[] { $"https://{batchAccName}.azure.com/.default" }; 
             var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedClientId });
             Azure.Core.AccessToken token = credential.GetToken(new Azure.Core.TokenRequestContext(scopes), new System.Threading.CancellationToken());
             this.batchCreds1 = null;
@@ -53,15 +54,13 @@ namespace AzurePerformanceTest
             this.BatchPoolID = DefaultPoolID;
         }
 
-        public static async Task<AzureExperimentManager> New(AzureExperimentStorage storage, ReferenceExperiment reference, string batchUrl, string batchAccName, string batchKey)
+        public static AzureExperimentManager Open(AzureExperimentStorage storage, string batchUrl, string batchAccName, string batchKey, string batchIdentity)
         {
-            await storage.SaveReferenceExperiment(reference);
-            return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
-        }
-
-        public static AzureExperimentManager Open(AzureExperimentStorage storage, string batchUrl, string batchAccName, string batchKey)
-        {
-            return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
+            if (batchIdentity != null)
+                return new AzureExperimentManager(storage, batchUrl, batchAccName, batchIdentity, true);
+            if (batchKey != null)
+                return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
+            throw new KeyNotFoundException("Connection string has no value for the batch key or managed identity");
         }
 
         public static AzureExperimentManager Open(string connectionString)
@@ -70,13 +69,13 @@ namespace AzurePerformanceTest
             string batchAccountName = cs.BatchAccountName;
             string batchUrl = cs.BatchURL;
             string batchAccessKey = cs.BatchAccessKey;
+            string batchIdentity = cs.BatchIdentity;
 
-            cs.RemoveKeys(BatchConnectionString.KeyBatchAccount, BatchConnectionString.KeyBatchURL, BatchConnectionString.KeyBatchAccessKey);
-            string storageConnectionString = cs.ToString();
+            string storageConnectionString = cs.WithoutBatchData().ToString();
 
             AzureExperimentStorage storage = new AzureExperimentStorage(storageConnectionString);
             if (batchAccountName != null)
-                return Open(storage, batchUrl, batchAccountName, batchAccessKey);
+                return Open(storage, batchUrl, batchAccountName, batchAccessKey, batchIdentity);
             return OpenWithoutStart(storage);
         }
 
