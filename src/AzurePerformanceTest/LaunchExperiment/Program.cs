@@ -16,7 +16,7 @@ namespace LaunchExperiment
         {
             Keys keys = JsonConvert.DeserializeObject<Keys>(File.ReadAllText("..\\..\\keys.json"));
             var storage = new AzureExperimentStorage(keys.storageName, keys.storageKey);
-            var manager = AzureExperimentManager.Open(storage, keys.batchUri, keys.batchName, keys.batchKey);
+            var manager = AzureExperimentManager.Open(storage, keys.batchUri, keys.batchName, keys.batchKey, null);
 
             //var refExp = new ReferenceExperiment(ExperimentDefinition.Create("referencez3.zip", ExperimentDefinition.DefaultContainerUri, "reference", "smt2", "model_validate=true -smt2 -file:{0}", TimeSpan.FromSeconds(1200), "Z3", null, 2048), 20, 16.34375);
 

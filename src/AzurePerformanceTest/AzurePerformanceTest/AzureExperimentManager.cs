@@ -60,7 +60,7 @@ namespace AzurePerformanceTest
                 return new AzureExperimentManager(storage, batchUrl, batchAccName, batchIdentity, true);
             if (batchKey != null)
                 return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
-            throw new KeyNotFoundException("Connection string has no value for the batch key or managed identity");
+            throw new KeyNotFoundException("Connection string has no value for the BatchAccessKey or BatchIdentity. One of them has to be set");
         }
 
         public static AzureExperimentManager Open(string connectionString)
@@ -73,7 +73,16 @@ namespace AzurePerformanceTest
 
             string storageConnectionString = cs.WithoutBatchData().ToString();
 
-            AzureExperimentStorage storage = new AzureExperimentStorage(storageConnectionString);
+            AzureExperimentStorage storage = null;
+
+            try
+            {
+                storage = new AzureExperimentStorage(storageConnectionString);
+            }
+            catch
+            {
+                throw new Exception("Storage connection failed");
+            }
             if (batchAccountName != null)
                 return Open(storage, batchUrl, batchAccountName, batchAccessKey, batchIdentity);
             return OpenWithoutStart(storage);
