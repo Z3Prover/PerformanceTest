@@ -1,4 +1,5 @@
-﻿using Measurement;
+﻿using Azure.Identity;
+using Measurement;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -65,8 +66,15 @@ namespace AzurePerformanceTest
             var fileUri = new Uri($"https://{cs.AccountName}.file.core.windows.net/");
             var tableUri = new Uri($"https://{cs.AccountName}.table.core.windows.net/");
             var queueUri = new Uri($"https://{cs.AccountName}.queue.core.windows.net/");
-           
-            var tokenCredential = new TokenCredential("https://storage.azure.com");
+
+
+            var scopes = new[] { "https://storage.azure.com/" };
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = cs.AccountIdentity });
+            Azure.Core.AccessToken token = credential.GetToken(new Azure.Core.TokenRequestContext(scopes), new System.Threading.CancellationToken());
+
+
+            // var tokenCredential = new TokenCredential("https://storage.azure.com");
+            var tokenCredential = new TokenCredential(token.Token);
             var storageCredential = new StorageCredentials(tokenCredential);
             storageAccount = new CloudStorageAccount(storageCredential, blobUri, queueUri, tableUri, fileUri);
             
