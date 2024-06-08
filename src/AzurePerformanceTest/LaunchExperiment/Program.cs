@@ -14,7 +14,17 @@ namespace LaunchExperiment
     {
         static void Main(string[] args)
         {
-            Keys keys = JsonConvert.DeserializeObject<Keys>(File.ReadAllText("..\\..\\keys.json"));
+            if (args.Count() != 1)
+            {
+                Console.WriteLine("Usage: LaunchExperiment <keys.json>");
+                foreach (var arg in args)
+                {
+                    Console.WriteLine(arg);
+                }
+                return;
+            }
+
+            Keys keys = JsonConvert.DeserializeObject<Keys>(File.ReadAllText(args[0]));
             var storage = new AzureExperimentStorage(keys.storageName, keys.storageKey);
             var manager = AzureExperimentManager.Open(storage, keys.batchUri, keys.batchName, keys.batchKey, null);
 
