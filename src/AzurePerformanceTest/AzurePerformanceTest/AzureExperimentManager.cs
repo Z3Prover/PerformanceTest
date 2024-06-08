@@ -37,8 +37,9 @@ namespace AzurePerformanceTest
 
         protected AzureExperimentManager(AzureExperimentStorage storage, string batchUrl, string batchAccName, string managedClientId, bool dummy)
         {
+            Console.WriteLine(managedClientId);
             this.storage = storage;
-            var scopes = new[] { $"https://{batchAccName}.azure.com/.default" }; 
+            var scopes = new[] { "https://batch.core.windows.net/" }; 
             var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedClientId });
             Azure.Core.AccessToken token = credential.GetToken(new Azure.Core.TokenRequestContext(scopes), new System.Threading.CancellationToken());
             this.batchCreds1 = null;
