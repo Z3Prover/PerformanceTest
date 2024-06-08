@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using PerformanceTest;
 using System;
@@ -60,11 +61,15 @@ namespace AzurePerformanceTest
         public AzureExperimentStorage(string storageConnectionString)
         {
             var cs = new StorageAccountConnectionString(storageConnectionString);
+            var blobUri = new Uri($"https://{cs.AccountName}.blob.core.windows.net/");
+            var fileUri = new Uri($"https://{cs.AccountName}.file.core.windows.net/");
+            var tableUri = new Uri($"https://{cs.AccountName}.table.core.windows.net/");
+            var queueUri = new Uri($"https://{cs.AccountName}.queue.core.windows.net/");
+           
             var tokenCredential = new TokenCredential("https://storage.azure.com");
             var storageCredential = new StorageCredentials(tokenCredential);
-            storageAccount = new CloudStorageAccount(storageCredential, cs.AccountName, "core.windows.net", true);
-
-            /// storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            storageAccount = new CloudStorageAccount(storageCredential, blobUri, queueUri, tableUri, fileUri);
+            
             blobClient = storageAccount.CreateCloudBlobClient();
             binContainer = blobClient.GetContainerReference(binContainerName);
             outputContainer = blobClient.GetContainerReference(outputContainerName);

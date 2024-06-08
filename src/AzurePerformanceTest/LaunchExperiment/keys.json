@@ -1,9 +1,9 @@
 {
   "storageName" : "cz3",
   "storageKey"  : "none",
-  "storageIdentity" : "z3-bench",
+  "storageIdentity" : "9da8e059-3e41-46cb-afde-851e6e7f2838",
   "batchUri"    : "https://cz3.westeurope.batch.azure.com",
   "batchName"   : "cz3",
   "batchKey"    : "none",
-  "batchIdentity" : "z3-bench",
+  "batchIdentity" : "9da8e059-3e41-46cb-afde-851e6e7f2838",
 }
