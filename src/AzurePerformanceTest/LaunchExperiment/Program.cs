@@ -25,6 +25,7 @@ namespace LaunchExperiment
             }
 
             Keys keys = JsonConvert.DeserializeObject<Keys>(File.ReadAllText(args[0]));
+            var manager1 = AzureExperimentManager.Open(null, keys.batchUri, keys.batchName, null, keys.batchName);
             var storage = new AzureExperimentStorage(keys.storageName, keys.storageKey);
             var manager = AzureExperimentManager.Open(storage, keys.batchUri, keys.batchName, keys.batchKey, null);
 
