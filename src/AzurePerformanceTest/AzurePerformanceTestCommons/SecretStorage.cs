@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.KeyVault;
+﻿
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace AzurePerformanceTest
 {
     public class SecretStorage
     {
-        KeyVaultClient keyVaultClient;
+        SecretClient secretClient;
         string keyVaultUrl;
         Dictionary<string, string> cache = new Dictionary<string, string>();
 
@@ -26,17 +27,24 @@ namespace AzurePerformanceTest
             var builder =  ConfidentialClientApplicationBuilder.Create(AADAppId);
             var assertionCert = builder.WithCertificate(certificate);
 
-            keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(
-                   (authority, resource, scope) => GetAccessToken(authority, resource, scope, assertionCert)));
+
+            secretClient = new SecretClient(new Uri(keyVaultUrl), new Azure.Identity.DefaultAzureCredential());
         }
 
+        /// <summary>
+        ///  Retrieve secret from vault for processing.
+        ///  TODO: this can't be a good design. It passes a secret in plaintext. 
+        ///  Callers should not rely on secrets but on managed identities.
+        /// </summary>
+        /// <param name="secretName"></param>
+        /// <returns></returns>
         public async Task<string> GetSecret(string secretName)
         {
             if (cache.ContainsKey(secretName))
                 return cache[secretName];
 
-            var secret = await keyVaultClient.GetSecretAsync(keyVaultUrl, secretName);
-            var secretValue = secret.Value;
+            var secret = await secretClient.GetSecretAsync(secretName);
+            var secretValue = secret.Value.Value;
             cache.Add(secretName, secretValue);
             return secretValue;
         }
