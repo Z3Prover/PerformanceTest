@@ -1,10 +1,13 @@
-﻿using Measurement;
+﻿using Azure.Identity;
+using Measurement;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using PerformanceTest;
 using System;
@@ -14,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 
 using ExperimentID = System.Int32;
 
@@ -57,7 +61,23 @@ namespace AzurePerformanceTest
 
         public AzureExperimentStorage(string storageConnectionString)
         {
-            storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var cs = new StorageAccountConnectionString(storageConnectionString);
+            var blobUri = new Uri($"https://{cs.AccountName}.blob.core.windows.net/");
+            var fileUri = new Uri($"https://{cs.AccountName}.file.core.windows.net/");
+            var tableUri = new Uri($"https://{cs.AccountName}.table.core.windows.net/");
+            var queueUri = new Uri($"https://{cs.AccountName}.queue.core.windows.net/");
+
+
+            var scopes = new[] { "https://storage.azure.com/" };
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = cs.AccountIdentity });
+            Azure.Core.AccessToken token = credential.GetToken(new Azure.Core.TokenRequestContext(scopes), new System.Threading.CancellationToken());
+
+
+            // var tokenCredential = new TokenCredential("https://storage.azure.com");
+            var tokenCredential = new TokenCredential(token.Token);
+            var storageCredential = new StorageCredentials(tokenCredential);
+            storageAccount = new CloudStorageAccount(storageCredential, blobUri, queueUri, tableUri, fileUri);
+            
             blobClient = storageAccount.CreateCloudBlobClient();
             binContainer = blobClient.GetContainerReference(binContainerName);
             outputContainer = blobClient.GetContainerReference(outputContainerName);

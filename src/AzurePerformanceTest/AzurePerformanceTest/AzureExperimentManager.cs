@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.Batch.Auth;
 using Microsoft.Azure.Batch;
+using Azure.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.Azure.Batch.Common;
 using System.IO;
@@ -14,6 +15,7 @@ using Measurement;
 using System.Threading;
 
 using ExperimentID = System.Int32;
+using Azure.Core;
 
 namespace AzurePerformanceTest
 {
@@ -23,31 +25,43 @@ namespace AzurePerformanceTest
         const string DefaultPoolID = "z3-main";
 
         AzureExperimentStorage storage;
-        BatchSharedKeyCredentials batchCreds;
+        BatchSharedKeyCredentials batchCreds1;
+        BatchTokenCredentials batchCreds2;
 
         protected AzureExperimentManager(AzureExperimentStorage storage, string batchUrl, string batchAccName, string batchKey)
         {
             this.storage = storage;
-            this.batchCreds = new BatchSharedKeyCredentials(batchUrl, batchAccName, batchKey);
+            this.batchCreds1 = new BatchSharedKeyCredentials(batchUrl, batchAccName, batchKey);            
+            this.BatchPoolID = DefaultPoolID;
+        }
+
+        protected AzureExperimentManager(AzureExperimentStorage storage, string batchUrl, string batchAccName, string managedClientId, bool dummy)
+        {
+            Console.WriteLine(managedClientId);
+            this.storage = storage;
+            var scopes = new[] { "https://batch.core.windows.net/" }; 
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedClientId });
+            Azure.Core.AccessToken token = credential.GetToken(new Azure.Core.TokenRequestContext(scopes), new System.Threading.CancellationToken());
+            this.batchCreds1 = null;
+            this.batchCreds2 = new BatchTokenCredentials(batchUrl, token.Token);
             this.BatchPoolID = DefaultPoolID;
         }
 
         protected AzureExperimentManager(AzureExperimentStorage storage)
         {
             this.storage = storage;
-            this.batchCreds = null;
+            this.batchCreds1 = null;
+            this.batchCreds2 = null;
             this.BatchPoolID = DefaultPoolID;
         }
 
-        public static async Task<AzureExperimentManager> New(AzureExperimentStorage storage, ReferenceExperiment reference, string batchUrl, string batchAccName, string batchKey)
+        public static AzureExperimentManager Open(AzureExperimentStorage storage, string batchUrl, string batchAccName, string batchKey, string batchIdentity)
         {
-            await storage.SaveReferenceExperiment(reference);
-            return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
-        }
-
-        public static AzureExperimentManager Open(AzureExperimentStorage storage, string batchUrl, string batchAccName, string batchKey)
-        {
-            return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
+            if (batchIdentity != null)
+                return new AzureExperimentManager(storage, batchUrl, batchAccName, batchIdentity, true);
+            if (batchKey != null)
+                return new AzureExperimentManager(storage, batchUrl, batchAccName, batchKey);
+            throw new KeyNotFoundException("Connection string has no value for the BatchAccessKey or BatchIdentity. One of them has to be set");
         }
 
         public static AzureExperimentManager Open(string connectionString)
@@ -56,13 +70,22 @@ namespace AzurePerformanceTest
             string batchAccountName = cs.BatchAccountName;
             string batchUrl = cs.BatchURL;
             string batchAccessKey = cs.BatchAccessKey;
+            string batchIdentity = cs.BatchIdentity;
 
-            cs.RemoveKeys(BatchConnectionString.KeyBatchAccount, BatchConnectionString.KeyBatchURL, BatchConnectionString.KeyBatchAccessKey);
-            string storageConnectionString = cs.ToString();
+            string storageConnectionString = cs.WithoutBatchData().ToString();
 
-            AzureExperimentStorage storage = new AzureExperimentStorage(storageConnectionString);
+            AzureExperimentStorage storage = null;
+
+            try
+            {
+                storage = new AzureExperimentStorage(storageConnectionString);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Storage connection failed {e}");
+            }
             if (batchAccountName != null)
-                return Open(storage, batchUrl, batchAccountName, batchAccessKey);
+                return Open(storage, batchUrl, batchAccountName, batchAccessKey, batchIdentity);
             return OpenWithoutStart(storage);
         }
 
@@ -80,7 +103,7 @@ namespace AzurePerformanceTest
 
         public bool CanStart
         {
-            get { return batchCreds != null; }
+            get { return batchCreds1 != null || batchCreds2 != null; }
         }
 
         public override async Task DeleteExperiment(ExperimentID id)
@@ -98,7 +121,7 @@ namespace AzurePerformanceTest
             BatchClient bc;
             try
             {
-                bc = BatchClient.Open(batchCreds);
+                bc = BatchOpen();
             }
             catch (Exception ex)
             {
@@ -166,7 +189,7 @@ namespace AzurePerformanceTest
 
             try
             {
-                using (var bc = BatchClient.Open(batchCreds))
+                using (var bc = BatchOpen())            
                 {
                     List<ExperimentExecutionState> states = new List<ExperimentExecutionState>();
                     foreach (var expId in ids)
@@ -213,12 +236,18 @@ namespace AzurePerformanceTest
                 return null;
             }
         }
+
+        BatchClient BatchOpen()
+        {
+            return batchCreds1 != null ? BatchClient.Open(batchCreds1) : BatchClient.Open(batchCreds2);
+        }
+
         public override async Task<string[]> GetExperimentPoolId(IEnumerable<int> ids)
         {
             if (!CanStart) return null;
             try
             {
-                using (var bc = BatchClient.Open(batchCreds))
+                using (var bc = BatchOpen())
                 {
                     List<string> pools = new List<string>();
                     foreach (var expId in ids)
@@ -280,7 +309,7 @@ namespace AzurePerformanceTest
 
             var result = await Task.Run(() =>
             {
-                using (var bc = BatchClient.Open(batchCreds))
+                using (var bc = BatchOpen())
                 {
                     var pools = bc.PoolOperations.ListPools();
                     var descr = pools.Select(p => new PoolDescription
@@ -357,7 +386,7 @@ namespace AzurePerformanceTest
             var poolId = this.BatchPoolID;
             int id;
 
-            using (var bc = BatchClient.Open(batchCreds))
+            using (var bc = BatchOpen())
             {
                 var pool = await bc.PoolOperations.GetPoolAsync(poolId);
                 id = await storage.AddExperiment(definition, DateTime.Now, creator, note, string.Format("{0} (pool: {1})", pool.VirtualMachineSize, poolId));
@@ -451,7 +480,7 @@ namespace AzurePerformanceTest
             if (m.Success)
                 poolId = m.Groups[1].Value;
 
-            using (var bc = BatchClient.Open(batchCreds))
+            using (var bc = BatchOpen())
             {
                 var pool = await bc.PoolOperations.GetPoolAsync(poolId);
                 CloudJob job = bc.JobOperations.CreateJob();
@@ -566,7 +595,7 @@ namespace AzurePerformanceTest
             string tempBlobName = Guid.NewGuid().ToString();
             await storage.TempBlobContainer.GetBlockBlobReference(tempBlobName).UploadTextAsync(string.Join("\n", benchmarkNames));
 
-            using (var bc = BatchClient.Open(batchCreds))
+            using (var bc = BatchOpen())
             {
                 //var pool = await bc.PoolOperations.GetPoolAsync(poolId);
                 try

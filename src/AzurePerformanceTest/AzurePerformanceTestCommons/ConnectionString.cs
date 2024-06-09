@@ -81,6 +81,7 @@ namespace AzurePerformanceTest
         public const string KeyBatchAccount = "BatchAccount";
         public const string KeyBatchURL = "BatchURL";
         public const string KeyBatchAccessKey = "BatchAccessKey";
+        public const string KeyBatchIdentity = "BatchIdentity";
 
         public BatchConnectionString(string connectionString) : base(connectionString)
         {
@@ -100,14 +101,20 @@ namespace AzurePerformanceTest
 
         public string BatchAccessKey
         {
-            get { return this[KeyBatchAccessKey]; }
+            get { return TryGet(KeyBatchAccessKey); }
             set { this[KeyBatchAccessKey] = value; }
+        }
+
+        public string BatchIdentity
+        {
+            get { return TryGet(KeyBatchIdentity); }
+            set { this[KeyBatchIdentity] = value; }
         }
 
         public ConnectionString WithoutBatchData()
         {
             var copy = new ConnectionString(this.dict);
-            copy.RemoveKeys(KeyBatchAccount, KeyBatchAccessKey, KeyBatchURL);
+            copy.RemoveKeys(KeyBatchAccount, KeyBatchAccessKey, KeyBatchURL, KeyBatchIdentity);
             return copy;
         }        
     }
@@ -116,6 +123,7 @@ namespace AzurePerformanceTest
     {
         public const string KeyStorageAccountName = "AccountName";
         public const string KeyStorageAccountKey = "AccountKey";
+        public const string KeyStorageIdentity = "AccountIdentity";
 
         public StorageAccountConnectionString(string connectionString) : base(connectionString)
         {
@@ -134,8 +142,14 @@ namespace AzurePerformanceTest
 
         public string AccountKey
         {
-            get { return this[KeyStorageAccountKey]; }
+            get { return TryGet(KeyStorageAccountKey); }
             set { this[KeyStorageAccountKey] = value; }
+        }
+
+        public string AccountIdentity
+        {
+            get { return TryGet(KeyStorageIdentity); }
+            set { this[KeyStorageIdentity] = value; }
         }
     }
 }
